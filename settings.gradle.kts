@@ -1,4 +1,4 @@
-rootProject.name = "AttendPi"
+rootProject.name = "RpiAttendance"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
