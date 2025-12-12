@@ -14,6 +14,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.shared.core)
+
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.curl)
         }
