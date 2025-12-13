@@ -1,5 +1,7 @@
 import uvicorn
 import socket
+import time
+import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
@@ -9,6 +11,7 @@ from display import draw
 from fingerprint import FingerprintSensor, FingerprintError
 from face_capture import FaceCapture
 from face_recogniser import FaceRecognizer
+from keypad import read_key
 
 # ==========================================
 # CONFIGURATION
@@ -60,6 +63,12 @@ class DisplayRequest(BaseModel):
 class FaceEnrollRequest(BaseModel):
     name: str
 
+class FingerprintDeleteRequest(BaseModel):
+    id: int
+
+class FaceDeleteRequest(BaseModel):
+    id: str
+
 # ==========================================
 # ENDPOINTS (Same as before)
 # ==========================================
@@ -68,7 +77,7 @@ class FaceEnrollRequest(BaseModel):
 def show_text(req: DisplayRequest):
     """Display text on the OLED screen."""
     try:
-        draw(req.lines, req.duration)
+        draw(req.lines)
         return {"status": "success", "message": "Text displayed"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -118,15 +127,35 @@ def search_fingerprint():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/fingerprint/clear")
-def clear_fingerprints():
-    """DANGER: Clears all stored fingerprints."""
+@app.post("/fingerprint/delete")
+def delete_fingerprint(request: FingerprintDeleteRequest):
+    """Delete a fingerprint by its ID."""
     try:
-        fp_sensor.clear_fingerprints()
-        return {"status": "success", "message": "All fingerprints cleared"}
+        fp_sensor.delete_fingerprint(request.id)
+        return {"status": "success", "message": f"Fingerprint with ID {request.id} deleted"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/face/delete")
+def delete_face(request: FaceDeleteRequest):
+    """Delete a face by its ID."""
+    try:
+        os.remove(f"encodings/{request.id}.pkl")
+        return {"status": "success", "message": f"Face with ID {request.id} deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/keypad")
+def keypad():
+    try:
+        while True:
+            key = read_key()
+            if key is None:
+                time.sleep(0.1)
+            else:
+                return {"status": "success", "key": key}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ==========================================
 # RUNNER

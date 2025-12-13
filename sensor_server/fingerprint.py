@@ -45,7 +45,7 @@ class FingerprintSensor:
             if position_number >= 0:
                 logging.warning("Fingerprint already exists at position #%d.", position_number + 1)
                 draw(["Fingerprint", "already exists"])
-                return self._retry_capture()
+                raise FingerprintError("Fingerprint already exists")
 
             logging.info("Remove your finger.")
             draw(["Remove your", "finger"])
@@ -64,7 +64,7 @@ class FingerprintSensor:
             if self.f.compareCharacteristics() == 0:
                 logging.warning("Fingerprints do not match.")
                 draw(["Fingerprints", "do not match"])
-                return self._retry_capture()
+                raise FingerprintError("Fingerprints do not match")
 
             self.f.createTemplate()
             position = self.f.storeTemplate()
@@ -76,15 +76,6 @@ class FingerprintSensor:
             logging.error("Error during fingerprint capture: %s", e)
             draw(["Error during", "fingerprint capture"])
             raise FingerprintError(e)
-
-    def _retry_capture(self):
-        """Ask the user if they want to retry the fingerprint capture."""
-        choice = input("Do you want to try again? (y/n): ").strip().lower()
-        if choice == "y":
-            return self.capture_finger()
-        else:
-            logging.info("Fingerprint capture process aborted by the user.")
-            return None
 
     def delete_fingerprint(self, index):
         """Delete a specific fingerprint"""
