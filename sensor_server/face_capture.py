@@ -10,7 +10,7 @@ class FaceCapture:
     def __init__(self, dataset_dir="encodings"):
         self.dataset_dir = dataset_dir
 
-    def capture_and_encode(self, name, count=10):
+    def capture_and_encode(self, name, count=5, timeout=10):
         print("[INFO] Starting Face Capture")
         os.makedirs(self.dataset_dir, exist_ok=True)
         self.cam = Picamera2()
@@ -22,9 +22,14 @@ class FaceCapture:
         self.cam.start()
 
         encodings = []
-        time.sleep(0.2)
+
+        start_time = time.time()
 
         while len(encodings) < count:
+            if time.time() - start_time >= timeout:
+                self.cam.close()
+                return None
+
             frame = self.cam.capture_array()
 
             rgb = frame
@@ -54,4 +59,6 @@ class FaceCapture:
 
         print(f"[DONE] Saved encodings for {name} to {save_path}")
         draw(["done!!"])
+        return True
+
 

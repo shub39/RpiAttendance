@@ -16,9 +16,9 @@ class FaceRecognizer:
         self.dataset_dir = dataset_dir
         self.known_encodings = []
         self.known_names = []
-        self._load_encodings()
+        self.reload_encodings()
 
-    def _load_encodings(self):
+    def reload_encodings(self):
         """Load all face encodings from the dataset directory."""
         if not os.path.exists(self.dataset_dir):
             os.makedirs(self.dataset_dir)

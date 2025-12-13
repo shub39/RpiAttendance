@@ -27,15 +27,18 @@ class FingerprintSensor:
 
         logging.info("Sensor initialised successfully")
 
-    def capture_finger(self):
+    def capture_finger(self, timeout=10):
         """Capture a fingerprint and store it if its unique"""
         logging.info("Capturing fingerprint. Stored fingerprints %d", self.f.getTemplateCount())
 
+        start_time = time.time()
         try:
             logging.info("Please place your finger on the sensor.")
             draw(["Place your", "finger"])
             while not self.f.readImage():
-                time.sleep(0.5)
+                time.sleep(0.1)
+                if time.time() - start_time > timeout:
+                    raise FingerprintError("Enroll timeout reached")
                 pass
 
             self.f.convertImage(0x01)
@@ -50,13 +53,17 @@ class FingerprintSensor:
             logging.info("Remove your finger.")
             draw(["Remove your", "finger"])
             while self.f.readImage():
-                time.sleep(0.5)
+                time.sleep(0.1)
+                if time.time() - start_time > timeout:
+                    raise FingerprintError("Enroll timeout reached")
                 pass
 
             logging.info("Place your finger again.")
             draw(["Place your", "finger again"])
             while not self.f.readImage():
-                time.sleep(0.5)
+                time.sleep(0.1)
+                if time.time() - start_time > timeout:
+                    raise FingerprintError("Enroll timeout reached")
                 pass
 
             self.f.convertImage(0x02)
