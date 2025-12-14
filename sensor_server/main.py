@@ -87,7 +87,7 @@ async def enroll_face(req: FaceEnrollRequest):
     try:
         result = await with_timeout(hw.face_cap.capture_and_encode, req.name)
         await run_in_threadpool(hw.face_rec.reload_encodings)
-        return {"status": "ok" if result else None}
+        return {"status": result}
     except Exception as e:
         raise HTTPException(500, str(e))
 
@@ -170,7 +170,7 @@ async def status():
 @app.on_event("startup")
 def startup():
     if hw.ok:
-        draw(["RPi Sensor", "Ready"])
+        print("Rpi Server Ready")
 
 @app.on_event("shutdown")
 def shutdown():
