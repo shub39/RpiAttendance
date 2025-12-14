@@ -27,15 +27,29 @@ class FingerprintSensor:
 
         logging.info("Sensor initialised successfully")
 
-    def capture_finger(self):
-        """Capture a fingerprint and store it if its unique"""
+    def capture_finger(self, timeout=10):
+        """
+        Capture a fingerprint and store it if its unique
+
+        Args:
+            timeout (int): Timeout in seconds for fingerprint capture
+
+        Returns:
+            int: Position number of the captured fingerprint
+
+        Raises:
+            FingerprintError: If fingerprint capture fails or timeout is reached
+        """
         logging.info("Capturing fingerprint. Stored fingerprints %d", self.f.getTemplateCount())
 
+        start_time = time.time()
         try:
             logging.info("Please place your finger on the sensor.")
             draw(["Place your", "finger"])
             while not self.f.readImage():
-                time.sleep(0.5)
+                time.sleep(0.1)
+                if time.time() - start_time > timeout:
+                    raise FingerprintError("Enroll timeout reached")
                 pass
 
             self.f.convertImage(0x01)
@@ -45,18 +59,22 @@ class FingerprintSensor:
             if position_number >= 0:
                 logging.warning("Fingerprint already exists at position #%d.", position_number + 1)
                 draw(["Fingerprint", "already exists"])
-                return self._retry_capture()
+                raise FingerprintError("Fingerprint already exists")
 
             logging.info("Remove your finger.")
             draw(["Remove your", "finger"])
             while self.f.readImage():
-                time.sleep(0.5)
+                time.sleep(0.1)
+                if time.time() - start_time > timeout:
+                    raise FingerprintError("Enroll timeout reached")
                 pass
 
             logging.info("Place your finger again.")
             draw(["Place your", "finger again"])
             while not self.f.readImage():
-                time.sleep(0.5)
+                time.sleep(0.1)
+                if time.time() - start_time > timeout:
+                    raise FingerprintError("Enroll timeout reached")
                 pass
 
             self.f.convertImage(0x02)
@@ -64,7 +82,7 @@ class FingerprintSensor:
             if self.f.compareCharacteristics() == 0:
                 logging.warning("Fingerprints do not match.")
                 draw(["Fingerprints", "do not match"])
-                return self._retry_capture()
+                raise FingerprintError("Fingerprints do not match")
 
             self.f.createTemplate()
             position = self.f.storeTemplate()
@@ -74,17 +92,7 @@ class FingerprintSensor:
 
         except Exception as e:
             logging.error("Error during fingerprint capture: %s", e)
-            draw(["Error during", "fingerprint capture"])
             raise FingerprintError(e)
-
-    def _retry_capture(self):
-        """Ask the user if they want to retry the fingerprint capture."""
-        choice = input("Do you want to try again? (y/n): ").strip().lower()
-        if choice == "y":
-            return self.capture_finger()
-        else:
-            logging.info("Fingerprint capture process aborted by the user.")
-            return None
 
     def delete_fingerprint(self, index):
         """Delete a specific fingerprint"""
@@ -96,7 +104,18 @@ class FingerprintSensor:
             raise FingerprintError(e)
 
     def search_fingerprint(self, timeout=10):
-        """Search for the fingerprint"""
+        """
+        Search for the fingerprint
+
+        Args:
+            timeout (int): Timeout in seconds for fingerprint capture
+
+        Returns:
+            int: Position number of the captured fingerprint
+
+        Raises:
+            FingerprintError: If fingerprint capture fails or timeout is reached
+        """
         try:
             logging.info("Place finger on sensor")
 
@@ -130,3 +149,14 @@ class FingerprintSensor:
         except Exception as e:
             logging.error("Failed to clear fingerprints: %s", e)
             raise FingerprintError(e)
+
+if __name__ == "__main__":
+    fingerprint = FingerprintSensor()
+
+    enroll = fingerprint.capture_finger()
+    print(enroll)
+
+    position = fingerprint.search_fingerprint()
+    print(position)
+
+    fingerprint.delete_fingerprint(enroll)

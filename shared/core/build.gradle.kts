@@ -4,22 +4,12 @@ plugins {
 }
 
 kotlin {
-    listOf(
-        linuxArm64(),
-        linuxX64()
-    ).forEach { linuxTarget ->
-        linuxTarget.binaries.executable {
-            entryPoint = "main"
-        }
-    }
+    linuxArm64()
+    linuxX64()
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.shared.core)
-
             implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.curl)
-            implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
         }

@@ -1,148 +1,203 @@
-import uvicorn
+import os
+import time
 import socket
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
+import asyncio
+import logging
+import uvicorn
 
-# Import your existing modules
+from contextlib import asynccontextmanager
+from concurrent.futures import ThreadPoolExecutor
+from typing import List
+from fastapi import FastAPI, HTTPException
+from fastapi.concurrency import run_in_threadpool
+from pydantic import BaseModel
 from display import draw
 from fingerprint import FingerprintSensor, FingerprintError
 from face_capture import FaceCapture
 from face_recogniser import FaceRecognizer
+from keypad import read_key
 
-# ==========================================
-# CONFIGURATION
-# ==========================================
-SERVER_HOST = "0.0.0.0"  # Listen on all interfaces
-SERVER_PORT = 8000       # Port to modify
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
 
-# ==========================================
-# IP ADDRESS HELPER FUNCTION
-# ==========================================
+SERVER_HOST = "0.0.0.0"
+SERVER_PORT = 8000
+
+HARDWARE_TIMEOUT = 15
+PROCESS_TIMEOUT = 10
+
+KEYPAD_POLL_INTERVAL = 0.1
+
 def get_local_ip():
-    """Attempts to determine the non-local IP address of the machine."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # Connect to an external server (doesn't actually send data)
-        # This forces the kernel to pick the best interface for routing
         s.connect(("8.8.8.8", 80))
-        IP = s.getsockname()[0]
+        return s.getsockname()[0]
     except Exception:
-        # Fallback for systems without network connectivity
-        IP = '127.0.0.1'
+        return "127.0.0.1"
     finally:
         s.close()
-    return IP
 
-# ==========================================
-# GLOBAL HARDWARE INSTANCES
-# Initialize sensors once to keep connections alive
-# ==========================================
-try:
-    fp_sensor = FingerprintSensor()
-    face_cap = FaceCapture()
-    face_rec = FaceRecognizer()
-except Exception as e:
-    print(f"CRITICAL HARDWARE ERROR: {e}")
-    # We continue so the server starts, but endpoints may fail
-    pass
+class Hardware:
+    def __init__(self):
+        try:
+            self.fp = FingerprintSensor()
+            self.face_cap = FaceCapture()
+            self.face_rec = FaceRecognizer()
+            self.ok = True
+        except Exception as e:
+            logging.error(f"[HARDWARE INIT FAILED] {e}")
+            self.ok = False
 
-app = FastAPI(title="RPi Sensor Server")
+    def assert_ok(self):
+        if not self.ok:
+            raise RuntimeError("Hardware not initialized")
 
-# ==========================================
-# DATA MODELS (Request Bodies)
-# ==========================================
+hw = Hardware()
+executor = ThreadPoolExecutor(max_workers=3)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if not hw.ok:
+        raise RuntimeError("Hardware not initialized")
+    yield
+    executor.shutdown(wait=False)
+
+app = FastAPI(title="RPi Sensor Server", lifespan=lifespan)
 
 class DisplayRequest(BaseModel):
     lines: List[str]
-    duration: float = 0
 
 class FaceEnrollRequest(BaseModel):
     name: str
 
-# ==========================================
-# ENDPOINTS (Same as before)
-# ==========================================
+class FaceDeleteRequest(BaseModel):
+    name: str
+
+class FingerprintDeleteRequest(BaseModel):
+    id: int
+
+async def with_timeout(func, *args):
+    return await asyncio.wait_for(
+        run_in_threadpool(func, *args),
+        timeout=HARDWARE_TIMEOUT
+    )
 
 @app.post("/display")
-def show_text(req: DisplayRequest):
-    """Display text on the OLED screen."""
+async def show_text(req: DisplayRequest):
+    hw.assert_ok()
     try:
-        draw(req.lines, req.duration)
-        return {"status": "success", "message": "Text displayed"}
+        await run_in_threadpool(draw, req.lines)
+        return {"status": "ok"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(500, str(e))
+
 
 @app.post("/face/enroll")
-def enroll_face(req: FaceEnrollRequest):
-    """Capture and encode a new face."""
+async def enroll_face(req: FaceEnrollRequest):
+    hw.assert_ok()
     try:
-        face_cap.capture_and_encode(req.name)
-        face_rec._load_encodings()
-        return {"status": "success", "message": f"Face enrolled successfully for {req.name}"}
+        result = await with_timeout(hw.face_cap.capture_and_encode, req.name, 5, PROCESS_TIMEOUT)
+
+        if not result:
+            raise HTTPException(400, "No face detected")
+
+        await run_in_threadpool(hw.face_rec.reload_encodings)
+        return {"status": "ok"}
+    except HTTPException as e:
+        raise HTTPException(e.status_code, e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Face capture failed: {str(e)}")
+        raise HTTPException(500, str(e))
+
 
 @app.post("/face/recognize")
-def recognize_face():
-    """Take a picture and attempt to recognize a face."""
+async def recognize_face():
+    hw.assert_ok()
     try:
-        match_name = face_rec.recognize(timeout=10, tolerance=0.5)
-        if match_name:
-            return {"status": "success", "match": match_name}
-        else:
-            return {"status": "success", "match": None}
+        match = await with_timeout(hw.face_rec.recognize, PROCESS_TIMEOUT)
+        return {"match": match}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Recognition failed: {str(e)}")
+        raise HTTPException(500, str(e))
+
 
 @app.post("/fingerprint/enroll")
-def enroll_fingerprint():
-    """Start the fingerprint enrollment process."""
+async def enroll_fingerprint():
+    hw.assert_ok()
     try:
-        position = fp_sensor.capture_finger()
-        return {"status": "success", "index": position}
+        idx = await with_timeout(hw.fp.capture_finger, PROCESS_TIMEOUT)
+        return {"index": idx}
     except FingerprintError as e:
-        raise HTTPException(status_code=500, detail=f"Fingerprint sensor error: {str(e)}")
+        raise HTTPException(400, str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(500, str(e))
+
 
 @app.post("/fingerprint/search")
-def search_fingerprint():
-    """Scan for a fingerprint and return the index if found."""
+async def search_fingerprint():
+    hw.assert_ok()
     try:
-        position = fp_sensor.search_fingerprint(timeout=10)
-        if position is not None and position != -1:
-            return {"status": "success", "index": position}
-        else:
-            return {"status": "success", "index": None}
+        idx = await with_timeout(hw.fp.search_fingerprint)
+        return {"index": idx if idx != -1 else None}
+    except FingerprintError as e:
+        raise HTTPException(400, str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(500, str(e))
 
-@app.post("/fingerprint/clear")
-def clear_fingerprints():
-    """DANGER: Clears all stored fingerprints."""
+
+@app.post("/fingerprint/delete")
+async def delete_fingerprint(req: FingerprintDeleteRequest):
+    hw.assert_ok()
     try:
-        fp_sensor.clear_fingerprints()
-        return {"status": "success", "message": "All fingerprints cleared"}
+        await run_in_threadpool(hw.fp.delete_fingerprint, req.id)
+        return {"status": "ok"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(500, str(e))
 
 
-# ==========================================
-# RUNNER
-# ==========================================
+@app.post("/face/delete")
+async def delete_face(req: FaceDeleteRequest):
+    hw.assert_ok()
+    path = os.path.join("encodings", f"{req.name}.pkl")
+
+    if not os.path.isfile(path):
+        raise HTTPException(404, "Face ID not found")
+
+    try:
+        os.remove(path)
+        await run_in_threadpool(hw.face_rec.reload_encodings)
+        return {"status": "ok"}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/keypad")
+async def keypad(timeout: float = 5.0):
+    hw.assert_ok()
+    deadline = time.time() + timeout
+
+    while time.time() < deadline:
+        key = await run_in_threadpool(read_key)
+        if key is not None:
+            return {"key": key}
+        await asyncio.sleep(KEYPAD_POLL_INTERVAL)
+
+    return {"key": None}
+
+@app.get("/status")
+async def status():
+    hw.assert_ok()
+    return {"status": "ok"}
+
 if __name__ == "__main__":
+    ip = get_local_ip()
+    print(f"API: http://{ip}:{SERVER_PORT}/docs")
 
-    local_ip = get_local_ip()
-
-    print("Starting Sensor Server...")
-    print(f"Local IP: {local_ip}")
-    print(f"Access API at: http://{local_ip}:{SERVER_PORT}/docs")
-
-    try:
-        draw(["RPi Sensor", "Starting..."], sleep_seconds=1)
-        draw([f"IP: {local_ip}", f"Port: {SERVER_PORT}"], sleep_seconds=2)
-    except Exception as e:
-        print(f"Warning: Could not draw to display. Error: {e}")
-
-    uvicorn.run(app, host=SERVER_HOST, port=SERVER_PORT)
+    uvicorn.run(
+        app,
+        host=SERVER_HOST,
+        port=SERVER_PORT,
+        workers=1,
+        log_level="info"
+    )
