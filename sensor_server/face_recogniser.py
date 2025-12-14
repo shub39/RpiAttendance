@@ -8,8 +8,11 @@ import face_recognition
 import numpy as np
 from picamera2 import Picamera2, Preview
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
 
 class FaceRecognizer:
     def __init__(self, dataset_dir="encodings"):
@@ -58,7 +61,16 @@ class FaceRecognizer:
         return None
 
     def recognize(self, timeout=10, tolerance=0.99):
-        """Recognize a known face from camera within the timeout period."""
+        """
+        Recognize a known face from camera within the timeout period.
+
+        Args:
+            timeout (int): The maximum time to wait for face detection.
+            tolerance (float): The tolerance for face recognition.
+
+        Returns:
+            str: The name of the recognized face, or None if no face was recognized.
+        """
         if not self.known_encodings:
             logging.error("No known face encodings loaded.")
             return None
@@ -94,38 +106,8 @@ class FaceRecognizer:
             cam.close()
             logging.info("Camera released.")
 
-    def log_faces(self, timeout=30, on_face_detected=None, tolerance=0.5):
-        """
-        Captures video using Picamera2 and logs detected faces.
-        Calls `on_face_detected(name)` if provided and a match is found.
-        """
-        if not self.known_encodings:
-            logging.warning("No known encodings loaded. Will only log number of faces.")
-
-        cam = self._start_camera()
-        logging.info("Camera started for face logging.")
-
-        start_time = time.time()
-        try:
-            while time.time() - start_time < timeout:
-                frame = cam.capture_array()
-                rgb = frame
-                face_locations = face_recognition.face_locations(rgb)
-
-                if face_locations:
-                    logging.info(f"Detected {len(face_locations)} face(s).")
-                    encodings = face_recognition.face_encodings(rgb, face_locations)
-
-                    for encoding in encodings:
-                        name = self._match_face(encoding, tolerance)
-                        if name:
-                            logging.info(f"Matched {name}")
-                            if callable(on_face_detected):
-                                on_face_detected(int(name))
-                else:
-                    logging.debug("No faces in current frame.")
-        except Exception as e:
-            logging.error(f"Error during face logging: {e}")
-        finally:
-            cam.close()
-            logging.info("Camera released.")
+if __name__ == "__main__":
+    recognizer = FaceRecognizer()
+    recognizer.reload_encodings()
+    result = recognizer.recognize()
+    print(f"Recognized face: {result}")

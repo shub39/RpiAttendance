@@ -31,3 +31,9 @@ def read_key():
                 return KEYS[i][j]
         GPIO.output(line, GPIO.LOW)
     return None
+
+if __name__ == "__main__":
+    while True:
+        key = read_key()
+        if key is not None:
+            print(key)
