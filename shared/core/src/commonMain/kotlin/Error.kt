@@ -4,8 +4,10 @@ typealias RootError = Error
 
 sealed interface Result<out D, out E : RootError> {
     data class Success<out D>(val data: D) : Result<D, Nothing>
-    data class Error<out E : RootError>(val error: E) :
-        Result<Nothing, E>
+    data class Error<out E : RootError>(
+        val error: E,
+        val debugMessage: String? = null
+    ) : Result<Nothing, E>
 }
 
 inline fun <T, E : RootError, R> Result<T, E>.map(map: (T) -> R): Result<R, E> {
