@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 
 enum class SensorError: RootError {
     SERVER_ERROR,
+    FINGERPRINT_TIMEOUT,
     FACE_TIMEOUT,
 }
 
@@ -14,13 +15,13 @@ enum class SensorError: RootError {
 data class KeypadResponse(val key: Char?)
 
 @Serializable
-data class StatusResponse(val status: String?)
+data class StatusResponse(val status: String)
 
 @Serializable
 data class DisplayRequest(val lines: List<String>)
 
 @Serializable
-data class FaceDeleteRequest(val id: String)
+data class FaceDeleteRequest(val name: String)
 
 @Serializable
 data class FaceEnrollRequest(val name: String)

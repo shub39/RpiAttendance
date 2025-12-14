@@ -46,6 +46,13 @@ suspend inline fun <reified T> responseToResult(
             }
         }
 
+        in 400..499 -> {
+            Result.Error(
+                SourceError.DataError.SENSOR_ERROR,
+                "Bad request: ${response.status.value} - ${response.status.description}"
+            )
+        }
+
         else -> Result.Error(
             SourceError.DataError.UNKNOWN_ERROR,
             "HTTP ${response.status.value}: ${response.status.description}\nURL: ${response.request.url}"

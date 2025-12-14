@@ -11,7 +11,7 @@ import safeCall
 
 class SensorServerImpl(
     private val client: HttpClient
-): SensorServer {
+) : SensorServer {
 
     override suspend fun displayText(lines: List<String>): EmptyResult<SensorError> {
         val request: EmptyResult<SourceError> = safeCall {
@@ -30,6 +30,7 @@ class SensorServerImpl(
                     debugMessage = request.debugMessage
                 )
             }
+
             is Result.Success -> Result.Success(Unit)
         }
     }
@@ -46,19 +47,20 @@ class SensorServerImpl(
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                if (request.error == SourceError.DataError.SENSOR_ERROR) {
+                    Result.Error(
+                        error = SensorError.FACE_TIMEOUT,
+                        debugMessage = request.debugMessage
+                    )
+                } else {
+                    Result.Error(
+                        error = SensorError.SERVER_ERROR,
+                        debugMessage = request.debugMessage
+                    )
+                }
             }
-            is Result.Success -> if (request.data.status == null) {
-                Result.Error(
-                    error = SensorError.FACE_TIMEOUT,
-                    debugMessage = "No face detected inside timeout duration"
-                )
-            } else {
-                Result.Success(Unit)
-            }
+
+            is Result.Success -> Result.Success(Unit)
         }
     }
 
@@ -76,6 +78,7 @@ class SensorServerImpl(
                     debugMessage = request.debugMessage
                 )
             }
+
             is Result.Success -> Result.Success(request.data.match)
         }
     }
@@ -89,11 +92,19 @@ class SensorServerImpl(
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                if (request.error == SourceError.DataError.SENSOR_ERROR) {
+                    Result.Error(
+                        error = SensorError.FINGERPRINT_TIMEOUT,
+                        debugMessage = request.debugMessage
+                    )
+                } else {
+                    Result.Error(
+                        error = SensorError.SERVER_ERROR,
+                        debugMessage = request.debugMessage
+                    )
+                }
             }
+
             is Result.Success -> Result.Success(request.data.index)
         }
     }
@@ -112,6 +123,7 @@ class SensorServerImpl(
                     debugMessage = request.debugMessage
                 )
             }
+
             is Result.Success -> Result.Success(request.data.index)
         }
     }
@@ -133,6 +145,7 @@ class SensorServerImpl(
                     debugMessage = request.debugMessage
                 )
             }
+
             is Result.Success -> Result.Success(Unit)
         }
     }
@@ -154,6 +167,7 @@ class SensorServerImpl(
                     debugMessage = request.debugMessage
                 )
             }
+
             is Result.Success -> Result.Success(Unit)
         }
     }
@@ -174,6 +188,7 @@ class SensorServerImpl(
                     debugMessage = request.debugMessage
                 )
             }
+
             is Result.Success -> Result.Success(Unit)
         }
     }
@@ -194,6 +209,7 @@ class SensorServerImpl(
                     debugMessage = request.debugMessage
                 )
             }
+
             is Result.Success -> {
                 Result.Success(request.data.key)
             }
