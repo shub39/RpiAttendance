@@ -21,7 +21,7 @@ kotlin {
             implementation(libs.ktor.client.curl)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+            implementation(libs.kotlinx.coroutines)
         }
     }
 }
