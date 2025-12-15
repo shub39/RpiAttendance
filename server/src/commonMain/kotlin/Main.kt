@@ -105,12 +105,7 @@ fun main() {
                 "5" -> {
                     when (val res = sensorServer.recognizeFace()) {
                         is Result.Success -> {
-                            val id = res.data
-                            if (id == null) {
-                                println("No face recognized")
-                            } else {
-                                println("Face recognized: $id")
-                            }
+                            println(res.data)
                         }
                         is Result.Error ->
                             println("Error: ${res.error} ${res.debugMessage ?: ""}")
@@ -120,12 +115,7 @@ fun main() {
                 "6" -> {
                     when (val res = sensorServer.searchFingerPrint()) {
                         is Result.Success -> {
-                            val id = res.data
-                            if (id == null) {
-                                println("No fingerprint found")
-                            } else {
-                                println("Fingerprint found: ID=$id")
-                            }
+                            println(res.data)
                         }
                         is Result.Error ->
                             println("Error: ${res.error} ${res.debugMessage ?: ""}")
@@ -172,12 +162,7 @@ fun main() {
 
                     when (val res = sensorServer.getKeypadOutput(timeout)) {
                         is Result.Success -> {
-                            val key = res.data
-                            if (key == null) {
-                                println("No key pressed")
-                            } else {
-                                println("Key pressed: $key")
-                            }
+                            println(res.data)
                         }
                         is Result.Error ->
                             println("Error: ${res.error} ${res.debugMessage ?: ""}")

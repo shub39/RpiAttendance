@@ -64,7 +64,7 @@ class SensorServerImpl(
         }
     }
 
-    override suspend fun recognizeFace(): Result<String?, SensorError> {
+    override suspend fun recognizeFace(): Result<FaceSearchResult, SensorError> {
         val request: Result<FaceSearchResponse, SourceError> = safeCall {
             client.post(
                 url = Url("$BASE_URL/face/recognize")
@@ -79,7 +79,13 @@ class SensorServerImpl(
                 )
             }
 
-            is Result.Success -> Result.Success(request.data.match)
+            is Result.Success -> Result.Success(
+                if (request.data.match != null) {
+                    FaceSearchResult.Found(request.data.match!!)
+                } else {
+                    FaceSearchResult.NotFound
+                }
+            )
         }
     }
 
@@ -109,7 +115,7 @@ class SensorServerImpl(
         }
     }
 
-    override suspend fun searchFingerPrint(): Result<Int?, SensorError> {
+    override suspend fun searchFingerPrint(): Result<FingerprintSearchResult, SensorError> {
         val request: Result<FingerPrintSearchResponse, SourceError> = safeCall {
             client.post(
                 url = Url("$BASE_URL/fingerprint/search")
@@ -124,7 +130,13 @@ class SensorServerImpl(
                 )
             }
 
-            is Result.Success -> Result.Success(request.data.index)
+            is Result.Success -> Result.Success(
+                if (request.data.index != null) {
+                    FingerprintSearchResult.Found(request.data.index!!)
+                } else {
+                    FingerprintSearchResult.NotFound
+                }
+            )
         }
     }
 
@@ -193,7 +205,7 @@ class SensorServerImpl(
         }
     }
 
-    override suspend fun getKeypadOutput(timeout: Int): Result<Char?, SensorError> {
+    override suspend fun getKeypadOutput(timeout: Int): Result<KeypadResult, SensorError> {
         val request: Result<KeypadResponse, SourceError> = safeCall {
             client.get(
                 url = Url("$BASE_URL/keypad")
@@ -211,7 +223,7 @@ class SensorServerImpl(
             }
 
             is Result.Success -> {
-                Result.Success(request.data.key)
+                Result.Success(request.data.key.toKeypadResult())
             }
         }
     }
