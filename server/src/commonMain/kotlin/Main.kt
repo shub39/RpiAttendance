@@ -1,8 +1,11 @@
 import data.SensorServerImpl
+import data.database.getDatabaseBuilder
+import data.database.getRoomDatabase
 import io.ktor.client.*
 import io.ktor.client.engine.curl.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
@@ -11,9 +14,7 @@ fun main() {
     val client = HttpClient(Curl) {
         install(ContentNegotiation) {
             json(
-                json = Json {
-                    ignoreUnknownKeys = true
-                }
+                json = Json { ignoreUnknownKeys = true }
             )
         }
 
@@ -25,8 +26,13 @@ fun main() {
     }
 
     val sensorServer = SensorServerImpl(client)
+    val db = getRoomDatabase(getDatabaseBuilder())
 
     runBlocking {
+        println("DATABASE TEST =========")
+        println(db.studentDao().getStudents().first())
+        println("DATABASE WORKS!! ========")
+
         println("Starting server...")
         println("Displaying Status Message...")
 
