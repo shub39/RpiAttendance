@@ -6,12 +6,14 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 
 @Database(
-    entities = [StudentEntity::class],
+    entities = [StudentEntity::class, TeacherEntity::class, AttendanceLogEntity::class],
     version = 1,
 )
 @ConstructedBy(ServerDatabaseConstructor::class)
 abstract class ServerDatabase: RoomDatabase() {
     abstract fun studentDao(): StudentDao
+    abstract fun teacherDao(): TeacherDao
+    abstract fun attendanceLogDao(): AttendanceLogDao
 }
 
 @Suppress("KotlinNoActualForExpect")
