@@ -5,10 +5,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import domain.AttendanceStatus
 import domain.EntityType
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-@OptIn(ExperimentalTime::class)
 @Entity(
     tableName = "attendance_log",
     indices = [

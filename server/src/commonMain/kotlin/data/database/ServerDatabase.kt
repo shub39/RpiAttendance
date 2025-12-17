@@ -1,22 +1,26 @@
 package data.database
 
-import androidx.room.ConstructedBy
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.RoomDatabaseConstructor
+import androidx.room.*
 
 @Database(
-    entities = [StudentEntity::class, TeacherEntity::class, AttendanceLogEntity::class],
+    entities = [
+        StudentEntity::class,
+        TeacherEntity::class,
+        AttendanceLogEntity::class,
+        CourseEntity::class
+    ],
     version = 1,
 )
+@TypeConverters(Converters::class)
 @ConstructedBy(ServerDatabaseConstructor::class)
-abstract class ServerDatabase: RoomDatabase() {
+abstract class ServerDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
     abstract fun teacherDao(): TeacherDao
     abstract fun attendanceLogDao(): AttendanceLogDao
+    abstract fun courseDao(): CourseDao
 }
 
 @Suppress("KotlinNoActualForExpect")
-expect object ServerDatabaseConstructor: RoomDatabaseConstructor<ServerDatabase> {
+expect object ServerDatabaseConstructor : RoomDatabaseConstructor<ServerDatabase> {
     override fun initialize(): ServerDatabase
 }

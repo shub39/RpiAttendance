@@ -10,6 +10,10 @@ room {
 }
 
 kotlin {
+    compilerOptions {
+        optIn.add("kotlin.time.ExperimentalTime")
+    }
+
     listOf(
         linuxArm64(),
         linuxX64()
