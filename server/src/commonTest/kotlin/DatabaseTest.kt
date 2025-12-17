@@ -5,8 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlin.experimental.ExperimentalNativeApi
-import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.time.Clock
 
 @OptIn(ExperimentalNativeApi::class)
@@ -34,27 +34,6 @@ class DatabaseTest {
             subjectTaught = "Subject $it",
         )
     }
-    val students = courses.flatMap { course ->
-        (0..30).map { no ->
-            StudentEntity(
-                courseId = course.id,
-                biometricId = "student_$no",
-                firstName = "Student $no",
-                lastName = "Student $no",
-                contactEmail = "6789@$no",
-                contactPhone = "76125t76$no"
-            )
-        }
-    }
-    val attendanceLogs = students.map { students ->
-        AttendanceLogEntity(
-            biometricId = students.biometricId ?: "student_${students.id}",
-            entityType = EntityType.STUDENT,
-            entityId = students.id,
-            timeStamp = Clock.System.now(),
-            attendanceStatus = AttendanceStatus.IN
-        )
-    }
 
     private fun testIn(title: String, block: suspend CoroutineScope.() -> Unit) = runBlocking {
         println("\n-- $title --")
@@ -62,20 +41,71 @@ class DatabaseTest {
         println("\n")
     }
 
-    @AfterTest
-    fun tearDown() = testIn("Clear DB") {
-        courseDao.getAllCourses().first().forEach { courseDao.delete(it) }
-    }
-
     @Test
-    fun testInsertion() = testIn("Courses Test") {
+    fun coursesTest() = testIn("Courses Test") {
         courses.forEach { courseDao.upsert(it) }
         val coursesFromDb = courseDao.getAllCourses().first()
         println(coursesFromDb)
 
-        assert(coursesFromDb.isNotEmpty())
-        assert(coursesFromDb.size == courses.size)
+        assertEquals(coursesFromDb.isNotEmpty(), true)
+        assertEquals(coursesFromDb.size, courses.size)
     }
 
-}
+    @Test
+    fun teachersTest() = testIn("Teachers Test") {
+        teachers.forEach { teacherDao.upsert(it) }
+        val teachersFromDb = courseDao.getAllCourses().first()
+        println(teachersFromDb)
 
+        assertEquals(teachersFromDb.isNotEmpty(), true)
+        assertEquals(teachersFromDb.size, teachers.size)
+    }
+
+    @Test
+    fun studentsTest() = testIn("Students Test") {
+        val coursesFromDb = courseDao.getAllCourses().first()
+        val students = coursesFromDb.flatMap { course ->
+            (0..30).map { no ->
+                StudentEntity(
+                    courseId = course.id,
+                    biometricId = "student_$no",
+                    firstName = "Student $no",
+                    lastName = "Student $no",
+                    contactEmail = "6789@$no",
+                    contactPhone = "76125t76$no"
+                )
+            }
+        }
+
+        students.forEach { studentDao.upsert(it) }
+        val studentsFromDb = studentDao.getAllStudents().first()
+        println(studentsFromDb)
+        assertEquals(studentsFromDb.isNotEmpty(), true)
+        assertEquals(studentsFromDb.size, students.size)
+    }
+
+    @Test
+    fun attendanceLogsTest() = testIn("Attendance Logs Test") {
+        val studentsFromDb = studentDao.getAllStudents().first()
+        val attendanceLogs = studentsFromDb.map { students ->
+            AttendanceLogEntity(
+                biometricId = students.biometricId ?: "student_${students.id}",
+                entityType = EntityType.STUDENT,
+                entityId = students.id,
+                timeStamp = Clock.System.now(),
+                attendanceStatus = AttendanceStatus.IN
+            )
+        }
+
+        attendanceLogs.forEach { attendanceLogDao.upsert(it) }
+        val attendanceLogsFromDb = attendanceLogDao.getAttendanceLogs().first()
+        println(attendanceLogsFromDb)
+        assertEquals(attendanceLogsFromDb.isNotEmpty(), true)
+        assertEquals(attendanceLogsFromDb.size, attendanceLogs.size)
+
+        courseDao.getAllCourses().first().forEach { courseDao.delete(it) }
+        teacherDao.getAllTeachers().first().forEach { teacherDao.delete(it) }
+        studentDao.getAllStudents().first().forEach { studentDao.delete(it) }
+        attendanceLogDao.getAttendanceLogs().first().forEach { attendanceLogDao.delete(it) }
+    }
+}
