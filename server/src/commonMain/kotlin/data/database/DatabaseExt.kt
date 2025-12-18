@@ -5,14 +5,14 @@ import androidx.room.RoomDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
-fun getDatabaseBuilder(): RoomDatabase.Builder<ServerDatabase> {
+private fun getDatabaseBuilder(): RoomDatabase.Builder<ServerDatabase> {
     return Room.databaseBuilder<ServerDatabase>(
         name = "server_database.db"
     )
 }
 
 fun getRoomDatabase(
-    builder: RoomDatabase.Builder<ServerDatabase>
+    builder: RoomDatabase.Builder<ServerDatabase> = getDatabaseBuilder()
 ): ServerDatabase {
     return builder
         .setDriver(androidx.sqlite.driver.bundled.BundledSQLiteDriver())

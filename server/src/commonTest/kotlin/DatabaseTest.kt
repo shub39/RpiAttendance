@@ -1,9 +1,9 @@
 import data.database.*
-import domain.AttendanceStatus
-import domain.EntityType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import models.AttendanceStatus
+import models.EntityType
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -11,7 +11,7 @@ import kotlin.time.Clock
 
 @OptIn(ExperimentalNativeApi::class)
 class DatabaseTest {
-    val database = getRoomDatabase(getDatabaseBuilder())
+    val database = getRoomDatabase()
 
     val teacherDao = database.teacherDao()
     val studentDao = database.studentDao()

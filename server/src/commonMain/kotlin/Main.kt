@@ -1,6 +1,6 @@
 import data.SensorServerImpl
-import data.database.getDatabaseBuilder
 import data.database.getRoomDatabase
+import data.repository.AttendanceRepo
 import io.ktor.client.*
 import io.ktor.client.engine.curl.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -25,8 +25,11 @@ fun main() {
     }
 
     val sensorServer = SensorServerImpl(client)
-    val db = getRoomDatabase(getDatabaseBuilder())
+    val db = getRoomDatabase()
+    val repository = AttendanceRepo(db)
 
+
+    // testing
     runBlocking {
         println("Starting server...")
         println("Displaying Status Message...")

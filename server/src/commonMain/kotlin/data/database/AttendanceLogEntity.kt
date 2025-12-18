@@ -3,8 +3,8 @@ package data.database
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import domain.AttendanceStatus
-import domain.EntityType
+import models.AttendanceStatus
+import models.EntityType
 import kotlin.time.Instant
 
 @Entity(

@@ -76,7 +76,6 @@ interface SensorServer {
     suspend fun searchFingerPrint(): Result<FingerprintSearchResult, SensorError>
     suspend fun deleteFingerPrint(id: Int): EmptyResult<SensorError>
     suspend fun deleteFace(id: String): EmptyResult<SensorError>
-
     suspend fun getStatus(): EmptyResult<SensorError>
     suspend fun getKeypadOutput(timeout: Int): Result<KeypadResult, SensorError>
 }

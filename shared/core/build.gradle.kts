@@ -4,6 +4,10 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        optIn.add("kotlin.time.ExperimentalTime")
+    }
+
     linuxArm64()
     linuxX64()
 
