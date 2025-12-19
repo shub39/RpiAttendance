@@ -15,7 +15,7 @@ enum class SensorError: RootError {
 data class KeypadResponse(val key: Char?)
 
 @Serializable
-data class StatusResponse(val status: String)
+data class StatusResponse(val status: String, val ip: String)
 
 @Serializable
 data class DisplayRequest(val lines: List<String>)
@@ -76,7 +76,7 @@ interface SensorServer {
     suspend fun searchFingerPrint(): Result<FingerprintSearchResult, SensorError>
     suspend fun deleteFingerPrint(id: Int): EmptyResult<SensorError>
     suspend fun deleteFace(id: String): EmptyResult<SensorError>
-    suspend fun getStatus(): EmptyResult<SensorError>
+    suspend fun getStatus(): Result<StatusResponse, SensorError>
     suspend fun getKeypadOutput(timeout: Int): Result<KeypadResult, SensorError>
 }
 

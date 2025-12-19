@@ -184,7 +184,7 @@ class SensorServerImpl(
         }
     }
 
-    override suspend fun getStatus(): EmptyResult<SensorError> {
+    override suspend fun getStatus(): Result<StatusResponse, SensorError> {
         val request: Result<StatusResponse, SourceError> = safeCall {
             client.get(
                 url = Url("$BASE_URL/status")
@@ -201,7 +201,7 @@ class SensorServerImpl(
                 )
             }
 
-            is Result.Success -> Result.Success(Unit)
+            is Result.Success -> Result.Success(request.data)
         }
     }
 

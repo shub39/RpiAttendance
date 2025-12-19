@@ -73,13 +73,15 @@ fun main() {
         println("Starting server...")
         println("Displaying Status Message...")
 
-        when (val result = sensorServer.displayText(listOf("ADMIN SERVER", url))) {
-            is Result.Error -> {
-                println("Error: ${result.error}")
-                return@runBlocking
-            }
-            is Result.Success -> {
-                println("Displayed Status Message...")
+        sensorServer.getStatus().onSuccess { status ->
+            when (val result = sensorServer.displayText(listOf("ADMIN SERVER", "${status.ip}:8080"))) {
+                is Result.Error -> {
+                    println("Error: ${result.error}")
+                    return@runBlocking
+                }
+                is Result.Success -> {
+                    println("Displayed Status Message...")
+                }
             }
         }
 

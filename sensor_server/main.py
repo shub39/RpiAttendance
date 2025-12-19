@@ -188,7 +188,7 @@ async def keypad(timeout: float = 5.0):
 @app.get("/status")
 async def status():
     hw.assert_ok()
-    return {"status": "ok"}
+    return {"status": "ok", "ip": get_local_ip()}
 
 if __name__ == "__main__":
     ip = get_local_ip()

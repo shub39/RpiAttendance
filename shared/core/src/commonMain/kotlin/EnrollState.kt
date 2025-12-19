@@ -6,9 +6,6 @@ sealed interface EnrollState {
     data object FingerprintEnrolled: EnrollState
 
     @Serializable
-    data object FaceEnrolled: EnrollState
-
-    @Serializable
     data object EnrollComplete: EnrollState
 
     @Serializable

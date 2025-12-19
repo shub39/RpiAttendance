@@ -121,7 +121,7 @@ class AdminInterfaceImpl(
                     }
 
                     is Result.Success -> {
-                        emit(EnrollState.FaceEnrolled)
+                        emit(EnrollState.EnrollComplete)
                         onSuccess(fingerprintResult.data.toString())
                     }
                 }
