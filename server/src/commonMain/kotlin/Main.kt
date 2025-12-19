@@ -1,10 +1,18 @@
+import data.AdminInterfaceImpl
 import data.SensorServerImpl
 import data.database.getRoomDatabase
 import io.ktor.client.*
 import io.ktor.client.engine.curl.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.cio.*
+import io.ktor.server.engine.*
+import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.rpc.krpc.ktor.server.Krpc
+import kotlinx.rpc.krpc.ktor.server.rpc
+import kotlinx.rpc.krpc.serialization.json.json
 import kotlinx.serialization.json.Json
 
 fun main() {
@@ -30,14 +38,42 @@ fun main() {
     val attendanceLogDao = db.attendanceLogDao()
 
     val sensorServer = SensorServerImpl(client = client)
+    val adminInterface = AdminInterfaceImpl(
+        studentDao = studentDao,
+        teacherDao = teachDao,
+        courseDao = courseDao,
+        attendanceLogDao = attendanceLogDao,
+        sensorServer = sensorServer
+    )
 
+    // admin server to be accessed on client apps
+    val adminServer = embeddedServer(CIO, host = "0.0.0.0", port = 8080) {
+        install(Krpc)
+        routing {
+            rpc("/rpc") {
+                rpcConfig {
+                    serialization {
+                        json {
+                            ignoreUnknownKeys = true
+                        }
+                    }
+                }
 
-    // testing sensors
+                registerService<AdminInterface> { adminInterface }
+            }
+        }
+    }.start(wait = false)
+
+    val host = adminServer.engine.environment.config.host
+    val port = adminServer.engine.environment.config.port
+    val url = "$host:$port"
+
+    // testing sensors, will be core loop later
     runBlocking {
         println("Starting server...")
         println("Displaying Status Message...")
 
-        when (val result = sensorServer.displayText(listOf("Hello", "World"))) {
+        when (val result = sensorServer.displayText(listOf("ADMIN SERVER", url))) {
             is Result.Error -> {
                 println("Error: ${result.error}")
                 return@runBlocking
@@ -48,6 +84,7 @@ fun main() {
         }
 
         println("================================")
+        println("0. Shutdown and Exit")
         println("1. Display Text")
         println("2. Get Status")
         println("3. Enroll Face")
@@ -64,6 +101,13 @@ fun main() {
             val input = readlnOrNull()?.trim()
 
             when (input) {
+                "0" -> {
+                    println("Shutting down server...")
+                    adminServer.stop(1000, 2000)
+                    client.close()
+                    println("Server stopped. Goodbye!")
+                    break
+                }
 
                 "1" -> {
                     println("Enter text (space separated):")

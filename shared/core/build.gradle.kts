@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.kotlinx.rpc)
 }
 
 kotlin {
@@ -15,7 +16,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.kotlinx.coroutines)
+            implementation(libs.kotlinx.rpc.core)
         }
     }
 }

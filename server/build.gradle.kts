@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.kotlinx.rpc)
 }
 
 room {
@@ -29,11 +30,14 @@ kotlin {
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.curl)
+            implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.kotlinx.coroutines)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.kotlinx.rpc.krpc.server)
+            implementation(libs.kotlinx.rpc.krpc.ktor.server)
+            implementation(libs.kotlinx.rpc.krpc.serialization.json)
         }
     }
 }

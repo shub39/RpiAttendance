@@ -8,13 +8,8 @@ import data.database.CourseDao
 import data.database.StudentDao
 import data.database.TeacherDao
 import domain.SensorServer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import models.AttendanceLog
 import models.Course
 import models.Student
@@ -27,23 +22,27 @@ class AdminInterfaceImpl(
     private val attendanceLogDao: AttendanceLogDao,
     private val sensorServer: SensorServer
 ) : AdminInterface {
-    val scope = CoroutineScope(Dispatchers.Default)
+    val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     override fun getStudents(): Flow<List<Student>> = studentDao
         .getAllStudents()
         .map { flow -> flow.map { student -> student.toStudent() } }
+        .flowOn(Dispatchers.IO)
 
     override fun getTeachers(): Flow<List<Teacher>> = teacherDao
         .getAllTeachers()
         .map { flow -> flow.map { teachers -> teachers.toTeacher() } }
+        .flowOn(Dispatchers.IO)
 
     override fun getCourses(): Flow<List<Course>> = courseDao
         .getAllCourses()
         .map { flow -> flow.map { course -> course.toCourse() } }
+        .flowOn(Dispatchers.IO)
 
     override fun getAttendanceLogs(): Flow<List<AttendanceLog>> = attendanceLogDao
         .getAttendanceLogs()
         .map { flow -> flow.map { attendanceLog -> attendanceLog.toAttendanceLog() } }
+        .flowOn(Dispatchers.IO)
 
     override suspend fun upsertStudent(student: Student) {
         studentDao.upsert(student.toStudentEntity())
@@ -68,17 +67,24 @@ class AdminInterfaceImpl(
     }
 
     override suspend fun deleteCourse(course: Course) {
+        val attendanceLogs = attendanceLogDao.getAttendanceLogs().first()
         studentDao
             .getAllStudents()
             .first()
             .filter { it.courseId == course.id }
             .forEach { studentEntity ->
-                studentEntity.biometricId?.toIntOrNull()?.let { deleteBiometrics(it) }
+                studentEntity.biometricId?.toIntOrNull()?.let {
+                    deleteBiometrics(it)
+                    attendanceLogs
+                        .filter { entity -> entity.entityId == studentEntity.id }
+                        .forEach { entity -> attendanceLogDao.delete(entity) }
+                }
             }
+
         courseDao.delete(course.toCourseEntity())
     }
 
-    override suspend fun addBiometricDetailsForStudent(student: Student): Flow<EnrollState> =
+    override fun addBiometricDetailsForStudent(student: Student): Flow<EnrollState> =
         addBiometricDetails { biometricId ->
             scope.launch {
                 studentDao.upsert(
@@ -89,7 +95,7 @@ class AdminInterfaceImpl(
             }
         }
 
-    override suspend fun addBiometricDetailsForTeacher(teacher: Teacher): Flow<EnrollState> =
+    override fun addBiometricDetailsForTeacher(teacher: Teacher): Flow<EnrollState> =
         addBiometricDetails { biometricId ->
             scope.launch {
                 teacherDao.upsert(
