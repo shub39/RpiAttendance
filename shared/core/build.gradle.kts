@@ -2,15 +2,22 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.kotlinx.rpc)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
 }
 
 kotlin {
+    jvmToolchain(17)
     compilerOptions {
         optIn.add("kotlin.time.ExperimentalTime")
     }
 
     linuxArm64()
     linuxX64()
+    jvm()
+    androidLibrary {
+        namespace = "shub39.rpi_attendance.core"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+    }
 
     sourceSets {
         commonMain.dependencies {
