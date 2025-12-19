@@ -14,8 +14,8 @@ interface AttendanceLogDao {
     @Delete
     suspend fun delete(attendanceLog: AttendanceLogEntity)
 
-    @Query("SELECT * FROM attendance_log WHERE id = :id")
-    suspend fun getAttendanceLogById(id: Long): AttendanceLogEntity?
+//    @Query("SELECT * FROM attendance_log WHERE id = :id")
+//    suspend fun getAttendanceLogById(id: Long): AttendanceLogEntity?
 
     @Query("SELECT * FROM attendance_log")
     fun getAttendanceLogs(): Flow<List<AttendanceLogEntity>>

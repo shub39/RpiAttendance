@@ -1,6 +1,5 @@
 import data.SensorServerImpl
 import data.database.getRoomDatabase
-import data.repository.AttendanceRepo
 import io.ktor.client.*
 import io.ktor.client.engine.curl.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -10,6 +9,7 @@ import kotlinx.serialization.json.Json
 
 fun main() {
 
+    // initializing stuff
     val client = HttpClient(Curl) {
         install(ContentNegotiation) {
             json(
@@ -23,13 +23,16 @@ fun main() {
             caPath = "/etc/ssl/certs"
         }
     }
-
-    val sensorServer = SensorServerImpl(client)
     val db = getRoomDatabase()
-    val repository = AttendanceRepo(db)
+    val studentDao = db.studentDao()
+    val teachDao = db.teacherDao()
+    val courseDao = db.courseDao()
+    val attendanceLogDao = db.attendanceLogDao()
+
+    val sensorServer = SensorServerImpl(client = client)
 
 
-    // testing
+    // testing sensors
     runBlocking {
         println("Starting server...")
         println("Displaying Status Message...")
