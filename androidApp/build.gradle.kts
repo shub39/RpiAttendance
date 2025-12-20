@@ -65,7 +65,7 @@ android {
 
 dependencies {
     implementation(projects.core)
-    implementation(projects.ui)
+    implementation(projects.client)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
@@ -76,4 +76,7 @@ dependencies {
     implementation(compose.ui)
     implementation(compose.components.resources)
     implementation(compose.components.uiToolingPreview)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
 }

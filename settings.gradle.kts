@@ -34,5 +34,5 @@ plugins {
 
 include(":server")
 include(":core")
-include(":ui")
+include(":client")
 include(":androidApp", ":desktopApp")

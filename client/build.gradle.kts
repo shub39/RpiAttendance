@@ -21,7 +21,7 @@ kotlin {
 
     jvm()
     android {
-        namespace = "shub39.rpi_attendance.ui"
+        namespace = "shub39.rpi_attendance"
         compileSdk {
             version = release(libs.versions.android.compileSdk.get().toInt())
         }
@@ -40,9 +40,16 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.kotlinx.rpc.krpc.client)
+            implementation(libs.kotlinx.rpc.krpc.ktor.client)
         }
         androidMain.dependencies {
             implementation(compose.preview)
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)

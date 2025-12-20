@@ -5,8 +5,8 @@ import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import shub39.rpi_attendance.ui.App
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
@@ -15,7 +15,8 @@ class MainActivity: ComponentActivity() {
 
         setContent {
             enableEdgeToEdge()
-            Text("Hello World")
+
+            App()
         }
     }
 }
