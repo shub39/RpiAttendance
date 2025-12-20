@@ -1,0 +1,21 @@
+package shub39.rpi_attendance.client
+
+import android.os.Bundle
+import android.os.PersistableBundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Text
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+
+class MainActivity: ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        installSplashScreen()
+
+        setContent {
+            enableEdgeToEdge()
+            Text("Hello World")
+        }
+    }
+}

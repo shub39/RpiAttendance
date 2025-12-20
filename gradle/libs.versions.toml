@@ -12,6 +12,7 @@ ksp = "2.3.3"
 splashscreen = "1.2.0"
 androidx-activity-compose = "1.12.2"
 coroutines = "1.10.2"
+hotreload = "1.0.0"
 
 [libraries]
 # android
@@ -40,6 +41,7 @@ kotlinx-rpc-krpc-ktor-server = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krp
 kotlinx-rpc-krpc-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-serialization-json", version.ref = "rpc" }
 
 [plugins]
+hotreload = { id = "org.jetbrains.compose.hot-reload", version.ref = "hotreload" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

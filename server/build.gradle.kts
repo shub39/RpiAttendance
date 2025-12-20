@@ -14,6 +14,13 @@ kotlin {
     compilerOptions {
         optIn.add("kotlin.time.ExperimentalTime")
     }
+    targets.all {
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
 
     listOf(
         linuxArm64(),
@@ -26,7 +33,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.shared.core)
+            implementation(projects.core)
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.curl)
