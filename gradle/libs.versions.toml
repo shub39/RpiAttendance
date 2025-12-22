@@ -15,6 +15,7 @@ androidx-lifecycle = "2.9.6"
 coroutines = "1.10.2"
 hotreload = "1.0.0"
 koin = "4.1.1"
+datetime = "0.7.1"
 
 [libraries]
 # android
@@ -49,6 +50,7 @@ kotlinx-rpc-krpc-server = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-ser
 kotlinx-rpc-krpc-ktor-client = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-ktor-client", version.ref = "rpc" }
 kotlinx-rpc-krpc-ktor-server = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-ktor-server", version.ref = "rpc" }
 kotlinx-rpc-krpc-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-serialization-json", version.ref = "rpc" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 
 [plugins]
 hotreload = { id = "org.jetbrains.compose.hot-reload", version.ref = "hotreload" }

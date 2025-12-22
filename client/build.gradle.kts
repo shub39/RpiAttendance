@@ -50,6 +50,7 @@ kotlin {
             implementation(libs.kotlinx.rpc.krpc.ktor.client)
             implementation(libs.kotlinx.rpc.krpc.serialization.json)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.kotlinx.datetime)
         }
         androidMain.dependencies {
             implementation(compose.preview)
