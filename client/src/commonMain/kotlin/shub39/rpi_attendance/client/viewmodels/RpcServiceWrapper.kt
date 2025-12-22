@@ -38,7 +38,6 @@ class RpcServiceWrapper {
     }
 
     fun checkUrl(url: String) {
-        println(url)
         rpcCheckJob?.cancel()
         rpcCheckJob = scope.launch {
             try {
