@@ -21,7 +21,9 @@ fun main() {
     val client = HttpClient(Curl) {
         install(ContentNegotiation) {
             json(
-                json = Json { ignoreUnknownKeys = true }
+                json = Json {
+                    ignoreUnknownKeys = true
+                }
             )
         }
 
@@ -54,7 +56,7 @@ fun main() {
                 rpcConfig {
                     serialization {
                         json {
-                            ignoreUnknownKeys = true
+                            allowStructuredMapKeys = true
                         }
                     }
                 }

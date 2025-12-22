@@ -8,8 +8,16 @@ import data.database.CourseDao
 import data.database.StudentDao
 import data.database.TeacherDao
 import domain.SensorServer
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import models.AttendanceLog
 import models.Course
 import models.Student
@@ -23,6 +31,8 @@ class AdminInterfaceImpl(
     private val sensorServer: SensorServer
 ) : AdminInterface {
     val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    override suspend fun getStatus(): Boolean = true
 
     override fun getStudents(): Flow<List<Student>> = studentDao
         .getAllStudents()

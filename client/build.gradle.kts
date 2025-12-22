@@ -20,7 +20,7 @@ kotlin {
     }
 
     jvm()
-    android {
+    androidLibrary {
         namespace = "shub39.rpi_attendance"
         compileSdk {
             version = release(libs.versions.android.compileSdk.get().toInt())
@@ -28,6 +28,7 @@ kotlin {
         minSdk {
             version = release(libs.versions.android.minSdk.get().toInt())
         }
+        androidResources.enable = true
     }
 
     sourceSets {
@@ -39,12 +40,16 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.ui)
             implementation(compose.components.resources)
+            implementation(compose.preview)
+            implementation(compose.uiTooling)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.rpc.krpc.client)
             implementation(libs.kotlinx.rpc.krpc.ktor.client)
+            implementation(libs.kotlinx.rpc.krpc.serialization.json)
+            implementation(libs.ktor.client.okhttp)
         }
         androidMain.dependencies {
             implementation(compose.preview)

@@ -9,11 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:name=".MainApplication"
-        android:theme="@style/Theme.RpiAttendance.Splash">
+        android:theme="@style/Theme.RpiAttendance">
         <activity
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
-            android:theme="@style/Theme.RpiAttendance"
+            android:theme="@style/Theme.RpiAttendance.Splash"
             android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

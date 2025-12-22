@@ -8,6 +8,8 @@ import models.Teacher
 // what the admin can do
 @Rpc
 interface AdminInterface {
+    suspend fun getStatus(): Boolean
+
     fun getStudents(): Flow<List<Student>>
     fun getTeachers(): Flow<List<Teacher>>
     fun getCourses(): Flow<List<Course>>

@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.ui.di
+package shub39.rpi_attendance.client.di
 
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
