@@ -23,6 +23,7 @@ data class StudentEntity(
     val biometricId: String?,
     val firstName: String,
     val lastName: String,
+    val rollNo: Int,
     val contactEmail: String,
     val contactPhone: String
 )

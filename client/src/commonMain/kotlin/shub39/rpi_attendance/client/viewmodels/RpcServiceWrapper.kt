@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.rpc.krpc.ktor.client.installKrpc
 import kotlinx.rpc.krpc.ktor.client.rpc
 import kotlinx.rpc.krpc.ktor.client.rpcConfig
@@ -50,23 +48,17 @@ class RpcServiceWrapper {
                     adminInterface.getStudents(),
                     adminInterface.getTeachers(),
                     adminInterface.getCourses(),
-                    adminInterface.getAttendanceLogs()
-                ) { students, teachers, courses, attendanceLogs ->
+                ) { students, teachers, courses ->
                     val studentsByCourses = courses.map { course ->
                         course to students.filter { it.courseId == course.id }
                     }
-                    val attendanceLogsByDates = attendanceLogs.groupBy {
-                        it.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date
-                    }.toList()
 
                     models.update {
                         it.copy(
                             students = students,
                             teachers = teachers,
                             courses = courses,
-                            attendanceLogs = attendanceLogs,
                             studentsByCourses = studentsByCourses,
-                            attendanceLogsByDates = attendanceLogsByDates
                         )
                     }
                 }.launchIn(this)

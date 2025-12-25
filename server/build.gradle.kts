@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.kotlinx.rpc.krpc.server)
             implementation(libs.kotlinx.rpc.krpc.ktor.server)
             implementation(libs.kotlinx.rpc.krpc.serialization.json)
+            implementation(libs.kotlinx.datetime)
         }
     }
 }

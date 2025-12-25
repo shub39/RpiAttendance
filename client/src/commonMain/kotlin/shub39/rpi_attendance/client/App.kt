@@ -3,17 +3,12 @@ package shub39.rpi_attendance.client
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,8 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import rpiattendance.client.generated.resources.Res
@@ -33,6 +28,18 @@ import rpiattendance.client.generated.resources.app_name
 import rpiattendance.client.generated.resources.connect
 import rpiattendance.client.generated.resources.enter_ip
 import shub39.rpi_attendance.client.viewmodels.AppViewModel
+
+@Serializable
+sealed interface MainRoutes {
+    @Serializable
+    data object StudentList: MainRoutes
+
+    @Serializable
+    data object TeacherList: MainRoutes
+
+    @Serializable
+    data object AttendanceLog: MainRoutes
+}
 
 @Composable
 fun App(
@@ -98,20 +105,7 @@ private fun AppContent(
                 }
             }
         } else {
-            Scaffold(
-                modifier = modifier
-            ) { padding ->
-                LazyColumn(
-                    contentPadding = PaddingValues(
-                        top = padding.calculateTopPadding(),
-                        bottom = padding.calculateBottomPadding(),
-                        start = padding.calculateStartPadding(LocalLayoutDirection.current) + 16.dp,
-                        end = padding.calculateEndPadding(LocalLayoutDirection.current) + 16.dp
-                    )
-                ) {
 
-                }
-            }
         }
     }
 }

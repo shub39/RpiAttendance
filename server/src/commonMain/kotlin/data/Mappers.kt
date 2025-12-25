@@ -16,6 +16,7 @@ fun StudentEntity.toStudent(): Student {
         biometricId = biometricId,
         firstName = firstName,
         lastName = lastName,
+        rollNo = rollNo,
         contactEmail = contactEmail,
         contactPhone = contactPhone,
     )
@@ -28,6 +29,7 @@ fun Student.toStudentEntity(): StudentEntity {
         biometricId = biometricId,
         firstName = firstName,
         lastName = lastName,
+        rollNo = rollNo,
         contactEmail = contactEmail,
         contactPhone = contactPhone
     )

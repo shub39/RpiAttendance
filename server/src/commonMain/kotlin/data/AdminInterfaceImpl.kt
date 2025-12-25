@@ -18,8 +18,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import models.AttendanceLog
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import models.Course
+import models.EntityType
+import models.Session
 import models.Student
 import models.Teacher
 
@@ -49,10 +53,48 @@ class AdminInterfaceImpl(
         .map { flow -> flow.map { course -> course.toCourse() } }
         .flowOn(Dispatchers.IO)
 
-    override fun getAttendanceLogs(): Flow<List<AttendanceLog>> = attendanceLogDao
-        .getAttendanceLogs()
-        .map { flow -> flow.map { attendanceLog -> attendanceLog.toAttendanceLog() } }
-        .flowOn(Dispatchers.IO)
+    override suspend fun getSessionsForDate(courseId: Long, date: LocalDate): List<Session> {
+        val logs = attendanceLogDao.getAttendanceLogs().first()
+            .filter { it.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == date }
+
+        val teachers = teacherDao.getAllTeachers().first()
+        val students = studentDao.getAllStudents().first()
+            .filter { it.courseId == courseId }
+
+        return logs
+            .filter { it.entityType == EntityType.TEACHER }
+            .groupBy { it.entityId }
+            .mapNotNull { (teacherId, teacherLogs) ->
+                val teacher = teachers.find { it.id == teacherId } ?: return@mapNotNull null
+
+                val sessionStartTime = teacherLogs.minByOrNull { it.timeStamp }?.timeStamp
+                val sessionEndTime = teacherLogs.maxByOrNull { it.timeStamp }?.timeStamp
+
+                if (sessionStartTime == null || sessionEndTime == null) {
+                    return@mapNotNull null
+                }
+
+                val studentsPresent = students
+                    .filter { student ->
+                        student.courseId == courseId &&
+                        logs.any { log ->
+                            log.entityId == student.id &&
+                                    log.timeStamp >= sessionStartTime &&
+                                    log.timeStamp <= sessionEndTime
+                        }
+                    }
+                    .map { it.toStudent() }
+
+                Session(
+                    courseId = courseId,
+                    teacher = teacher.toTeacher(),
+                    startTime = sessionStartTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
+                    endTime = sessionEndTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
+                    totalStudents = students.size,
+                    students = studentsPresent
+                )
+            }
+    }
 
     override suspend fun upsertStudent(student: Student) {
         studentDao.upsert(student.toStudentEntity())

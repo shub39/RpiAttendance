@@ -9,6 +9,7 @@ data class Student(
     val biometricId: String?,
     val firstName: String,
     val lastName: String,
+    val rollNo: Int,
     val contactEmail: String,
     val contactPhone: String
 )

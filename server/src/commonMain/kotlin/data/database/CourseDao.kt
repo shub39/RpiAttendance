@@ -14,6 +14,9 @@ interface CourseDao {
     @Delete
     suspend fun delete(course: CourseEntity)
 
+    @Query("SELECT * FROM courses WHERE id = :id")
+    suspend fun getCourse(id: Long): CourseEntity?
+
     @Query("SELECT * FROM courses")
     fun getAllCourses(): Flow<List<CourseEntity>>
 }
