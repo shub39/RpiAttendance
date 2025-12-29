@@ -3,7 +3,7 @@ agp = "9.0.0-rc01"
 android-compileSdk = "36"
 android-minSdk = "27"
 compose-multiplatform = "1.9.3"
-kotlin = "2.3.0-RC3"
+kotlin = "2.3.0"
 ktor = "3.3.3"
 rpc = "0.10.1"
 room = "2.8.4"
@@ -11,11 +11,12 @@ sqlite = "2.6.2"
 ksp = "2.3.3"
 splashscreen = "1.2.0"
 androidx-activity-compose = "1.12.2"
-androidx-lifecycle = "2.9.6"
+androidx-lifecycle = "2.10.0-alpha07"
 coroutines = "1.10.2"
 hotreload = "1.0.0"
 koin = "4.1.1"
 datetime = "0.7.1"
+navigation = "2.9.1"
 
 [libraries]
 # android
@@ -41,6 +42,9 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+
+# Navigation
+jetbrains-compose-navigation = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref= "navigation"}
 
 # others
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }

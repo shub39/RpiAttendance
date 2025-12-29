@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.kotlinx.rpc.krpc.serialization.json)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.jetbrains.compose.navigation)
         }
         androidMain.dependencies {
             implementation(compose.preview)

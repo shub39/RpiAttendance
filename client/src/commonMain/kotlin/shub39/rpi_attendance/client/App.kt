@@ -27,6 +27,7 @@ import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.app_name
 import rpiattendance.client.generated.resources.connect
 import rpiattendance.client.generated.resources.enter_ip
+import shub39.rpi_attendance.client.screens.MainScreens
 import shub39.rpi_attendance.client.viewmodels.AppViewModel
 
 @Serializable
@@ -70,6 +71,7 @@ private fun AppContent(
         targetState = showApp
     ) { showAppContent ->
         if (!showAppContent) {
+            // prompt to enter Ip
             var ip by remember { mutableStateOf("") }
 
             Surface {
@@ -105,7 +107,7 @@ private fun AppContent(
                 }
             }
         } else {
-
+            MainScreens()
         }
     }
 }
