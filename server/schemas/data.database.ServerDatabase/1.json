@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "24f324548a67901e7271b4c1dc4cebdb",
+    "identityHash": "2483b061e9544cdd13a51a9ed741ce4b",
     "entities": [
       {
         "tableName": "students",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `courseId` INTEGER NOT NULL, `biometricId` TEXT, `firstName` TEXT NOT NULL, `lastName` TEXT NOT NULL, `contactEmail` TEXT NOT NULL, `contactPhone` TEXT NOT NULL, FOREIGN KEY(`courseId`) REFERENCES `courses`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `courseId` INTEGER NOT NULL, `biometricId` TEXT, `firstName` TEXT NOT NULL, `lastName` TEXT NOT NULL, `rollNo` INTEGER NOT NULL, `contactEmail` TEXT NOT NULL, `contactPhone` TEXT NOT NULL, FOREIGN KEY(`courseId`) REFERENCES `courses`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -35,6 +35,12 @@
             "fieldPath": "lastName",
             "columnName": "lastName",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rollNo",
+            "columnName": "rollNo",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -256,7 +262,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '24f324548a67901e7271b4c1dc4cebdb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2483b061e9544cdd13a51a9ed741ce4b')"
     ]
   }
 }

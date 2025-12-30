@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import rpiattendance.client.generated.resources.Res
@@ -30,18 +29,6 @@ import rpiattendance.client.generated.resources.enter_ip
 import shub39.rpi_attendance.client.screens.MainScreens
 import shub39.rpi_attendance.client.viewmodels.AppViewModel
 
-@Serializable
-sealed interface MainRoutes {
-    @Serializable
-    data object StudentList: MainRoutes
-
-    @Serializable
-    data object TeacherList: MainRoutes
-
-    @Serializable
-    data object AttendanceLog: MainRoutes
-}
-
 @Composable
 fun App(
     modifier: Modifier = Modifier,
@@ -49,12 +36,14 @@ fun App(
 ) {
     val isInterfaceChecked by mainViewModel.isInterfaceChecked.collectAsState()
 
-    AppContent(
-        modifier = modifier,
-        isInterfaceChecked = isInterfaceChecked,
-        onCheckIp = { mainViewModel.checkUrl(it) },
-        onSetUrl = { mainViewModel.setUrl(it) }
-    )
+    MaterialTheme {
+        AppContent(
+            modifier = modifier,
+            isInterfaceChecked = isInterfaceChecked,
+            onCheckIp = { mainViewModel.checkUrl(it) },
+            onSetUrl = { mainViewModel.setUrl(it) }
+        )
+    }
 }
 
 @Composable
