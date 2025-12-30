@@ -13,9 +13,10 @@ import androidx.compose.ui.Modifier
 fun StudentsScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues,
-    state: StudentsScreenState
+    state: StudentsScreenState,
+    onAction: (StudentsScreenAction) -> Unit
 ) {
-    if (state.studentsByCourse == null) return
+    if (state.selectedStudentsByCourse == null) return
 
     LazyColumn(
         modifier = modifier,
@@ -24,7 +25,7 @@ fun StudentsScreen(
         stickyHeader {
             LargeTopAppBar(
                 title = {
-                    Text(text = state.studentsByCourse.first.name)
+                    Text(text = state.selectedStudentsByCourse.first.name)
                 }
             )
         }

@@ -2,11 +2,11 @@ package shub39.rpi_attendance.client.screens.students_screen
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import shub39.rpi_attendance.client.viewmodels.StudentsByCourse
+import shub39.rpi_attendance.client.StudentsByCourse
 
 @Stable
 @Immutable
 data class StudentsScreenState(
-    val studentsByCourse: StudentsByCourse? = null,
-
+    val studentsByCourses: List<StudentsByCourse> = emptyList(),
+    val selectedStudentsByCourse: StudentsByCourse? = null,
 )

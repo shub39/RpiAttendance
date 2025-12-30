@@ -5,9 +5,11 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import shub39.rpi_attendance.client.viewmodels.AppViewModel
 import shub39.rpi_attendance.client.viewmodels.RpcServiceWrapper
+import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
 
 val modules = module {
     singleOf(::RpcServiceWrapper)
 
     viewModelOf(::AppViewModel)
+    viewModelOf(::StudentsScreenViewModel)
 }
