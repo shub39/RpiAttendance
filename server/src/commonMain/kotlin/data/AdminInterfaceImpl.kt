@@ -4,7 +4,6 @@ import AdminInterface
 import EnrollState
 import Result
 import data.database.AttendanceLogDao
-import data.database.CourseDao
 import data.database.StudentDao
 import data.database.TeacherDao
 import domain.SensorServer
@@ -21,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import models.Course
 import models.EntityType
 import models.Session
 import models.Student
@@ -30,7 +28,6 @@ import models.Teacher
 class AdminInterfaceImpl(
     private val studentDao: StudentDao,
     private val teacherDao: TeacherDao,
-    private val courseDao: CourseDao,
     private val attendanceLogDao: AttendanceLogDao,
     private val sensorServer: SensorServer
 ) : AdminInterface {
@@ -48,18 +45,12 @@ class AdminInterfaceImpl(
         .map { flow -> flow.map { teachers -> teachers.toTeacher() } }
         .flowOn(Dispatchers.IO)
 
-    override fun getCourses(): Flow<List<Course>> = courseDao
-        .getAllCourses()
-        .map { flow -> flow.map { course -> course.toCourse() } }
-        .flowOn(Dispatchers.IO)
-
     override suspend fun getSessionsForDate(courseId: Long, date: LocalDate): List<Session> {
         val logs = attendanceLogDao.getAttendanceLogs().first()
             .filter { it.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == date }
 
         val teachers = teacherDao.getAllTeachers().first()
         val students = studentDao.getAllStudents().first()
-            .filter { it.courseId == courseId }
 
         return logs
             .filter { it.entityType == EntityType.TEACHER }
@@ -76,7 +67,6 @@ class AdminInterfaceImpl(
 
                 val studentsPresent = students
                     .filter { student ->
-                        student.courseId == courseId &&
                         logs.any { log ->
                             log.entityId == student.id &&
                                     log.timeStamp >= sessionStartTime &&
@@ -86,7 +76,6 @@ class AdminInterfaceImpl(
                     .map { it.toStudent() }
 
                 Session(
-                    courseId = courseId,
                     teacher = teacher.toTeacher(),
                     startTime = sessionStartTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
                     endTime = sessionEndTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
@@ -104,10 +93,6 @@ class AdminInterfaceImpl(
         teacherDao.upsert(teacher.toTeacherEntity())
     }
 
-    override suspend fun upsertCourse(course: Course) {
-        courseDao.upsert(course.toCourseEntity())
-    }
-
     override suspend fun deleteStudent(student: Student) {
         student.biometricId?.toIntOrNull()?.let { deleteBiometrics(it) }
         studentDao.delete(student.toStudentEntity())
@@ -116,24 +101,6 @@ class AdminInterfaceImpl(
     override suspend fun deleteTeacher(teacher: Teacher) {
         teacher.biometricId?.toIntOrNull()?.let { deleteBiometrics(it) }
         teacherDao.delete(teacher.toTeacherEntity())
-    }
-
-    override suspend fun deleteCourse(course: Course) {
-        val attendanceLogs = attendanceLogDao.getAttendanceLogs().first()
-        studentDao
-            .getAllStudents()
-            .first()
-            .filter { it.courseId == course.id }
-            .forEach { studentEntity ->
-                studentEntity.biometricId?.toIntOrNull()?.let {
-                    deleteBiometrics(it)
-                    attendanceLogs
-                        .filter { entity -> entity.entityId == studentEntity.id }
-                        .forEach { entity -> attendanceLogDao.delete(entity) }
-                }
-            }
-
-        courseDao.delete(course.toCourseEntity())
     }
 
     override fun addBiometricDetailsForStudent(student: Student): Flow<EnrollState> =

@@ -1,18 +1,15 @@
 package data
 
 import data.database.AttendanceLogEntity
-import data.database.CourseEntity
 import data.database.StudentEntity
 import data.database.TeacherEntity
 import models.AttendanceLog
-import models.Course
 import models.Student
 import models.Teacher
 
 fun StudentEntity.toStudent(): Student {
     return Student(
         id = id,
-        courseId = courseId,
         biometricId = biometricId,
         firstName = firstName,
         lastName = lastName,
@@ -25,7 +22,6 @@ fun StudentEntity.toStudent(): Student {
 fun Student.toStudentEntity(): StudentEntity {
     return StudentEntity(
         id = id,
-        courseId = courseId,
         biometricId = biometricId,
         firstName = firstName,
         lastName = lastName,
@@ -52,24 +48,6 @@ fun Teacher.toTeacherEntity(): TeacherEntity {
         firstName = firstName,
         lastName = lastName,
         subjectTaught = subjectTaught
-    )
-}
-
-fun CourseEntity.toCourse(): Course {
-    return Course(
-        id = id,
-        name = name,
-        description = description,
-        code = code
-    )
-}
-
-fun Course.toCourseEntity(): CourseEntity {
-    return CourseEntity(
-        id = id,
-        name = name,
-        description = description,
-        code = code
     )
 }
 

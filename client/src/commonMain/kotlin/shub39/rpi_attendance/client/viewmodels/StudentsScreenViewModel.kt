@@ -6,11 +6,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import shub39.rpi_attendance.client.screens.students_screen.StudentsScreenAction
 import shub39.rpi_attendance.client.screens.students_screen.StudentsScreenState
@@ -39,18 +36,7 @@ class StudentsScreenViewModel(
         dataSyncJob?.cancel()
         dataSyncJob = viewModelScope.launch {
             rpcServiceWrapper.rpcService?.let { adminInterface ->
-                combine(
-                    adminInterface.getStudents(),
-                    adminInterface.getCourses()
-                ) { students, courses ->
-                    val studentsByCourses = courses.map { course ->
-                        course to students.filter { it.courseId == course.id }
-                    }
-
-                    _state.update {
-                        it.copy(studentsByCourses = studentsByCourses)
-                    }
-                }.launchIn(this)
+                adminInterface
             }
         }
     }

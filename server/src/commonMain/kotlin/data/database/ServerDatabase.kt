@@ -1,13 +1,16 @@
 package data.database
 
-import androidx.room.*
+import androidx.room.ConstructedBy
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.RoomDatabaseConstructor
+import androidx.room.TypeConverters
 
 @Database(
     entities = [
         StudentEntity::class,
         TeacherEntity::class,
         AttendanceLogEntity::class,
-        CourseEntity::class
     ],
     version = 1,
 )
@@ -17,7 +20,6 @@ abstract class ServerDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
     abstract fun teacherDao(): TeacherDao
     abstract fun attendanceLogDao(): AttendanceLogDao
-    abstract fun courseDao(): CourseDao
 }
 
 @Suppress("KotlinNoActualForExpect")

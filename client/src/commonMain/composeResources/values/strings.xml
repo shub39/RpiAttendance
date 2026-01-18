@@ -4,6 +4,7 @@
     <string name="enter_ip">Enter IP</string>
     <string name="connect">Connect</string>
     <string name="students">Students</string>
+    <string name="students_enrolled_template">%1$d students enrolled</string>
     <string name="teachers">Teachers</string>
     <string name="attendance_log">Attendance Log</string>
 </resources>

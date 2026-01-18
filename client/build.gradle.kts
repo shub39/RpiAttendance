@@ -53,7 +53,7 @@ kotlin {
             implementation(libs.jetbrains.compose.navigation)
         }
         androidMain.dependencies {
-            implementation("org.jetbrains.compose.ui:ui-tooling-preview:1.10.0")
+            implementation(libs.compose.ui.tooling.preview)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
         }
