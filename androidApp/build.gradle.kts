@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.components.resources)
     implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)

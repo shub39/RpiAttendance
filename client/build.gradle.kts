@@ -41,7 +41,6 @@ kotlin {
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.ui.tooling.preview)
-            implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
@@ -51,6 +50,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.datetime)
             implementation(libs.jetbrains.compose.navigation)
+            implementation(libs.compose.ui.tooling)
         }
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)

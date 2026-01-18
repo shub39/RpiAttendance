@@ -71,8 +71,8 @@ fun StudentsScreen(
             contentPadding = PaddingValues(
                 top = paddingValues.calculateTopPadding() + 16.dp,
                 bottom = paddingValues.calculateBottomPadding() + 60.dp,
-                start = paddingValues.calculateLeftPadding(LocalLayoutDirection.current) + 16.dp,
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + 16.dp
+                start = paddingValues.calculateLeftPadding(LocalLayoutDirection.current),
+                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current)
             )
         ) {
             items(state.students) { student ->

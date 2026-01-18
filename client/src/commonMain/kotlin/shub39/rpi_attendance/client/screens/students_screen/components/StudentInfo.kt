@@ -1,0 +1,84 @@
+package shub39.rpi_attendance.client.screens.students_screen.components
+
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import models.Student
+import org.jetbrains.compose.resources.painterResource
+import rpiattendance.client.generated.resources.Res
+import rpiattendance.client.generated.resources.create
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun StudentInfo(
+    modifier: Modifier = Modifier,
+    student: Student,
+    onEdit: () -> Unit
+) {
+    Card(
+        modifier = modifier.animateContentSize(),
+        shape = MaterialTheme.shapes.extraExtraLarge
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = student.firstName,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = student.rollNo.toString()
+                    )
+                }
+
+                IconButton(
+                    onClick = {}
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.create),
+                        contentDescription = "Edit"
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+@Preview
+private fun Preview() {
+    StudentInfo(
+        student = Student(
+            id = 1,
+            biometricId = "as",
+            firstName = "Shubham",
+            lastName = "Gorai",
+            rollNo = 12213,
+            contactEmail = "asasa",
+            contactPhone = "112123"
+        ),
+        onEdit = {}
+    )
+}
