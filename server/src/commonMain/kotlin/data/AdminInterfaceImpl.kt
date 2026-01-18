@@ -128,6 +128,8 @@ class AdminInterfaceImpl(
     private fun addBiometricDetails(
         onSuccess: (String) -> Unit
     ): Flow<EnrollState> = flow {
+        emit(EnrollState.Enrolling)
+
         when (val fingerprintResult = sensorServer.enrollFingerPrint()) {
             is Result.Error -> emit(EnrollState.EnrollFailed(fingerprintResult.debugMessage))
             is Result.Success -> {

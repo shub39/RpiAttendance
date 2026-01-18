@@ -4,5 +4,5 @@ import models.Student
 
 sealed interface StudentsScreenAction {
     data class DeleteStudent(val student: Student): StudentsScreenAction
-    data class EnrollStudent(val student: Student): StudentsScreenAction
+    data class AddStudent(val student: Student): StudentsScreenAction
 }

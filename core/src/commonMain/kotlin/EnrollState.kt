@@ -3,6 +3,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface EnrollState {
     @Serializable
+    data object Idle: EnrollState
+
+    @Serializable
+    data object Enrolling: EnrollState
+
+    @Serializable
     data object FingerprintEnrolled: EnrollState
 
     @Serializable

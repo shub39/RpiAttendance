@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:name=".MainApplication"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.RpiAttendance">
         <activity
             android:exported="true"
