@@ -35,24 +35,27 @@ fun App(
     modifier: Modifier = Modifier,
     mainViewModel: AppViewModel = koinInject()
 ) {
+    val serverUrl by mainViewModel.serverUrl.collectAsState()
     val isInterfaceChecked by mainViewModel.isInterfaceChecked.collectAsState()
 
     AppTheme {
-       AppContent(
-           modifier = modifier,
-           isInterfaceChecked = isInterfaceChecked,
-           onCheckIp = { mainViewModel.checkUrl(it) },
-           onSetUrl = { mainViewModel.setUrl(it) }
-       )
-   }
+        AppContent(
+            modifier = modifier,
+            isInterfaceChecked = isInterfaceChecked,
+            serverUrl = serverUrl,
+            onSetUrl = { mainViewModel.updateServerUrl(it) },
+            onSaveUrl = { mainViewModel.saveUrl(it) }
+        )
+    }
 }
 
 @Composable
 private fun AppContent(
     modifier: Modifier = Modifier,
+    serverUrl: String,
     isInterfaceChecked: Boolean,
-    onCheckIp: (String) -> Unit,
-    onSetUrl: (String) -> Unit
+    onSetUrl: (String) -> Unit,
+    onSaveUrl: (String) -> Unit
 ) {
     var showApp by remember { mutableStateOf(false) }
 
@@ -62,8 +65,6 @@ private fun AppContent(
     ) { showAppContent ->
         if (!showAppContent) {
             // prompt to enter Ip
-            var ip by remember { mutableStateOf("") }
-
             Surface {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -76,19 +77,17 @@ private fun AppContent(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
-                        value = ip,
-                        onValueChange = {
-                            ip = it
-                            onCheckIp(it)
-                        },
+                        value = serverUrl,
+                        onValueChange = { onSetUrl(it) },
                         label = { Text(stringResource(Res.string.enter_ip)) },
+                        singleLine = true,
                         shape = MaterialTheme.shapes.extraLarge
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(
                         onClick = {
+                            onSaveUrl(serverUrl)
                             showApp = true
-                            onSetUrl(ip)
                         },
                         enabled = isInterfaceChecked
                     ) {

@@ -221,7 +221,7 @@ fun StudentUpsertSheet(
                                 enabled = isValidStudentData
                             ) {
                                 Text(
-                                    text = if (newStudent.biometricId == null || enrollState !is EnrollState.EnrollComplete) {
+                                    text = if (newStudent.biometricId == null || enrollState is EnrollState.EnrollComplete) {
                                         "Enroll"
                                     } else {
                                         "Delete"
