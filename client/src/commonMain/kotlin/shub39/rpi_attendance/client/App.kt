@@ -26,7 +26,8 @@ import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.app_name
 import rpiattendance.client.generated.resources.connect
 import rpiattendance.client.generated.resources.enter_ip
-import shub39.rpi_attendance.client.screens.MainScreens
+import shub39.rpi_attendance.client.presentation.MainScreens
+import shub39.rpi_attendance.client.presentation.theme.AppTheme
 import shub39.rpi_attendance.client.viewmodels.AppViewModel
 
 @Composable
@@ -36,14 +37,14 @@ fun App(
 ) {
     val isInterfaceChecked by mainViewModel.isInterfaceChecked.collectAsState()
 
-    MaterialTheme {
-        AppContent(
-            modifier = modifier,
-            isInterfaceChecked = isInterfaceChecked,
-            onCheckIp = { mainViewModel.checkUrl(it) },
-            onSetUrl = { mainViewModel.setUrl(it) }
-        )
-    }
+    AppTheme {
+       AppContent(
+           modifier = modifier,
+           isInterfaceChecked = isInterfaceChecked,
+           onCheckIp = { mainViewModel.checkUrl(it) },
+           onSetUrl = { mainViewModel.setUrl(it) }
+       )
+   }
 }
 
 @Composable

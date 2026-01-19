@@ -18,6 +18,9 @@ data class KeypadResponse(val key: Char?)
 data class StatusResponse(val status: String, val ip: String)
 
 @Serializable
+data class Response(val status: String)
+
+@Serializable
 data class DisplayRequest(val lines: List<String>)
 
 @Serializable

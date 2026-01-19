@@ -3,6 +3,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface EnrollState {
     @Serializable
+    data object Idle: EnrollState
+
+    @Serializable
+    data object Enrolling: EnrollState
+
+    @Serializable
     data object FingerprintEnrolled: EnrollState
 
     @Serializable
@@ -10,4 +16,10 @@ sealed interface EnrollState {
 
     @Serializable
     data class EnrollFailed(val errorMessage: String?): EnrollState
+
+    companion object {
+        fun EnrollState.isEnrolling(): Boolean {
+            return this is Enrolling || this is FingerprintEnrolled
+        }
+    }
 }
