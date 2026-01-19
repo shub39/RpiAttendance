@@ -86,10 +86,22 @@ class AdminInterfaceImpl(
     }
 
     override suspend fun upsertStudent(student: Student) {
+        val presentStudent = studentDao.getStudentById(student.id)
+        if (presentStudent != null) {
+            if (presentStudent.biometricId != null && student.biometricId == null) {
+                deleteBiometrics(presentStudent.biometricId.toInt())
+            }
+        }
         studentDao.upsert(student.toStudentEntity())
     }
 
     override suspend fun upsertTeacher(teacher: Teacher) {
+        val presentTeacher = teacherDao.getTeacherById(teacher.id)
+        if (presentTeacher != null) {
+            if (presentTeacher.biometricId != null && teacher.biometricId == null) {
+                deleteBiometrics(presentTeacher.biometricId.toInt())
+            }
+        }
         teacherDao.upsert(teacher.toTeacherEntity())
     }
 

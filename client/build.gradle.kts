@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.compose.ui.tooling)
+            implementation(libs.materialkolor)
         }
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)

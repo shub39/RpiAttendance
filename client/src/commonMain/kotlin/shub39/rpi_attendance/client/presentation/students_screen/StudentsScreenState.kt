@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.screens.students_screen
+package shub39.rpi_attendance.client.presentation.students_screen
 
 import EnrollState
 import androidx.compose.runtime.Immutable

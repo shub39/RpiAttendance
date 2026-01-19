@@ -7,4 +7,9 @@
     <string name="students_enrolled_template">%1$d students enrolled</string>
     <string name="teachers">Teachers</string>
     <string name="attendance_log">Attendance Log</string>
+    <string name="add_student">Add Student</string>
+    <string name="edit_student">Edit Student</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
 </resources>

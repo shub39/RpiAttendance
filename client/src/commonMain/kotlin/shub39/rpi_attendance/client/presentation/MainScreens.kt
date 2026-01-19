@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.screens
+package shub39.rpi_attendance.client.presentation
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import shub39.rpi_attendance.client.navigation.Route
-import shub39.rpi_attendance.client.screens.students_screen.StudentsScreen
+import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreen
 import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
 
 @Composable

@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.screens.students_screen.components
+package shub39.rpi_attendance.client.presentation.students_screen.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.dp
 import models.Student
 import org.jetbrains.compose.resources.painterResource
 import rpiattendance.client.generated.resources.Res
-import rpiattendance.client.generated.resources.create
+import rpiattendance.client.generated.resources.edit
+import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -57,7 +58,7 @@ fun StudentInfo(
                     onClick = {}
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.create),
+                        painter = painterResource(Res.drawable.edit),
                         contentDescription = "Edit"
                     )
                 }
@@ -69,16 +70,18 @@ fun StudentInfo(
 @Composable
 @Preview
 private fun Preview() {
-    StudentInfo(
-        student = Student(
-            id = 1,
-            biometricId = "as",
-            firstName = "Shubham",
-            lastName = "Gorai",
-            rollNo = 12213,
-            contactEmail = "asasa",
-            contactPhone = "112123"
-        ),
-        onEdit = {}
-    )
+    AppTheme {
+        StudentInfo(
+            student = Student(
+                id = 1,
+                biometricId = "as",
+                firstName = "Shubham",
+                lastName = "Gorai",
+                rollNo = 12213,
+                contactEmail = "asasa",
+                contactPhone = "112123"
+            ),
+            onEdit = {}
+        )
+    }
 }

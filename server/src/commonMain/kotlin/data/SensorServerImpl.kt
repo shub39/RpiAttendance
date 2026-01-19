@@ -3,10 +3,30 @@ package data
 import EmptyResult
 import Result
 import SourceError
-import domain.*
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import domain.DisplayRequest
+import domain.FaceDeleteRequest
+import domain.FaceEnrollRequest
+import domain.FaceSearchResponse
+import domain.FaceSearchResult
+import domain.FingerPrintDeleteRequest
+import domain.FingerPrintEnrollResponse
+import domain.FingerPrintSearchResponse
+import domain.FingerprintSearchResult
+import domain.KeypadResponse
+import domain.KeypadResult
+import domain.Response
+import domain.SensorError
+import domain.SensorServer
+import domain.StatusResponse
+import domain.toKeypadResult
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.Url
+import io.ktor.http.contentType
 import safeCall
 
 class SensorServerImpl(
@@ -36,7 +56,7 @@ class SensorServerImpl(
     }
 
     override suspend fun enrollFace(name: String): EmptyResult<SensorError> {
-        val request: Result<StatusResponse, SourceError> = safeCall {
+        val request: Result<Response, SourceError> = safeCall {
             client.post(
                 url = Url("$BASE_URL/face/enroll")
             ) {
@@ -141,7 +161,7 @@ class SensorServerImpl(
     }
 
     override suspend fun deleteFingerPrint(id: Int): EmptyResult<SensorError> {
-        val request: Result<StatusResponse, SourceError> = safeCall {
+        val request: Result<Response, SourceError> = safeCall {
             client.post(
                 url = Url("$BASE_URL/fingerprint/delete")
             ) {
@@ -163,7 +183,7 @@ class SensorServerImpl(
     }
 
     override suspend fun deleteFace(id: String): EmptyResult<SensorError> {
-        val request: Result<StatusResponse, SourceError> = safeCall {
+        val request: Result<Response, SourceError> = safeCall {
             client.post(
                 url = Url("$BASE_URL/face/delete")
             ) {

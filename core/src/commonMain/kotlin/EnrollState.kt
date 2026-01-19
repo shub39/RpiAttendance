@@ -16,4 +16,10 @@ sealed interface EnrollState {
 
     @Serializable
     data class EnrollFailed(val errorMessage: String?): EnrollState
+
+    companion object {
+        fun EnrollState.isEnrolling(): Boolean {
+            return this is Enrolling || this is FingerprintEnrolled
+        }
+    }
 }
