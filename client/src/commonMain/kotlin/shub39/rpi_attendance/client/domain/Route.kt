@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.navigation
+package shub39.rpi_attendance.client.domain
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable

@@ -55,7 +55,7 @@ fun StudentInfo(
                 }
 
                 IconButton(
-                    onClick = {}
+                    onClick = onEdit
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.edit),

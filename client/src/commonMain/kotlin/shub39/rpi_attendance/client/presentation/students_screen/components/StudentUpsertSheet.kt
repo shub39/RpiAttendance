@@ -2,6 +2,7 @@ package shub39.rpi_attendance.client.presentation.students_screen.components
 
 import EnrollState
 import EnrollState.Companion.isEnrolling
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -59,16 +60,16 @@ fun StudentUpsertSheet(
     student: Student,
     onUpsert: (Student) -> Unit,
     onEnroll: (Student) -> Unit,
+    onDelete: (Student) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     var newStudent by remember { mutableStateOf(student) }
 
-    val isValidStudent = newStudent.firstName.isNotBlank() &&
+    val isValidStudentData = newStudent.firstName.isNotBlank() &&
             newStudent.lastName.isNotBlank() &&
             newStudent.rollNo > 0 &&
             newStudent.contactEmail.isNotBlank() &&
-            newStudent.contactPhone.isNotBlank() &&
-            newStudent != student
+            newStudent.contactPhone.isNotBlank()
 
     ModalBottomSheet(
         modifier = modifier,
@@ -76,34 +77,38 @@ fun StudentUpsertSheet(
         sheetGesturesEnabled = false,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.edit),
-                contentDescription = null,
-                modifier = Modifier.size(36.dp)
-            )
-            Text(
-                text = stringResource(
-                    if (isUpdate) {
-                        Res.string.edit_student
-                    } else {
-                        Res.string.add_student
-                    }
-                ),
-                style = MaterialTheme.typography.titleLarge
-            )
-            HorizontalDivider()
-        }
-
         LazyColumn(
             modifier = Modifier.heightIn(max = 500.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
+            stickyHeader {
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.edit),
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
+                    Text(
+                        text = stringResource(
+                            if (isUpdate) {
+                                Res.string.edit_student
+                            } else {
+                                Res.string.add_student
+                            }
+                        ),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    HorizontalDivider()
+                }
+            }
+
             item {
                 OutlinedTextField(
                     value = newStudent.firstName,
@@ -213,10 +218,10 @@ fun StudentUpsertSheet(
                                         newStudent = newStudent.copy(biometricId = null)
                                     }
                                 },
-                                enabled = isValidStudent
+                                enabled = isValidStudentData
                             ) {
                                 Text(
-                                    text = if (newStudent.biometricId == null) {
+                                    text = if (newStudent.biometricId == null || enrollState is EnrollState.EnrollComplete) {
                                         "Enroll"
                                     } else {
                                         "Delete"
@@ -229,42 +234,48 @@ fun StudentUpsertSheet(
                     }
                 )
             }
-        }
 
-        Column(
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            HorizontalDivider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = onDismissRequest,
-                    modifier = Modifier.weight(1f),
-                    enabled = enrollState is EnrollState.Idle ||
-                            enrollState is EnrollState.EnrollComplete ||
-                            enrollState is EnrollState.EnrollFailed
+            item {
+                Column(
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = stringResource(Res.string.delete)
-                    )
-                }
+                    HorizontalDivider()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                onDelete(newStudent)
+                                onDismissRequest()
+                            },
+                            modifier = Modifier.weight(1f),
+                            enabled = enrollState is EnrollState.Idle ||
+                                    enrollState is EnrollState.EnrollComplete ||
+                                    enrollState is EnrollState.EnrollFailed
+                        ) {
+                            Text(
+                                text = stringResource(Res.string.delete)
+                            )
+                        }
 
-                Button(
-                    onClick = {
-                        onUpsert(newStudent)
-                    },
-                    modifier = Modifier.weight(1f),
-                    enabled = isValidStudent
-                ) {
-                    Text(text = stringResource(Res.string.save))
+                        Button(
+                            onClick = {
+                                onUpsert(newStudent)
+                                onDismissRequest()
+                            },
+                            modifier = Modifier.weight(1f),
+                            enabled = isValidStudentData && student != newStudent
+                        ) {
+                            Text(text = stringResource(Res.string.save))
+                        }
+                    }
                 }
             }
         }
@@ -288,7 +299,8 @@ private fun Preview() {
             onUpsert = { },
             onDismissRequest = { },
             enrollState = EnrollState.Idle,
-            onEnroll = {}
+            onEnroll = {},
+            onDelete = {}
         )
     }
 }

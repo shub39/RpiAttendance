@@ -19,7 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import shub39.rpi_attendance.client.navigation.Route
+import shub39.rpi_attendance.client.domain.Route
 import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreen
 import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
 

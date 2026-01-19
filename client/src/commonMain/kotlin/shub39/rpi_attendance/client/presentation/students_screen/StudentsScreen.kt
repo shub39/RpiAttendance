@@ -52,6 +52,7 @@ fun StudentsScreen(
     onAction: (StudentsScreenAction) -> Unit
 ) {
     var showStudentAddSheet by remember { mutableStateOf(false) }
+    var editStudent by remember { mutableStateOf<Student?>(null) }
 
     Scaffold(
         modifier = Modifier.padding(contentPadding),
@@ -99,7 +100,7 @@ fun StudentsScreen(
                         StudentInfo(
                             student = student,
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            onEdit = {},
+                            onEdit = { editStudent = student },
                         )
                     }
                 }
@@ -135,7 +136,6 @@ fun StudentsScreen(
             isUpdate = false,
             enrollState = state.enrollState,
             student = Student(
-                id = 0,
                 biometricId = null,
                 firstName = "",
                 lastName = "",
@@ -148,8 +148,27 @@ fun StudentsScreen(
                 onAction(StudentsScreenAction.UpsertStudent(it))
                 onAction(StudentsScreenAction.EnrollStudent(it))
             },
+            onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
             onDismissRequest = { 
                 if (!state.enrollState.isEnrolling()) showStudentAddSheet = false
+            }
+        )
+    }
+
+    if (editStudent != null) {
+        StudentUpsertSheet(
+            modifier = Modifier.imePadding(),
+            isUpdate = true,
+            enrollState = state.enrollState,
+            student = editStudent!!,
+            onUpsert = { onAction(StudentsScreenAction.UpsertStudent(it)) },
+            onEnroll = {
+                onAction(StudentsScreenAction.UpsertStudent(it))
+                onAction(StudentsScreenAction.EnrollStudent(it))
+            },
+            onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
+            onDismissRequest = {
+                if (!state.enrollState.isEnrolling()) editStudent = null
             }
         )
     }

@@ -52,6 +52,7 @@ kotlin {
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.compose.ui.tooling)
             implementation(libs.materialkolor)
+            implementation(libs.androidx.datastore.core)
         }
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
