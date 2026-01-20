@@ -180,64 +180,81 @@ fun StudentUpsertSheet(
             }
 
             item {
-                ListItem(
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    ),
-                    leadingContent = {
-                        Icon(
-                            painter = painterResource(
-                                if (newStudent.biometricId == null) {
-                                    Res.drawable.fingerprint_off
+                if (isUpdate) {
+                    ListItem(
+                        colors = ListItemDefaults.colors(
+                            containerColor = Color.Transparent
+                        ),
+                        leadingContent = {
+                            Icon(
+                                painter = painterResource(
+                                    if (newStudent.biometricId == null) {
+                                        Res.drawable.fingerprint_off
+                                    } else {
+                                        Res.drawable.fingerprint
+                                    }
+                                ),
+                                contentDescription = null
+                            )
+                        },
+                        headlineContent = {
+                            Text(text = "Biometrics")
+                        },
+                        supportingContent = {
+                            Text(
+                                text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
+                                    when (enrollState) {
+                                        is EnrollState.EnrollFailed -> "Enroll Failed"
+                                        EnrollState.Enrolling -> "Enrolling"
+                                        EnrollState.FingerprintEnrolled -> "Fingerprint Enrolled..."
+                                        EnrollState.Idle -> "Not Enrolled"
+                                    }
                                 } else {
-                                    Res.drawable.fingerprint
+                                    "Enrolled"
                                 }
-                            ),
-                            contentDescription = null
-                        )
-                    },
-                    headlineContent = {
-                        Text(text = "Biometrics")
-                    },
-                    supportingContent = {
-                        Text(
-                            text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
-                                when (enrollState) {
-                                    is EnrollState.EnrollFailed -> "Enroll Failed"
-                                    EnrollState.Enrolling -> "Enrolling"
-                                    EnrollState.FingerprintEnrolled -> "Fingerprint Enrolled..."
-                                    EnrollState.Idle -> "Not Enrolled"
+                            )
+                        },
+                        trailingContent = {
+                            if (!enrollState.isEnrolling()) {
+                                Button(
+                                    onClick = {
+                                        if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
+                                            onEnroll(newStudent)
+                                        } else {
+                                            newStudent = newStudent.copy(biometricId = null)
+                                        }
+                                    },
+                                    enabled = isValidStudentData
+                                ) {
+                                    Text(
+                                        text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
+                                            "Enroll"
+                                        } else {
+                                            "Delete"
+                                        }
+                                    )
                                 }
                             } else {
-                                "Enrolled"
+                                LoadingIndicator()
                             }
-                        )
-                    },
-                    trailingContent = {
-                        if (!enrollState.isEnrolling()) {
-                            Button(
-                                onClick = {
-                                    if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
-                                        onEnroll(newStudent)
-                                    } else {
-                                        newStudent = newStudent.copy(biometricId = null)
-                                    }
-                                },
-                                enabled = isValidStudentData
-                            ) {
-                                Text(
-                                    text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
-                                        "Enroll"
-                                    } else {
-                                        "Delete"
-                                    }
-                                )
-                            }
-                        } else {
-                            LoadingIndicator()
                         }
-                    }
-                )
+                    )
+                } else {
+                    ListItem(
+                        headlineContent = {
+                            Text("Enroll Biometrics after saving data")
+                        },
+                        leadingContent = {
+                            Icon(
+                                painter = painterResource(Res.drawable.fingerprint_off),
+                                contentDescription = null
+                            )
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = Color.Transparent
+                        ),
+                    )
+                }
             }
 
             item {
