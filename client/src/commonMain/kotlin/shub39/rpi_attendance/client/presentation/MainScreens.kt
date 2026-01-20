@@ -21,7 +21,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import shub39.rpi_attendance.client.domain.Route
 import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreen
+import shub39.rpi_attendance.client.presentation.teachers_screen.TeachersScreen
 import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
+import shub39.rpi_attendance.client.viewmodels.TeachersScreenViewModel
 
 @Composable
 fun MainScreens(
@@ -58,7 +60,14 @@ fun MainScreens(
                 )
             }
             composable<Route.TeachersScreen> {
+                val viewModel = koinInject<TeachersScreenViewModel>()
+                val state by viewModel.state.collectAsState()
 
+                TeachersScreen(
+                    contentPadding = padding,
+                    state = state,
+                    onAction = viewModel::onAction
+                )
             }
             composable<Route.AttendanceLogScreen> {
 

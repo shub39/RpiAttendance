@@ -11,6 +11,7 @@ import shub39.rpi_attendance.client.domain.AppDatastore
 import shub39.rpi_attendance.client.viewmodels.AppViewModel
 import shub39.rpi_attendance.client.viewmodels.RpcServiceWrapper
 import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
+import shub39.rpi_attendance.client.viewmodels.TeachersScreenViewModel
 
 expect val platformModules: Module
 
@@ -21,4 +22,5 @@ val modules = module {
 
     viewModelOf(::AppViewModel)
     viewModelOf(::StudentsScreenViewModel)
+    viewModelOf(::TeachersScreenViewModel)
 }

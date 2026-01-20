@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.presentation.students_screen.components
+package shub39.rpi_attendance.client.presentation.teachers_screen.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import models.Student
+import models.Teacher
 import org.jetbrains.compose.resources.painterResource
 import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.edit
@@ -26,9 +26,9 @@ import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun StudentInfo(
+fun TeacherInfo(
     modifier: Modifier = Modifier,
-    student: Student,
+    teacher: Teacher,
     onEdit: () -> Unit
 ) {
     Card(
@@ -48,17 +48,17 @@ fun StudentInfo(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = student.firstName,
+                        text = teacher.firstName,
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        text = student.rollNo.toString()
+                        text = teacher.subjectTaught
                     )
                 }
 
                 Icon(
                     painter = painterResource(
-                        if (student.biometricId == null) {
+                        if (teacher.biometricId == null) {
                             Res.drawable.fingerprint_off
                         } else {
                             Res.drawable.fingerprint
@@ -84,15 +84,13 @@ fun StudentInfo(
 @Preview
 private fun Preview() {
     AppTheme {
-        StudentInfo(
-            student = Student(
+        TeacherInfo(
+            teacher = Teacher(
                 id = 1,
                 biometricId = "as",
                 firstName = "Shubham",
                 lastName = "Gorai",
-                rollNo = 12213,
-                contactEmail = "asasa",
-                contactPhone = "112123"
+                subjectTaught = "Chemistry"
             ),
             onEdit = {}
         )

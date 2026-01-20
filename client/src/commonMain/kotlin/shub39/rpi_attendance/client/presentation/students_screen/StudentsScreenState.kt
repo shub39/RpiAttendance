@@ -9,5 +9,7 @@ import models.Student
 @Immutable
 data class StudentsScreenState(
     val students: List<Student> = emptyList(),
-    val enrollState: EnrollState = EnrollState.Idle
+    val enrollState: EnrollState = EnrollState.Idle,
+    val searchResults: List<Student> = emptyList(),
+    val searchQuery: String = ""
 )

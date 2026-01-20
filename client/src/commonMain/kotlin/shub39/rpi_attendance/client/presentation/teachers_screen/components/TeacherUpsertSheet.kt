@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.presentation.students_screen.components
+package shub39.rpi_attendance.client.presentation.teachers_screen.components
 
 import EnrollState
 import EnrollState.Companion.isEnrolling
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -35,17 +34,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import models.Student
+import models.Teacher
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import rpiattendance.client.generated.resources.Res
-import rpiattendance.client.generated.resources.add_student
+import rpiattendance.client.generated.resources.add_teacher
 import rpiattendance.client.generated.resources.delete
 import rpiattendance.client.generated.resources.edit
-import rpiattendance.client.generated.resources.edit_student
+import rpiattendance.client.generated.resources.edit_teacher
 import rpiattendance.client.generated.resources.fingerprint
 import rpiattendance.client.generated.resources.fingerprint_off
 import rpiattendance.client.generated.resources.save
@@ -53,23 +51,21 @@ import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun StudentUpsertSheet(
+fun TeacherUpsertSheet(
     modifier: Modifier = Modifier,
     isUpdate: Boolean = false,
     enrollState: EnrollState,
-    student: Student,
-    onUpsert: (Student) -> Unit,
-    onEnroll: (Student) -> Unit,
-    onDelete: (Student) -> Unit,
+    teacher: Teacher,
+    onUpsert: (Teacher) -> Unit,
+    onEnroll: (Teacher) -> Unit,
+    onDelete: (Teacher) -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    var newStudent by remember { mutableStateOf(student) }
+    var newTeacher by remember { mutableStateOf(teacher) }
 
-    val isValidStudentData = newStudent.firstName.isNotBlank() &&
-            newStudent.lastName.isNotBlank() &&
-            newStudent.rollNo > 0 &&
-            newStudent.contactEmail.isNotBlank() &&
-            newStudent.contactPhone.isNotBlank()
+    val isValidTeacherData = newTeacher.firstName.isNotBlank() &&
+            newTeacher.lastName.isNotBlank() &&
+            newTeacher.subjectTaught.isNotBlank()
 
     ModalBottomSheet(
         modifier = modifier,
@@ -98,9 +94,9 @@ fun StudentUpsertSheet(
                     Text(
                         text = stringResource(
                             if (isUpdate) {
-                                Res.string.edit_student
+                                Res.string.edit_teacher
                             } else {
-                                Res.string.add_student
+                                Res.string.add_teacher
                             }
                         ),
                         style = MaterialTheme.typography.titleLarge
@@ -111,8 +107,8 @@ fun StudentUpsertSheet(
 
             item {
                 OutlinedTextField(
-                    value = newStudent.firstName,
-                    onValueChange = { newStudent = newStudent.copy(firstName = it) },
+                    value = newTeacher.firstName,
+                    onValueChange = { newTeacher = newTeacher.copy(firstName = it) },
                     label = { Text("First Name") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
@@ -124,8 +120,8 @@ fun StudentUpsertSheet(
 
             item {
                 OutlinedTextField(
-                    value = newStudent.lastName,
-                    onValueChange = { newStudent = newStudent.copy(lastName = it) },
+                    value = newTeacher.lastName,
+                    onValueChange = { newTeacher = newTeacher.copy(lastName = it) },
                     label = { Text("Last Name") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
@@ -137,42 +133,11 @@ fun StudentUpsertSheet(
 
             item {
                 OutlinedTextField(
-                    value = newStudent.rollNo.toString(),
-                    onValueChange = {
-                        if (it.toIntOrNull() != null) {
-                            newStudent = newStudent.copy(rollNo = it.toInt())
-                        }
-                    },
-                    label = { Text("Roll No") },
+                    value = newTeacher.subjectTaught,
+                    onValueChange = { newTeacher = newTeacher.copy(subjectTaught = it) },
+                    label = { Text("Subject Taught") },
                     singleLine = true,
                     shape = MaterialTheme.shapes.large,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                )
-            }
-
-            item {
-                OutlinedTextField(
-                    value = newStudent.contactEmail,
-                    onValueChange = { newStudent = newStudent.copy(contactEmail = it) },
-                    label = { Text("Email") },
-                    shape = MaterialTheme.shapes.large,
-                    singleLine = true,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                )
-            }
-
-            item {
-                OutlinedTextField(
-                    value = newStudent.contactPhone,
-                    onValueChange = { newStudent = newStudent.copy(contactPhone = it) },
-                    label = { Text("Phone") },
-                    shape = MaterialTheme.shapes.large,
-                    singleLine = true,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
@@ -188,7 +153,7 @@ fun StudentUpsertSheet(
                         leadingContent = {
                             Icon(
                                 painter = painterResource(
-                                    if (newStudent.biometricId == null) {
+                                    if (newTeacher.biometricId == null) {
                                         Res.drawable.fingerprint_off
                                     } else {
                                         Res.drawable.fingerprint
@@ -202,7 +167,7 @@ fun StudentUpsertSheet(
                         },
                         supportingContent = {
                             Text(
-                                text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
+                                text = if (newTeacher.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
                                     when (enrollState) {
                                         is EnrollState.EnrollFailed -> "Enroll Failed"
                                         EnrollState.Enrolling -> "Enrolling"
@@ -218,16 +183,16 @@ fun StudentUpsertSheet(
                             if (!enrollState.isEnrolling()) {
                                 Button(
                                     onClick = {
-                                        if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
-                                            onEnroll(newStudent)
+                                        if (newTeacher.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
+                                            onEnroll(newTeacher)
                                         } else {
-                                            newStudent = newStudent.copy(biometricId = null)
+                                            newTeacher = newTeacher.copy(biometricId = null)
                                         }
                                     },
-                                    enabled = isValidStudentData
+                                    enabled = isValidTeacherData
                                 ) {
                                     Text(
-                                        text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
+                                        text = if (newTeacher.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
                                             "Enroll"
                                         } else {
                                             "Delete"
@@ -274,7 +239,7 @@ fun StudentUpsertSheet(
                     ) {
                         OutlinedButton(
                             onClick = {
-                                onDelete(newStudent)
+                                onDelete(newTeacher)
                                 onDismissRequest()
                             },
                             modifier = Modifier.weight(1f),
@@ -289,13 +254,15 @@ fun StudentUpsertSheet(
 
                         Button(
                             onClick = {
-                                onUpsert(newStudent)
+                                onUpsert(newTeacher)
                                 onDismissRequest()
                             },
                             modifier = Modifier.weight(1f),
-                            enabled = isValidStudentData && student != newStudent
+                            enabled = isValidTeacherData && teacher != newTeacher
                         ) {
-                            Text(text = stringResource(Res.string.save))
+                            Text(
+                                text = stringResource(Res.string.save)
+                            )
                         }
                     }
                 }
@@ -308,21 +275,20 @@ fun StudentUpsertSheet(
 @Composable
 private fun Preview() {
     AppTheme {
-        StudentUpsertSheet(
-            student = Student(
-                id = 1,
-                biometricId = "1",
-                firstName = "Shubham",
-                lastName = "Gorai",
-                rollNo = 120,
-                contactEmail = "gmail",
-                contactPhone = "123"
-            ),
-            onUpsert = { },
-            onDismissRequest = { },
+        TeacherUpsertSheet(
+            isUpdate = false,
             enrollState = EnrollState.Idle,
+            teacher = Teacher(
+                id = 0,
+                biometricId = null,
+                firstName = "",
+                lastName = "",
+                subjectTaught = ""
+            ),
+            onUpsert = {},
             onEnroll = {},
-            onDelete = {}
+            onDelete = {},
+            onDismissRequest = {}
         )
     }
 }

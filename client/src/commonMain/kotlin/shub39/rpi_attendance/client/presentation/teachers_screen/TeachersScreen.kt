@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.presentation.students_screen
+package shub39.rpi_attendance.client.presentation.teachers_screen
 
 import EnrollState.Companion.isEnrolling
 import androidx.compose.animation.AnimatedContent
@@ -37,43 +37,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import models.Student
+import models.Teacher
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.add
-import rpiattendance.client.generated.resources.add_student
+import rpiattendance.client.generated.resources.add_teacher
 import rpiattendance.client.generated.resources.delete
 import rpiattendance.client.generated.resources.search
-import rpiattendance.client.generated.resources.students
-import rpiattendance.client.generated.resources.students_enrolled_template
-import shub39.rpi_attendance.client.presentation.students_screen.components.StudentInfo
-import shub39.rpi_attendance.client.presentation.students_screen.components.StudentUpsertSheet
+import rpiattendance.client.generated.resources.teachers
+import rpiattendance.client.generated.resources.teachers_enrolled_template
+import shub39.rpi_attendance.client.presentation.teachers_screen.components.TeacherInfo
+import shub39.rpi_attendance.client.presentation.teachers_screen.components.TeacherUpsertSheet
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun StudentsScreen(
+fun TeachersScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues,
-    state: StudentsScreenState,
-    onAction: (StudentsScreenAction) -> Unit
+    state: TeachersScreenState,
+    onAction: (TeachersScreenAction) -> Unit
 ) {
-    var showStudentAddSheet by remember { mutableStateOf(false) }
-    var editStudent by remember { mutableStateOf<Student?>(null) }
+    var showTeacherAddSheet by remember { mutableStateOf(false) }
+    var editTeacher by remember { mutableStateOf<Teacher?>(null) }
 
     Scaffold(
         modifier = Modifier.padding(contentPadding),
         topBar = {
             LargeFlexibleTopAppBar(
                 title = {
-                    Text(text = stringResource(Res.string.students))
+                    Text(text = stringResource(Res.string.teachers))
                 },
                 subtitle = {
                     Text(
                         text = stringResource(
-                            Res.string.students_enrolled_template,
-                            state.students.size
+                            Res.string.teachers_enrolled_template,
+                            state.teachers.size
                         )
                     )
                 }
@@ -81,17 +81,17 @@ fun StudentsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showStudentAddSheet = true }
+                onClick = { showTeacherAddSheet = true }
             ) {
                 Icon(
                     painter = painterResource(Res.drawable.add),
-                    contentDescription = "Add Student"
+                    contentDescription = "Add Teacher"
                 )
             }
         }
     ) { paddingValues ->
         AnimatedContent(
-            targetState = state.students.isNotEmpty()
+            targetState = state.teachers.isNotEmpty()
         ) { isNotEmpty ->
             if (isNotEmpty) {
                 LazyColumn(
@@ -112,13 +112,13 @@ fun StudentsScreen(
                                 value = state.searchQuery,
                                 onValueChange = {
                                     onAction(
-                                        StudentsScreenAction.OnChangeSearchQuery(it)
+                                        TeachersScreenAction.OnChangeSearchQuery(it)
                                     )
                                 },
                                 singleLine = true,
                                 shape = MaterialTheme.shapes.large,
                                 label = { Text("Search") },
-                                placeholder = { Text("Name, Roll No") },
+                                placeholder = { Text("Name, Subject") },
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(Res.drawable.search),
@@ -128,7 +128,7 @@ fun StudentsScreen(
                                 trailingIcon = {
                                     IconButton(
                                         onClick = {
-                                            onAction(StudentsScreenAction.OnChangeSearchQuery(""))
+                                            onAction(TeachersScreenAction.OnChangeSearchQuery(""))
                                         },
                                         enabled = state.searchQuery.isNotBlank()
                                     ) {
@@ -145,11 +145,11 @@ fun StudentsScreen(
                         }
                     }
 
-                    items(state.searchResults) { student ->
-                        StudentInfo(
-                            student = student,
+                    items(state.searchResults) { teacher ->
+                        TeacherInfo(
+                            teacher = teacher,
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            onEdit = { editStudent = student }
+                            onEdit = { editTeacher = teacher }
                         )
                     }
 
@@ -157,11 +157,11 @@ fun StudentsScreen(
                         item { HorizontalDivider() }
                     }
 
-                    items(state.students) { student ->
-                        StudentInfo(
-                            student = student,
+                    items(state.teachers) { teacher ->
+                        TeacherInfo(
+                            teacher = teacher,
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            onEdit = { editStudent = student },
+                            onEdit = { editTeacher = teacher },
                         )
                     }
                 }
@@ -183,7 +183,7 @@ fun StudentsScreen(
                             modifier = Modifier.size(64.dp),
                         )
                         Text(
-                            text = stringResource(Res.string.add_student)
+                            text = stringResource(Res.string.add_teacher)
                         )
                     }
                 }
@@ -191,50 +191,48 @@ fun StudentsScreen(
         }
     }
 
-    if (showStudentAddSheet) {
-        StudentUpsertSheet(
+    if (showTeacherAddSheet) {
+        TeacherUpsertSheet(
             modifier = Modifier.imePadding(),
             isUpdate = false,
             enrollState = state.enrollState,
-            student = Student(
+            teacher = Teacher(
                 biometricId = null,
                 firstName = "",
                 lastName = "",
-                rollNo = 0,
-                contactEmail = "",
-                contactPhone = ""
+                subjectTaught = ""
             ),
-            onUpsert = { onAction(StudentsScreenAction.UpsertStudent(it)) },
+            onUpsert = { onAction(TeachersScreenAction.UpsertTeacher(it)) },
             onEnroll = {
-                onAction(StudentsScreenAction.UpsertStudent(it))
-                onAction(StudentsScreenAction.EnrollStudent(it))
+                onAction(TeachersScreenAction.UpsertTeacher(it))
+                onAction(TeachersScreenAction.EnrollTeacher(it))
             },
-            onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
+            onDelete = { onAction(TeachersScreenAction.DeleteTeacher(it)) },
             onDismissRequest = {
                 if (!state.enrollState.isEnrolling()) {
-                    showStudentAddSheet = false
-                    onAction(StudentsScreenAction.ResetEnrollState)
+                    showTeacherAddSheet = false
+                    onAction(TeachersScreenAction.ResetEnrollState)
                 }
             }
         )
     }
 
-    if (editStudent != null) {
-        StudentUpsertSheet(
+    if (editTeacher != null) {
+        TeacherUpsertSheet(
             modifier = Modifier.imePadding(),
             isUpdate = true,
             enrollState = state.enrollState,
-            student = editStudent!!,
-            onUpsert = { onAction(StudentsScreenAction.UpsertStudent(it)) },
+            teacher = editTeacher!!,
+            onUpsert = { onAction(TeachersScreenAction.UpsertTeacher(it)) },
             onEnroll = {
-                onAction(StudentsScreenAction.UpsertStudent(it))
-                onAction(StudentsScreenAction.EnrollStudent(it))
+                onAction(TeachersScreenAction.UpsertTeacher(it))
+                onAction(TeachersScreenAction.EnrollTeacher(it))
             },
-            onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
+            onDelete = { onAction(TeachersScreenAction.DeleteTeacher(it)) },
             onDismissRequest = {
                 if (!state.enrollState.isEnrolling()) {
-                    editStudent = null
-                    onAction(StudentsScreenAction.ResetEnrollState)
+                    editTeacher = null
+                    onAction(TeachersScreenAction.ResetEnrollState)
                 }
             }
         )
@@ -245,10 +243,10 @@ fun StudentsScreen(
 @Composable
 private fun Preview() {
     AppTheme {
-        StudentsScreen(
+        TeachersScreen(
             modifier = Modifier,
             contentPadding = PaddingValues(),
-            state = StudentsScreenState(),
+            state = TeachersScreenState(),
             onAction = { }
         )
     }

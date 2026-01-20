@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreenAction
-import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreenState
+import shub39.rpi_attendance.client.presentation.teachers_screen.TeachersScreenAction
+import shub39.rpi_attendance.client.presentation.teachers_screen.TeachersScreenState
 
-class StudentsScreenViewModel(
+class TeachersScreenViewModel(
     private val rpcServiceWrapper: RpcServiceWrapper
 ) : ViewModel() {
     private var dataSyncJob: Job? = null
 
-    private val _state = MutableStateFlow(StudentsScreenState())
+    private val _state = MutableStateFlow(TeachersScreenState())
     val state = _state.asStateFlow()
         .onStart { onStartSync() }
         .stateIn(
@@ -30,19 +30,19 @@ class StudentsScreenViewModel(
             initialValue = _state.value
         )
 
-    fun onAction(action: StudentsScreenAction) {
+    fun onAction(action: TeachersScreenAction) {
         when (action) {
-            is StudentsScreenAction.UpsertStudent -> viewModelScope.launch {
-                rpcServiceWrapper.rpcService?.upsertStudent(action.student)
+            is TeachersScreenAction.UpsertTeacher -> viewModelScope.launch {
+                rpcServiceWrapper.rpcService?.upsertTeacher(action.teacher)
             }
 
-            is StudentsScreenAction.DeleteStudent -> viewModelScope.launch {
-                rpcServiceWrapper.rpcService?.deleteStudent(action.student)
+            is TeachersScreenAction.DeleteTeacher -> viewModelScope.launch {
+                rpcServiceWrapper.rpcService?.deleteTeacher(action.teacher)
             }
 
-            is StudentsScreenAction.EnrollStudent -> viewModelScope.launch {
+            is TeachersScreenAction.EnrollTeacher -> viewModelScope.launch {
                 rpcServiceWrapper.rpcService
-                    ?.addBiometricDetailsForStudent(action.student)
+                    ?.addBiometricDetailsForTeacher(action.teacher)
                     ?.onEach { enrollState ->
                         _state.update {
                             it.copy(
@@ -53,7 +53,7 @@ class StudentsScreenViewModel(
                     ?.launchIn(this)
             }
 
-            is StudentsScreenAction.OnChangeSearchQuery -> {
+            is TeachersScreenAction.OnChangeSearchQuery -> {
                 if (action.query.isBlank()) {
                     _state.update {
                         it.copy(searchQuery = action.query, searchResults = emptyList())
@@ -61,19 +61,19 @@ class StudentsScreenViewModel(
                     return
                 }
 
-                _state.update { studentsScreenState ->
-                    studentsScreenState.copy(
+                _state.update { teachersScreenState ->
+                    teachersScreenState.copy(
                         searchQuery = action.query,
-                        searchResults = studentsScreenState.students.filter {
+                        searchResults = teachersScreenState.teachers.filter {
                             it.firstName.contains(action.query, ignoreCase = true) ||
                                     it.lastName.contains(action.query, ignoreCase = true) ||
-                                    it.rollNo.toString().contains(action.query)
+                                    it.subjectTaught.contains(action.query, ignoreCase = true)
                         }
                     )
                 }
             }
 
-            StudentsScreenAction.ResetEnrollState -> {
+            TeachersScreenAction.ResetEnrollState -> {
                 _state.update {
                     it.copy(enrollState = EnrollState.Idle)
                 }
@@ -84,9 +84,9 @@ class StudentsScreenViewModel(
     private fun onStartSync() {
         dataSyncJob?.cancel()
         dataSyncJob = viewModelScope.launch {
-            rpcServiceWrapper.rpcService?.getStudents()?.onEach { students ->
+            rpcServiceWrapper.rpcService?.getTeachers()?.onEach { teachers ->
                 _state.update {
-                    it.copy(students = students)
+                    it.copy(teachers = teachers)
                 }
             }?.launchIn(this)
         }
