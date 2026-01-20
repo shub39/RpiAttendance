@@ -6,5 +6,6 @@ sealed interface StudentsScreenAction {
     data class DeleteStudent(val student: Student): StudentsScreenAction
     data class UpsertStudent(val student: Student): StudentsScreenAction
     data class EnrollStudent(val student: Student): StudentsScreenAction
+    data class OnChangeSearchQuery(val query: String): StudentsScreenAction
     data object ResetEnrollState: StudentsScreenAction
 }

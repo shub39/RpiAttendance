@@ -2,10 +2,12 @@ package shub39.rpi_attendance.client.presentation.students_screen
 
 import EnrollState.Companion.isEnrolling
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +19,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +43,8 @@ import org.jetbrains.compose.resources.stringResource
 import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.add
 import rpiattendance.client.generated.resources.add_student
+import rpiattendance.client.generated.resources.delete
+import rpiattendance.client.generated.resources.search
 import rpiattendance.client.generated.resources.students
 import rpiattendance.client.generated.resources.students_enrolled_template
 import shub39.rpi_attendance.client.presentation.students_screen.components.StudentInfo
@@ -96,6 +104,59 @@ fun StudentsScreen(
                     ),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    stickyHeader {
+                        Row(
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            OutlinedTextField(
+                                value = state.searchQuery,
+                                onValueChange = {
+                                    onAction(
+                                        StudentsScreenAction.OnChangeSearchQuery(it)
+                                    )
+                                },
+                                singleLine = true,
+                                shape = MaterialTheme.shapes.large,
+                                label = { Text("Search") },
+                                placeholder = { Text("Name, Roll No") },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(Res.drawable.search),
+                                        contentDescription = null
+                                    )
+                                },
+                                trailingIcon = {
+                                    IconButton(
+                                        onClick = {
+                                            onAction(StudentsScreenAction.OnChangeSearchQuery(""))
+                                        },
+                                        enabled = state.searchQuery.isNotBlank()
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(Res.drawable.delete),
+                                            contentDescription = null
+                                        )
+                                    }
+                                },
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                    }
+
+                    items(state.searchResults) { student ->
+                        StudentInfo(
+                            student = student,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onEdit = { editStudent = student }
+                        )
+                    }
+
+                    if (state.searchResults.isNotEmpty()) {
+                        item { HorizontalDivider() }
+                    }
+
                     items(state.students) { student ->
                         StudentInfo(
                             student = student,
@@ -149,7 +210,7 @@ fun StudentsScreen(
                 onAction(StudentsScreenAction.EnrollStudent(it))
             },
             onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
-            onDismissRequest = { 
+            onDismissRequest = {
                 if (!state.enrollState.isEnrolling()) {
                     showStudentAddSheet = false
                     onAction(StudentsScreenAction.ResetEnrollState)

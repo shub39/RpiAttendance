@@ -18,7 +18,7 @@ import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreenS
 
 class StudentsScreenViewModel(
     private val rpcServiceWrapper: RpcServiceWrapper
-): ViewModel() {
+) : ViewModel() {
     private var dataSyncJob: Job? = null
 
     private val _state = MutableStateFlow(StudentsScreenState())
@@ -35,9 +35,11 @@ class StudentsScreenViewModel(
             is StudentsScreenAction.UpsertStudent -> viewModelScope.launch {
                 rpcServiceWrapper.rpcService?.upsertStudent(action.student)
             }
+
             is StudentsScreenAction.DeleteStudent -> viewModelScope.launch {
                 rpcServiceWrapper.rpcService?.deleteStudent(action.student)
             }
+
             is StudentsScreenAction.EnrollStudent -> viewModelScope.launch {
                 rpcServiceWrapper.rpcService
                     ?.addBiometricDetailsForStudent(action.student)
@@ -49,6 +51,26 @@ class StudentsScreenViewModel(
                         }
                     }
                     ?.launchIn(this)
+            }
+
+            is StudentsScreenAction.OnChangeSearchQuery -> {
+                if (action.query.isBlank()) {
+                    _state.update {
+                        it.copy(searchQuery = action.query, searchResults = emptyList())
+                    }
+                    return
+                }
+
+                _state.update { studentsScreenState ->
+                    studentsScreenState.copy(
+                        searchQuery = action.query,
+                        searchResults = studentsScreenState.students.filter {
+                            it.firstName.contains(action.query, ignoreCase = true) ||
+                                    it.lastName.contains(action.query, ignoreCase = true) ||
+                                    it.rollNo.toString().contains(action.query)
+                        }
+                    )
+                }
             }
 
             StudentsScreenAction.ResetEnrollState -> {
