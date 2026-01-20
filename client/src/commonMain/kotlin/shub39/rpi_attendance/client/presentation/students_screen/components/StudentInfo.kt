@@ -20,6 +20,8 @@ import models.Student
 import org.jetbrains.compose.resources.painterResource
 import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.edit
+import rpiattendance.client.generated.resources.fingerprint
+import rpiattendance.client.generated.resources.fingerprint_off
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -53,6 +55,17 @@ fun StudentInfo(
                         text = student.rollNo.toString()
                     )
                 }
+
+                Icon(
+                    painter = painterResource(
+                        if (student.biometricId == null) {
+                            Res.drawable.fingerprint_off
+                        } else {
+                            Res.drawable.fingerprint
+                        }
+                    ),
+                    contentDescription = null
+                )
 
                 IconButton(
                     onClick = onEdit

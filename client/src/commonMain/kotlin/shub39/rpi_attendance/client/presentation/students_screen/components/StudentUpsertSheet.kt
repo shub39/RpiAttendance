@@ -201,8 +201,13 @@ fun StudentUpsertSheet(
                     },
                     supportingContent = {
                         Text(
-                            text = if (newStudent.biometricId == null) {
-                                "Not Enrolled"
+                            text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
+                                when (enrollState) {
+                                    is EnrollState.EnrollFailed -> "Enroll Failed"
+                                    EnrollState.Enrolling -> "Enrolling"
+                                    EnrollState.FingerprintEnrolled -> "Fingerprint Enrolled..."
+                                    EnrollState.Idle -> "Not Enrolled"
+                                }
                             } else {
                                 "Enrolled"
                             }
@@ -212,7 +217,7 @@ fun StudentUpsertSheet(
                         if (!enrollState.isEnrolling()) {
                             Button(
                                 onClick = {
-                                    if (newStudent.biometricId == null) {
+                                    if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
                                         onEnroll(newStudent)
                                     } else {
                                         newStudent = newStudent.copy(biometricId = null)
@@ -221,7 +226,7 @@ fun StudentUpsertSheet(
                                 enabled = isValidStudentData
                             ) {
                                 Text(
-                                    text = if (newStudent.biometricId == null || enrollState is EnrollState.EnrollComplete) {
+                                    text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
                                         "Enroll"
                                     } else {
                                         "Delete"

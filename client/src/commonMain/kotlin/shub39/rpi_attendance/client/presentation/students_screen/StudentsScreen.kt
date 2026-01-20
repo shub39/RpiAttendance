@@ -150,7 +150,10 @@ fun StudentsScreen(
             },
             onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
             onDismissRequest = { 
-                if (!state.enrollState.isEnrolling()) showStudentAddSheet = false
+                if (!state.enrollState.isEnrolling()) {
+                    showStudentAddSheet = false
+                    onAction(StudentsScreenAction.ResetEnrollState)
+                }
             }
         )
     }
@@ -168,7 +171,10 @@ fun StudentsScreen(
             },
             onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
             onDismissRequest = {
-                if (!state.enrollState.isEnrolling()) editStudent = null
+                if (!state.enrollState.isEnrolling()) {
+                    editStudent = null
+                    onAction(StudentsScreenAction.ResetEnrollState)
+                }
             }
         )
     }

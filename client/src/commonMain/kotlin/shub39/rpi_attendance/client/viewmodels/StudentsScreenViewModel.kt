@@ -1,5 +1,6 @@
 package shub39.rpi_attendance.client.viewmodels
 
+import EnrollState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -48,6 +49,12 @@ class StudentsScreenViewModel(
                         }
                     }
                     ?.launchIn(this)
+            }
+
+            StudentsScreenAction.ResetEnrollState -> {
+                _state.update {
+                    it.copy(enrollState = EnrollState.Idle)
+                }
             }
         }
     }
