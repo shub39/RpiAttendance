@@ -67,10 +67,13 @@ fun main() {
         }
     }.start(wait = false)
 
-    // testing sensors, will be core loop later
-    testLoop(
-        sensorServer = sensorServer,
-        adminServer = adminServer,
-        client = client
-    )
+    // main loop
+    mainLoop(sensorServer = sensorServer)
+
+    // testing
+//    testLoop(
+//        sensorServer = sensorServer,
+//        adminServer = adminServer,
+//        client = client
+//    )
 }
