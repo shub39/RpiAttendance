@@ -68,14 +68,7 @@ fun main() {
     }.start(wait = false)
 
     // main loop
-    mainLoop(
-        sensorServer = sensorServer,
-        adminServer = adminServer,
-        client = client,
-        attendanceLogDao = attendanceLogDao,
-        studentDao = studentDao,
-        teacherDao = teachDao
-    )
+    mainLoop(sensorServer = sensorServer)
 
     // testing
 //    testLoop(
