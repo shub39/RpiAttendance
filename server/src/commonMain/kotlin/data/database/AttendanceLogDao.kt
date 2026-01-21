@@ -14,6 +14,9 @@ interface AttendanceLogDao {
     @Delete
     suspend fun delete(attendanceLog: AttendanceLogEntity)
 
+    @Query("SELECT * FROM attendance_log WHERE biometricId = :biometricId")
+    suspend fun getAttendanceLogByBiometricId(biometricId: String): List<AttendanceLogEntity>
+
 //    @Query("SELECT * FROM attendance_log WHERE id = :id")
 //    suspend fun getAttendanceLogById(id: Long): AttendanceLogEntity?
 
