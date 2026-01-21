@@ -71,7 +71,10 @@ fun main() {
     mainLoop(
         sensorServer = sensorServer,
         adminServer = adminServer,
-        client = client
+        client = client,
+        attendanceLogDao = attendanceLogDao,
+        studentDao = studentDao,
+        teacherDao = teachDao
     )
 
     // testing

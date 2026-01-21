@@ -17,8 +17,8 @@ interface StudentDao {
     @Query("SELECT * FROM students WHERE id = :id")
     suspend fun getStudentById(id: Long): StudentEntity?
 
-//    @Query("SELECT * FROM students WHERE biometricId = :biometricId")
-//    suspend fun getStudentByBiometricId(biometricId: String): StudentEntity?
+    @Query("SELECT * FROM students WHERE biometricId = :biometricId")
+    suspend fun getStudentByBiometricId(biometricId: String): StudentEntity?
 //
 //    @Query("SELECT * FROM students WHERE firstName LIKE '%' || :name || '%'")
 //    suspend fun getStudentsByName(name: String): List<StudentEntity>
