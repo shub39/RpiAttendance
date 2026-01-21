@@ -68,7 +68,11 @@ fun main() {
     }.start(wait = false)
 
     // main loop
-    mainLoop(sensorServer = sensorServer)
+    mainLoop(
+        sensorServer = sensorServer,
+        adminServer = adminServer,
+        client = client
+    )
 
     // testing
 //    testLoop(

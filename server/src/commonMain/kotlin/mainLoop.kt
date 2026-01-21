@@ -1,28 +1,26 @@
 import domain.KeypadResult
 import domain.SensorServer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 fun mainLoop(
-    sensorServer: SensorServer
+    sensorServer: SensorServer,
+    adminServer: AdminServer,
+    client: HttpClient
 ) {
-    val scope = CoroutineScope(Dispatchers.IO)
+    runBlocking {
+        sensorServer.displayText(listOf(
+            "Rpiattendance",
+            "by shub39"
+        ))
+        delay(2000)
 
-    scope.launch {
         while (true) {
-            sensorServer.displayText(listOf(
-                "Rpiattendance",
-                "by shub39"
-            ))
-            delay(2000)
-
             sensorServer.displayText(listOf(
                 "select option",
                 "1. display ip",
-                "2. attendance"
+                "4. attendance"
             ))
 
             when (val res = sensorServer.getKeypadOutput(10)) {
@@ -41,8 +39,22 @@ fun mainLoop(
                                 delay(5000)
                             }
                         }
-                        KeypadResult.Key2 -> {
+                        KeypadResult.Key4 -> {
+                            println("Key 4 pressed")
+                        }
+                        KeypadResult.KeyA -> {
+                            sensorServer.displayText(listOf("Shutting Down"))
+                            delay(2000)
+                            sensorServer.displayText(listOf())
 
+                            adminServer.stop(1000, 2000)
+                            client.close()
+                            println("Server stopped.")
+
+                            break
+                        }
+                        KeypadResult.NoInput -> {
+                            println("No Input")
                         }
                         else -> {
                             println("Invalid key: ${res.data}")
