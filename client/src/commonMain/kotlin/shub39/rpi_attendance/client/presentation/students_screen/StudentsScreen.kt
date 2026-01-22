@@ -116,7 +116,7 @@ fun StudentsScreen(
                                     )
                                 },
                                 singleLine = true,
-                                shape = MaterialTheme.shapes.large,
+                                shape = MaterialTheme.shapes.extraLarge,
                                 label = { Text("Search") },
                                 placeholder = { Text("Name, Roll No") },
                                 leadingIcon = {

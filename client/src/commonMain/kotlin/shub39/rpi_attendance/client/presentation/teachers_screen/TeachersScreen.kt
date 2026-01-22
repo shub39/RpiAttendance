@@ -111,12 +111,10 @@ fun TeachersScreen(
                             OutlinedTextField(
                                 value = state.searchQuery,
                                 onValueChange = {
-                                    onAction(
-                                        TeachersScreenAction.OnChangeSearchQuery(it)
-                                    )
+                                    onAction(TeachersScreenAction.OnChangeSearchQuery(it))
                                 },
                                 singleLine = true,
-                                shape = MaterialTheme.shapes.large,
+                                shape = MaterialTheme.shapes.extraLarge,
                                 label = { Text("Search") },
                                 placeholder = { Text("Name, Subject") },
                                 leadingIcon = {
