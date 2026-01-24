@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.painterResource
 import rpiattendance.client.generated.resources.Res
-import rpiattendance.client.generated.resources.arrow_forward_ios
+import rpiattendance.client.generated.resources.arrow_forward
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +53,7 @@ fun AttendanceLogScreen(
                     onClick = {}
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.arrow_forward_ios),
+                        painter = painterResource(Res.drawable.arrow_forward),
                         contentDescription = null,
                         tint = Color.Black
                     )
