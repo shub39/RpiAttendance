@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
@@ -18,7 +20,10 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.getSelectedDate
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +39,8 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toLocalDateTime
 import models.Session
 import models.Student
@@ -56,6 +63,37 @@ fun AttendanceLogScreen(
     onAction: (AttendanceLogAction) -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
+
+    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDate = state.selectedDate.toJavaLocalDate(),
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            content = {
+                DatePicker(
+                    state = datePickerState
+                )
+            },
+            confirmButton = {
+                val newDate = datePickerState.getSelectedDate()?.toKotlinLocalDate()
+
+                TextButton(
+                    onClick = {
+                        newDate?.let {
+                            onAction(AttendanceLogAction.OnGetSessions(it))
+                        }
+                        showDatePicker = false
+                    },
+                    enabled = newDate != null && newDate <= today
+                ) {
+                    Text(text = "Done")
+                }
+            }
+        )
+    }
 
     Scaffold(
         modifier = modifier.padding(padding),
@@ -118,7 +156,8 @@ fun AttendanceLogScreen(
                             )
                         )
                     },
-                    shape = ButtonGroupDefaults.connectedTrailingButtonShape
+                    shape = ButtonGroupDefaults.connectedTrailingButtonShape,
+                    enabled = state.selectedDate < today
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.arrow_forward),
