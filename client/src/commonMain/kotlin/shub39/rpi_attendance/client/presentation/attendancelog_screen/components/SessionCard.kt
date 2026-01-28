@@ -28,7 +28,10 @@ fun SessionCard(
     var showDetails by remember { mutableStateOf(false) }
 
     if (showDetails) {
-
+        SessionDetails(
+            onDismissRequest = { showDetails = false },
+            session = session
+        )
     }
 
     Card(

@@ -45,7 +45,7 @@ class AdminInterfaceImpl(
         .map { flow -> flow.map { teachers -> teachers.toTeacher() } }
         .flowOn(Dispatchers.IO)
 
-    override suspend fun getSessionsForDate(courseId: Long, date: LocalDate): List<Session> {
+    override suspend fun getSessionsForDate(date: LocalDate): List<Session> {
         val logs = attendanceLogDao.getAttendanceLogs().first()
             .filter { it.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == date }
 

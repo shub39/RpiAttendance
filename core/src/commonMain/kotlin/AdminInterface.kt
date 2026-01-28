@@ -13,7 +13,7 @@ interface AdminInterface {
     fun getStudents(): Flow<List<Student>>
     fun getTeachers(): Flow<List<Teacher>>
 
-    suspend fun getSessionsForDate(courseId: Long, date: LocalDate): List<Session>
+    suspend fun getSessionsForDate(date: LocalDate): List<Session>
 
     suspend fun upsertStudent(student: Student)
     suspend fun upsertTeacher(teacher: Teacher)
