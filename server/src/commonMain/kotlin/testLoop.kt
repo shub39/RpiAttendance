@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 
 fun testLoop(
     sensorServer: SensorServer,
+    adminServer: AdminServer,
     client: HttpClient
 ) {
     runBlocking {
@@ -44,6 +45,7 @@ fun testLoop(
             when (input) {
                 "0" -> {
                     println("Shutting down server...")
+                    adminServer.stop(1000, 2000)
                     client.close()
                     println("Server stopped. Goodbye!")
                     break

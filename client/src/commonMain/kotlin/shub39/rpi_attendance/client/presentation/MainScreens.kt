@@ -6,9 +6,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -21,11 +21,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import shub39.rpi_attendance.client.domain.Route
 import shub39.rpi_attendance.client.presentation.attendancelog_screen.AttendanceLogScreen
-import shub39.rpi_attendance.client.presentation.sessions_screen.SessionsScreen
 import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreen
 import shub39.rpi_attendance.client.presentation.teachers_screen.TeachersScreen
-import shub39.rpi_attendance.client.viewmodels.AttendanceLogScreenViewModel
-import shub39.rpi_attendance.client.viewmodels.SessionsViewModel
+import shub39.rpi_attendance.client.viewmodels.AttendanceLogViewModel
 import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
 import shub39.rpi_attendance.client.viewmodels.TeachersScreenViewModel
 
@@ -55,7 +53,7 @@ fun MainScreens(
         ) {
             composable<Route.StudentsScreen> {
                 val viewModel = koinInject<StudentsScreenViewModel>()
-                val state by viewModel.state.collectAsStateWithLifecycle()
+                val state by viewModel.state.collectAsState()
 
                 StudentsScreen(
                     contentPadding = padding,
@@ -65,7 +63,7 @@ fun MainScreens(
             }
             composable<Route.TeachersScreen> {
                 val viewModel = koinInject<TeachersScreenViewModel>()
-                val state by viewModel.state.collectAsStateWithLifecycle()
+                val state by viewModel.state.collectAsState()
 
                 TeachersScreen(
                     contentPadding = padding,
@@ -73,19 +71,9 @@ fun MainScreens(
                     onAction = viewModel::onAction
                 )
             }
-            composable<Route.SessionsScreen> {
-                val viewModel = koinInject<SessionsViewModel>()
-                val state by viewModel.state.collectAsStateWithLifecycle()
-
-                SessionsScreen(
-                    padding = padding,
-                    state = state,
-                    onAction = viewModel::onAction
-                )
-            }
             composable<Route.AttendanceLogScreen> {
-                val viewModel = koinInject<AttendanceLogScreenViewModel>()
-                val state by viewModel.state.collectAsStateWithLifecycle()
+                val viewModel = koinInject<AttendanceLogViewModel>()
+                val state by viewModel.state.collectAsState()
 
                 AttendanceLogScreen(
                     padding = padding,

@@ -18,8 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButtonMenu
-import androidx.compose.material3.FloatingActionButtonMenuItem
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,9 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.github.vinceglb.filekit.dialogs.FileKitMode
-import io.github.vinceglb.filekit.dialogs.FileKitType
-import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import models.Student
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -56,39 +51,13 @@ import shub39.rpi_attendance.client.presentation.students_screen.components.Stud
 import shub39.rpi_attendance.client.presentation.students_screen.components.StudentUpsertSheet
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StudentsScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues,
     state: StudentsScreenState,
     onAction: (StudentsScreenAction) -> Unit
-) {
-    val launcher = rememberFilePickerLauncher(
-        type = FileKitType.File(extensions = listOf("txt", "json")),
-        mode = FileKitMode.Single
-    ) { file ->
-        if (file != null) {
-            onAction(StudentsScreenAction.ImportList(file))
-        }
-    }
-
-    StudentsScreenContent(
-        modifier = modifier,
-        contentPadding = contentPadding,
-        state = state,
-        onAction = onAction,
-        onPickFile = { launcher.launch() }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun StudentsScreenContent(
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues,
-    state: StudentsScreenState,
-    onAction: (StudentsScreenAction) -> Unit,
-    onPickFile: () -> Unit
 ) {
     var showStudentAddSheet by remember { mutableStateOf(false) }
     var editStudent by remember { mutableStateOf<Student?>(null) }
@@ -111,37 +80,12 @@ private fun StudentsScreenContent(
             )
         },
         floatingActionButton = {
-            var menu by remember { mutableStateOf(false) }
-            FloatingActionButtonMenu(
-                expanded = menu,
-                button = {
-                    ToggleFloatingActionButton(
-                        checked = menu,
-                        onCheckedChange = { menu = it }
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.add),
-                            contentDescription = null
-                        )
-                    }
-                }
+            FloatingActionButton(
+                onClick = { showStudentAddSheet = true }
             ) {
-                FloatingActionButtonMenuItem(
-                    onClick = {
-                        showStudentAddSheet = true
-                        menu = false
-                    },
-                    text = { Text("Add Manually") },
-                    icon = {}
-                )
-
-                FloatingActionButtonMenuItem(
-                    onClick = {
-                        onPickFile()
-                        menu = false
-                    },
-                    text = { Text("Import") },
-                    icon = {}
+                Icon(
+                    painter = painterResource(Res.drawable.add),
+                    contentDescription = "Add Student"
                 )
             }
         }
@@ -160,7 +104,7 @@ private fun StudentsScreenContent(
                     ),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    item {
+                    stickyHeader {
                         Row(
                             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
@@ -301,12 +245,11 @@ private fun StudentsScreenContent(
 @Composable
 private fun Preview() {
     AppTheme {
-        StudentsScreenContent(
+        StudentsScreen(
             modifier = Modifier,
             contentPadding = PaddingValues(),
             state = StudentsScreenState(),
-            onAction = { },
-            onPickFile = {}
+            onAction = { }
         )
     }
 }
