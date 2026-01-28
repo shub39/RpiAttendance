@@ -20,8 +20,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import shub39.rpi_attendance.client.domain.Route
+import shub39.rpi_attendance.client.presentation.attendancelog_screen.AttendanceLogScreen
 import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreen
 import shub39.rpi_attendance.client.presentation.teachers_screen.TeachersScreen
+import shub39.rpi_attendance.client.viewmodels.AttendanceLogViewModel
 import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
 import shub39.rpi_attendance.client.viewmodels.TeachersScreenViewModel
 
@@ -70,7 +72,14 @@ fun MainScreens(
                 )
             }
             composable<Route.AttendanceLogScreen> {
+                val viewModel = koinInject<AttendanceLogViewModel>()
+                val state by viewModel.state.collectAsState()
 
+                AttendanceLogScreen(
+                    padding = padding,
+                    state = state,
+                    onAction = viewModel::onAction
+                )
             }
         }
     }

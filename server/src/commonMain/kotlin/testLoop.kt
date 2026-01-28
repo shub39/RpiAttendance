@@ -1,9 +1,9 @@
-import data.SensorServerImpl
+import domain.SensorServer
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.runBlocking
 
 fun testLoop(
-    sensorServer: SensorServerImpl,
+    sensorServer: SensorServer,
     adminServer: AdminServer,
     client: HttpClient
 ) {
