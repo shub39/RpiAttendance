@@ -28,7 +28,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build Arm64 Executable
-        run: ./gradlew :server:linkDebugExecutableLinuxArm64
+        run: ./gradlew :server:linkReleaseExecutableLinuxArm64
         env:
           KONAN_DATA_DIR: ${{ github.workspace }}/.konan
 
