@@ -2,6 +2,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import kotlinx.rpc.annotations.Rpc
 import models.AttendanceLog
+import models.DetailedAttendanceLog
 import models.Session
 import models.Student
 import models.Teacher
@@ -13,7 +14,7 @@ interface AdminInterface {
 
     fun getStudents(): Flow<List<Student>>
     fun getTeachers(): Flow<List<Teacher>>
-    fun getAttendanceLogs(): Flow<List<AttendanceLog>>
+    fun getDetailedAttendanceLogs(): Flow<List<DetailedAttendanceLog>>
 
     suspend fun getSessionsForDate(date: LocalDate): List<Session>
 

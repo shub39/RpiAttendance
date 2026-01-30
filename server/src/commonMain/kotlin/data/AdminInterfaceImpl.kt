@@ -22,6 +22,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logInfo
 import models.AttendanceLog
+import models.DetailedAttendanceLog
 import models.EntityType
 import models.Session
 import models.Student
@@ -47,9 +48,31 @@ class AdminInterfaceImpl(
         .map { flow -> flow.map { teachers -> teachers.toTeacher() } }
         .flowOn(Dispatchers.IO)
 
-    override fun getAttendanceLogs(): Flow<List<AttendanceLog>> = attendanceLogDao
+    override fun getDetailedAttendanceLogs(): Flow<List<DetailedAttendanceLog>> = attendanceLogDao
         .getAttendanceLogs()
-        .map { flow -> flow.map { log -> log.toAttendanceLog() } }
+        .map { flow ->
+            flow.mapNotNull { log ->
+                when (log.entityType) {
+                    EntityType.STUDENT -> {
+                        studentDao.getStudentById(log.entityId)?.let { studentEntity ->
+                            DetailedAttendanceLog.StudentLog(
+                                student = studentEntity.toStudent(),
+                                log = log.toAttendanceLog()
+                            )
+                        }
+                    }
+
+                    EntityType.TEACHER -> {
+                        teacherDao.getTeacherById(log.entityId)?.let { teacherEntity ->
+                            DetailedAttendanceLog.TeacherLog(
+                                teacher = teacherEntity.toTeacher(),
+                                log = log.toAttendanceLog()
+                            )
+                        }
+                    }
+                }
+            }
+        }
         .flowOn(Dispatchers.IO)
 
     override suspend fun getSessionsForDate(date: LocalDate): List<Session> {

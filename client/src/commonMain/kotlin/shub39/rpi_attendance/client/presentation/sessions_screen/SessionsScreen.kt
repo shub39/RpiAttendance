@@ -4,54 +4,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ButtonGroupDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.getSelectedDate
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
-import kotlinx.datetime.plus
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toLocalDateTime
 import models.Session
 import models.Student
 import models.Teacher
-import org.jetbrains.compose.resources.painterResource
-import rpiattendance.client.generated.resources.Res
-import rpiattendance.client.generated.resources.arrow_back
-import rpiattendance.client.generated.resources.arrow_forward
+import shub39.rpi_attendance.client.presentation.DateDisplay
 import shub39.rpi_attendance.client.presentation.sessions_screen.components.SessionCard
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
-import shub39.rpi_attendance.client.presentation.toFormattedString
 import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -62,41 +37,10 @@ fun SessionsScreen(
     state: SessionsState,
     onAction: (SessionsAction) -> Unit
 ) {
-    var showDatePicker by remember { mutableStateOf(false) }
-
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
     LaunchedEffect(Unit) {
         onAction(SessionsAction.OnGetSessions(today))
-    }
-
-    if (showDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDate = state.selectedDate.toJavaLocalDate(),
-        )
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            content = {
-                DatePicker(
-                    state = datePickerState
-                )
-            },
-            confirmButton = {
-                val newDate = datePickerState.getSelectedDate()?.toKotlinLocalDate()
-
-                TextButton(
-                    onClick = {
-                        newDate?.let {
-                            onAction(SessionsAction.OnGetSessions(it))
-                        }
-                        showDatePicker = false
-                    },
-                    enabled = newDate != null && newDate <= today
-                ) {
-                    Text(text = "Done")
-                }
-            }
-        )
     }
 
     Scaffold(
@@ -104,7 +48,7 @@ fun SessionsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Attendance Logs")
+                    Text(text = "Sessions")
                 }
             )
         }
@@ -114,60 +58,11 @@ fun SessionsScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                FilledTonalIconButton(
-                    onClick = {
-                        onAction(
-                            SessionsAction.OnGetSessions(
-                                state.selectedDate.minus(
-                                    1, DateTimeUnit.DAY
-                                )
-                            )
-                        )
-                    },
-                    shape = ButtonGroupDefaults.connectedLeadingButtonShape
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.arrow_back),
-                        contentDescription = null,
-                    )
-                }
-
-                FilledTonalButton(
-                    onClick = { showDatePicker = true },
-                    modifier = Modifier.weight(1f),
-                    shape = ButtonGroupDefaults.connectedMiddleButtonPressShape
-                ) {
-                    Text(
-                        text = state.selectedDate.toFormattedString(),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                FilledTonalIconButton(
-                    onClick = {
-                        onAction(
-                            SessionsAction.OnGetSessions(
-                                state.selectedDate.plus(
-                                    1, DateTimeUnit.DAY
-                                )
-                            )
-                        )
-                    },
-                    shape = ButtonGroupDefaults.connectedTrailingButtonShape,
-                    enabled = state.selectedDate < today
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.arrow_forward),
-                        contentDescription = null,
-                    )
-                }
-            }
+            DateDisplay(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                selectedDate = state.selectedDate,
+                onDateChange = { onAction(SessionsAction.OnGetSessions(it)) }
+            )
 
             if (state.sessions.isNotEmpty()) {
                 LazyColumn(
