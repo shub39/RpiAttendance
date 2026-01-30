@@ -11,6 +11,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.yield
 import kotlinx.datetime.TimeZone
@@ -19,6 +21,8 @@ import models.AttendanceLog
 import models.AttendanceStatus
 import models.EntityType
 import kotlin.time.Clock
+
+val sensorMutex = Mutex()
 
 suspend fun mainLoop(
     studentDao: StudentDao,
@@ -41,19 +45,22 @@ suspend fun mainLoop(
 
             is Result.Success -> {
                 when (res.data) {
-                    KeypadResult.Key2 -> handleDisplayIp(sensorServer)
-                    KeypadResult.Key5 -> takeAttendance(
+                    KeypadResult.Key1 -> handleDisplayIp(sensorServer)
+                    
+                    KeypadResult.Key4 -> takeAttendance(
                         sensorServer,
                         studentDao,
                         teacherDao,
-                        attendanceLogDao
+                        attendanceLogDao,
+                        10_000
                     )
 
-                    KeypadResult.Key8 -> takeBulkAttendance(
+                    KeypadResult.Key7 -> takeAttendance(
                         sensorServer,
                         studentDao,
                         teacherDao,
-                        attendanceLogDao
+                        attendanceLogDao,
+                        30_000
                     )
 
                     KeypadResult.KeyA -> {
@@ -95,55 +102,45 @@ private suspend fun handleDisplayIp(sensorServer: SensorServer) {
     }
 }
 
-private suspend fun takeBulkAttendance(
-    sensorServer: SensorServer,
-    studentDao: StudentDao,
-    teacherDao: TeacherDao,
-    attendanceLogDao: AttendanceLogDao
-) {
-    sensorServer.displayText(listOf("Taking bulk", "attendance"))
-
-    withTimeoutOrNull(30_000) {
-        coroutineScope {
-            launch {
-                while (isActive) {
-                    handleFaceRecognition(
-                        sensorServer,
-                        studentDao,
-                        teacherDao,
-                        attendanceLogDao
-                    )
-                    yield()
-                }
-            }
-            launch {
-                while (isActive) {
-                    handleFingerprintSearch(
-                        sensorServer,
-                        studentDao,
-                        teacherDao,
-                        attendanceLogDao
-                    )
-                    yield()
-                }
-            }
-        }
-    }
-}
-
 private suspend fun takeAttendance(
     sensorServer: SensorServer,
     studentDao: StudentDao,
     teacherDao: TeacherDao,
-    attendanceLogDao: AttendanceLogDao
+    attendanceLogDao: AttendanceLogDao,
+    timeout: Long
 ) {
-    sensorServer.displayText(listOf("Taking", "attendance"))
-    coroutineScope {
-        launch {
-            handleFaceRecognition(sensorServer, studentDao, teacherDao, attendanceLogDao)
-        }
-        launch {
-            handleFingerprintSearch(sensorServer, studentDao, teacherDao, attendanceLogDao)
+    sensorServer.displayText(listOf("Taking bulk", "attendance"))
+
+    withTimeoutOrNull(timeout) {
+        coroutineScope {
+            launch {
+                while (isActive) {
+                    sensorMutex.withLock {
+                        handleFaceRecognition(
+                            sensorServer,
+                            studentDao,
+                            teacherDao,
+                            attendanceLogDao
+                        )
+                    }
+                    delay(50)
+                    yield()
+                }
+            }
+            launch {
+                while (isActive) {
+                    sensorMutex.withLock {
+                        handleFingerprintSearch(
+                            sensorServer,
+                            studentDao,
+                            teacherDao,
+                            attendanceLogDao
+                        )
+                    }
+                    delay(50)
+                    yield()
+                }
+            }
         }
     }
 }

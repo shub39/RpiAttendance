@@ -9,6 +9,7 @@ import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.runBlocking
 import kotlinx.rpc.krpc.ktor.server.Krpc
 import kotlinx.rpc.krpc.ktor.server.rpc
 import kotlinx.rpc.krpc.serialization.json.json
@@ -45,7 +46,7 @@ fun main() {
     )
 
     // admin server to be accessed on client apps
-    embeddedServer(CIO, host = "0.0.0.0", port = 8080) {
+    val server = embeddedServer(CIO, host = "0.0.0.0", port = 8080) {
         install(Krpc)
         routing {
             rpc("/rpc") {
@@ -56,7 +57,11 @@ fun main() {
                 registerService<AdminInterface> { adminInterface }
             }
         }
+    }
 
+    server.start(wait = false)
+
+    runBlocking {
         mainLoop(
             sensorServer = sensorServer,
             client = client,
@@ -64,5 +69,7 @@ fun main() {
             studentDao = studentDao,
             teacherDao = teachDao
         )
-    }.start(wait = true)
+    }
+
+    server.stop(1000, 5000)
 }
