@@ -24,6 +24,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
 
+      - name: Patch libgcc path for CI
+        run: |
+          LIBGCC_PATH=$(aarch64-linux-gnu-gcc -print-libgcc-file-name)
+          sed -i "s|/usr/lib/gcc/aarch64-linux-gnu/15.1.0/libgcc.a|$LIBGCC_PATH|g" server/build.gradle.kts
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
