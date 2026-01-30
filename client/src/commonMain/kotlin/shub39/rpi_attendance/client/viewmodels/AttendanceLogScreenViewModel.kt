@@ -52,8 +52,8 @@ class AttendanceLogScreenViewModel(
                 ?.onEach { logs ->
                     _state.update { attendanceLogState ->
                         attendanceLogState.copy(
-                            allLogs = logs,
-                            filteredLogs = logs.filter {
+                            allDetailedLogs = logs,
+                            filteredDetailedLogs = logs.filter {
                                 it.log.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == state.value.selectedDate
                             }
                         )

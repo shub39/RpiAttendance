@@ -8,7 +8,6 @@ import kotlin.time.Clock
 
 data class AttendanceLogState(
     val selectedDate: LocalDate =  Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-    val filteredLogs: List<DetailedAttendanceLog> = emptyList(),
-    val allLogs: List<DetailedAttendanceLog> = emptyList()
+    val filteredDetailedLogs: List<DetailedAttendanceLog> = emptyList(),
+    val allDetailedLogs: List<DetailedAttendanceLog> = emptyList()
 )
-

@@ -27,7 +27,7 @@ import models.EntityType
 import models.Student
 import models.Teacher
 import shub39.rpi_attendance.client.presentation.DateDisplay
-import shub39.rpi_attendance.client.presentation.attendancelog_screen.components.AttendanceLogCard
+import shub39.rpi_attendance.client.presentation.attendancelog_screen.components.DetailedLogCard
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -51,7 +51,7 @@ fun AttendanceLogScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Sessions")
+                    Text(text = "Attendance Log")
                 }
             )
         }
@@ -67,14 +67,19 @@ fun AttendanceLogScreen(
                 onDateChange = { onAction(AttendanceLogAction.OnLoadDate(it)) }
             )
 
-            if (state.filteredLogs.isNotEmpty()) {
+            if (state.filteredDetailedLogs.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 60.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(state.filteredLogs) { log ->
-                        AttendanceLogCard(log = log)
+                    items(state.filteredDetailedLogs) { detailedLogs ->
+                        DetailedLogCard(
+                            detailedLog = detailedLogs,
+                            onDelete = {
+                                onAction(AttendanceLogAction.OnDeleteLog(detailedLogs.log))
+                            }
+                        )
                     }
                 }
             } else {
@@ -97,7 +102,7 @@ private fun Preview() {
     AppTheme {
         AttendanceLogScreen(
             state = AttendanceLogState(
-                filteredLogs = (0..100).map { num ->
+                filteredDetailedLogs = (0..100).map { num ->
                     if (num % 2 == 0) {
                         DetailedAttendanceLog.StudentLog(
                             student = Student(
