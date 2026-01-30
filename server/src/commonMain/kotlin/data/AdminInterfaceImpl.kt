@@ -21,6 +21,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logInfo
+import models.AttendanceLog
 import models.EntityType
 import models.Session
 import models.Student
@@ -44,6 +45,11 @@ class AdminInterfaceImpl(
     override fun getTeachers(): Flow<List<Teacher>> = teacherDao
         .getAllTeachers()
         .map { flow -> flow.map { teachers -> teachers.toTeacher() } }
+        .flowOn(Dispatchers.IO)
+
+    override fun getAttendanceLogs(): Flow<List<AttendanceLog>> = attendanceLogDao
+        .getAttendanceLogs()
+        .map { flow -> flow.map { log -> log.toAttendanceLog() } }
         .flowOn(Dispatchers.IO)
 
     override suspend fun getSessionsForDate(date: LocalDate): List<Session> {
@@ -118,6 +124,11 @@ class AdminInterfaceImpl(
         logInfo("deleting teacher $teacher")
         teacher.biometricId?.toIntOrNull()?.let { deleteBiometrics(it) }
         teacherDao.delete(teacher.toTeacherEntity())
+    }
+
+    override suspend fun deleteAttendanceLog(attendanceLog: AttendanceLog) {
+        logInfo("deleting attendance log $attendanceLog")
+        attendanceLogDao.delete(attendanceLog.toAttendanceLogEntity())
     }
 
     override fun addBiometricDetailsForStudent(student: Student): Flow<EnrollState> =

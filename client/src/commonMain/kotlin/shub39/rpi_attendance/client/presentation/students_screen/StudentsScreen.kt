@@ -67,7 +67,6 @@ fun StudentsScreen(
         type = FileKitType.File(extensions = listOf("txt", "json")),
         mode = FileKitMode.Single
     ) { file ->
-        println(file)
         if (file != null) {
             onAction(StudentsScreenAction.ImportList(file))
         }
@@ -84,7 +83,7 @@ fun StudentsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun StudentsScreenContent(
+private fun StudentsScreenContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues,
     state: StudentsScreenState,
