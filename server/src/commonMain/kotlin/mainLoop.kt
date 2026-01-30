@@ -9,8 +9,10 @@ import domain.SensorServer
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.yield
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import models.AttendanceLog
@@ -18,42 +20,52 @@ import models.AttendanceStatus
 import models.EntityType
 import kotlin.time.Clock
 
-fun mainLoop(
+suspend fun mainLoop(
     studentDao: StudentDao,
     teacherDao: TeacherDao,
     attendanceLogDao: AttendanceLogDao,
     sensorServer: SensorServer,
-    adminServer: AdminServer,
     client: HttpClient
 ) {
-    runBlocking {
-        sensorServer.displayText(listOf("Rpiattendance", "by shub39"))
-        delay(2000)
+    sensorServer.displayText(listOf("Rpiattendance", "by shub39"))
+    delay(2000)
 
-        while (true) {
-            displayMenu(sensorServer)
+    while (true) {
+        displayMenu(sensorServer)
 
-            when (val res = sensorServer.getKeypadOutput(10)) {
-                is Result.Error -> {
-                    logError("Keypad", res.error, res.debugMessage)
-                    sensorServer.displayText(listOf("Error reading keypad"))
-                }
+        when (val res = sensorServer.getKeypadOutput(10)) {
+            is Result.Error -> {
+                logError("Keypad", res.error, res.debugMessage)
+                sensorServer.displayText(listOf("Error reading keypad"))
+            }
 
-                is Result.Success -> {
-                    when (res.data) {
-                        KeypadResult.Key1 -> handleDisplayIp(sensorServer)
-                        KeypadResult.Key4 -> takeAttendance(sensorServer, studentDao, teacherDao, attendanceLogDao)
-                        KeypadResult.KeyA -> {
-                            handleShutdown(sensorServer, adminServer, client)
-                            break
-                        }
+            is Result.Success -> {
+                when (res.data) {
+                    KeypadResult.Key2 -> handleDisplayIp(sensorServer)
+                    KeypadResult.Key5 -> takeAttendance(
+                        sensorServer,
+                        studentDao,
+                        teacherDao,
+                        attendanceLogDao
+                    )
 
-                        KeypadResult.NoInput -> logInfo("No keypad input.")
-                        else -> {
-                            logInfo("Invalid key: ${res.data}")
-                            sensorServer.displayText(listOf("Invalid key"))
-                            delay(1000)
-                        }
+                    KeypadResult.Key8 -> takeBulkAttendance(
+                        sensorServer,
+                        studentDao,
+                        teacherDao,
+                        attendanceLogDao
+                    )
+
+                    KeypadResult.KeyA -> {
+                        handleShutdown(sensorServer, client)
+                        break
+                    }
+
+                    KeypadResult.NoInput -> logInfo("No keypad input.")
+                    else -> {
+                        logInfo("Invalid key: ${res.data}")
+                        sensorServer.displayText(listOf("Invalid key"))
+                        delay(1000)
                     }
                 }
             }
@@ -64,9 +76,9 @@ fun mainLoop(
 private suspend fun displayMenu(sensorServer: SensorServer) {
     sensorServer.displayText(
         listOf(
-            "select option",
             "1. display ip",
-            "4. attendance"
+            "4. attendance",
+            "7. bulk attendance"
         )
     )
 }
@@ -83,6 +95,42 @@ private suspend fun handleDisplayIp(sensorServer: SensorServer) {
     }
 }
 
+private suspend fun takeBulkAttendance(
+    sensorServer: SensorServer,
+    studentDao: StudentDao,
+    teacherDao: TeacherDao,
+    attendanceLogDao: AttendanceLogDao
+) {
+    sensorServer.displayText(listOf("Taking bulk", "attendance"))
+
+    withTimeoutOrNull(30_000) {
+        coroutineScope {
+            launch {
+                while (isActive) {
+                    handleFaceRecognition(
+                        sensorServer,
+                        studentDao,
+                        teacherDao,
+                        attendanceLogDao
+                    )
+                    yield()
+                }
+            }
+            launch {
+                while (isActive) {
+                    handleFingerprintSearch(
+                        sensorServer,
+                        studentDao,
+                        teacherDao,
+                        attendanceLogDao
+                    )
+                    yield()
+                }
+            }
+        }
+    }
+}
+
 private suspend fun takeAttendance(
     sensorServer: SensorServer,
     studentDao: StudentDao,
@@ -91,9 +139,13 @@ private suspend fun takeAttendance(
 ) {
     sensorServer.displayText(listOf("Taking", "attendance"))
     coroutineScope {
-        launch { handleFaceRecognition(sensorServer, studentDao, teacherDao, attendanceLogDao) }
-        launch { handleFingerprintSearch(sensorServer, studentDao, teacherDao, attendanceLogDao) }
-    }.join()
+        launch {
+            handleFaceRecognition(sensorServer, studentDao, teacherDao, attendanceLogDao)
+        }
+        launch {
+            handleFingerprintSearch(sensorServer, studentDao, teacherDao, attendanceLogDao)
+        }
+    }
 }
 
 private suspend fun handleFaceRecognition(
@@ -107,7 +159,15 @@ private suspend fun handleFaceRecognition(
         is Result.Success -> {
             when (val faceData = face.data) {
                 is FaceSearchResult.Found -> {
-                    if (processAttendance(faceData.name, "Face", sensorServer, studentDao, teacherDao, attendanceLogDao)) {
+                    if (processAttendance(
+                            faceData.name,
+                            "Face",
+                            sensorServer,
+                            studentDao,
+                            teacherDao,
+                            attendanceLogDao
+                        )
+                    ) {
                         delay(1000)
                     }
                 }
@@ -209,11 +269,13 @@ private suspend fun logAttendance(
     )
 }
 
-private suspend fun handleShutdown(sensorServer: SensorServer, adminServer: AdminServer, client: HttpClient) {
+private suspend fun handleShutdown(
+    sensorServer: SensorServer,
+    client: HttpClient
+) {
     sensorServer.displayText(listOf("Shutting Down"))
     delay(2000)
     sensorServer.displayText(listOf())
-    adminServer.stop(1000, 2000)
     client.close()
     logInfo("Server stopped.")
 }
