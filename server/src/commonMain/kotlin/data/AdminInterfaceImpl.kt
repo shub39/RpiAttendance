@@ -20,6 +20,9 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import logInfo
+import models.AttendanceLog
+import models.DetailedAttendanceLog
 import models.EntityType
 import models.Session
 import models.Student
@@ -43,6 +46,33 @@ class AdminInterfaceImpl(
     override fun getTeachers(): Flow<List<Teacher>> = teacherDao
         .getAllTeachers()
         .map { flow -> flow.map { teachers -> teachers.toTeacher() } }
+        .flowOn(Dispatchers.IO)
+
+    override fun getDetailedAttendanceLogs(): Flow<List<DetailedAttendanceLog>> = attendanceLogDao
+        .getAttendanceLogs()
+        .map { flow ->
+            flow.mapNotNull { log ->
+                when (log.entityType) {
+                    EntityType.STUDENT -> {
+                        studentDao.getStudentById(log.entityId)?.let { studentEntity ->
+                            DetailedAttendanceLog.StudentLog(
+                                student = studentEntity.toStudent(),
+                                log = log.toAttendanceLog()
+                            )
+                        }
+                    }
+
+                    EntityType.TEACHER -> {
+                        teacherDao.getTeacherById(log.entityId)?.let { teacherEntity ->
+                            DetailedAttendanceLog.TeacherLog(
+                                teacher = teacherEntity.toTeacher(),
+                                log = log.toAttendanceLog()
+                            )
+                        }
+                    }
+                }
+            }
+        }
         .flowOn(Dispatchers.IO)
 
     override suspend fun getSessionsForDate(date: LocalDate): List<Session> {
@@ -86,6 +116,7 @@ class AdminInterfaceImpl(
     }
 
     override suspend fun upsertStudent(student: Student) {
+        logInfo("upserting student $student")
         val presentStudent = studentDao.getStudentById(student.id)
         if (presentStudent != null) {
             if (presentStudent.biometricId != null && student.biometricId == null) {
@@ -96,6 +127,7 @@ class AdminInterfaceImpl(
     }
 
     override suspend fun upsertTeacher(teacher: Teacher) {
+        logInfo("upserting teacher $teacher")
         val presentTeacher = teacherDao.getTeacherById(teacher.id)
         if (presentTeacher != null) {
             if (presentTeacher.biometricId != null && teacher.biometricId == null) {
@@ -106,13 +138,20 @@ class AdminInterfaceImpl(
     }
 
     override suspend fun deleteStudent(student: Student) {
+        logInfo("deleting student $student")
         student.biometricId?.toIntOrNull()?.let { deleteBiometrics(it) }
         studentDao.delete(student.toStudentEntity())
     }
 
     override suspend fun deleteTeacher(teacher: Teacher) {
+        logInfo("deleting teacher $teacher")
         teacher.biometricId?.toIntOrNull()?.let { deleteBiometrics(it) }
         teacherDao.delete(teacher.toTeacherEntity())
+    }
+
+    override suspend fun deleteAttendanceLog(attendanceLog: AttendanceLog) {
+        logInfo("deleting attendance log $attendanceLog")
+        attendanceLogDao.delete(attendanceLog.toAttendanceLogEntity())
     }
 
     override fun addBiometricDetailsForStudent(student: Student): Flow<EnrollState> =
@@ -163,6 +202,7 @@ class AdminInterfaceImpl(
     }
 
     private suspend fun deleteBiometrics(id: Int) {
+        logInfo("deleting biometrics for $id")
         sensorServer.deleteFingerPrint(id)
         sensorServer.deleteFace(id.toString())
     }

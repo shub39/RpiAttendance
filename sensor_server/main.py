@@ -26,7 +26,6 @@ logging.basicConfig(
 SERVER_HOST = "0.0.0.0"
 SERVER_PORT = 8000
 
-HARDWARE_TIMEOUT = 15
 PROCESS_TIMEOUT = 10
 
 KEYPAD_POLL_INTERVAL = 0.1
@@ -83,7 +82,7 @@ class FingerprintDeleteRequest(BaseModel):
 async def with_timeout(func, *args):
     return await asyncio.wait_for(
         run_in_threadpool(func, *args),
-        timeout=HARDWARE_TIMEOUT
+        timeout=PROCESS_TIMEOUT
     )
 
 @app.post("/display")
@@ -117,7 +116,7 @@ async def enroll_face(req: FaceEnrollRequest):
 async def recognize_face():
     hw.assert_ok()
     try:
-        match = await with_timeout(hw.face_rec.recognize, PROCESS_TIMEOUT)
+        match = await with_timeout(hw.face_rec.recognize)
         return {"match": match}
     except Exception as e:
         raise HTTPException(500, str(e))

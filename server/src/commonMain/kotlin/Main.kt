@@ -7,19 +7,15 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
-import io.ktor.server.cio.CIOApplicationEngine
-import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.runBlocking
 import kotlinx.rpc.krpc.ktor.server.Krpc
 import kotlinx.rpc.krpc.ktor.server.rpc
 import kotlinx.rpc.krpc.serialization.json.json
 import kotlinx.serialization.json.Json
 
-typealias AdminServer = EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>
-
 fun main() {
-
     // initializing stuff
     val client = HttpClient(Curl) {
         install(ContentNegotiation) {
@@ -50,37 +46,30 @@ fun main() {
     )
 
     // admin server to be accessed on client apps
-    val adminServer = embeddedServer(CIO, host = "0.0.0.0", port = 8080) {
+    val server = embeddedServer(CIO, host = "0.0.0.0", port = 8080) {
         install(Krpc)
         routing {
             rpc("/rpc") {
                 rpcConfig {
-                    serialization {
-                        json {
-                            allowStructuredMapKeys = true
-                        }
-                    }
+                    serialization { json { allowStructuredMapKeys = true } }
                 }
 
                 registerService<AdminInterface> { adminInterface }
             }
         }
-    }.start(wait = false)
+    }
 
-    // main loop
-    mainLoop(
-        sensorServer = sensorServer,
-        adminServer = adminServer,
-        client = client,
-        attendanceLogDao = attendanceLogDao,
-        studentDao = studentDao,
-        teacherDao = teachDao
-    )
+    server.start(wait = false)
 
-    // testing
-//    testLoop(
-//        sensorServer = sensorServer,
-//        adminServer = adminServer,
-//        client = client
-//    )
+    runBlocking {
+        mainLoop(
+            sensorServer = sensorServer,
+            client = client,
+            attendanceLogDao = attendanceLogDao,
+            studentDao = studentDao,
+            teacherDao = teachDao
+        )
+    }
+
+    server.stop(1000, 5000)
 }

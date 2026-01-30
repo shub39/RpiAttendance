@@ -1,5 +1,6 @@
 package shub39.rpi_attendance.client.presentation.teachers_screen
 
+import io.github.vinceglb.filekit.PlatformFile
 import models.Teacher
 
 sealed interface TeachersScreenAction {
@@ -8,4 +9,6 @@ sealed interface TeachersScreenAction {
     data class EnrollTeacher(val teacher: Teacher): TeachersScreenAction
     data class OnChangeSearchQuery(val query: String): TeachersScreenAction
     data object ResetEnrollState: TeachersScreenAction
+
+    data class ImportList(val file: PlatformFile): TeachersScreenAction
 }

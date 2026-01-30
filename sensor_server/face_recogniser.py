@@ -79,7 +79,7 @@ class FaceRecognizer:
 
         return None
 
-    def recognize(self, timeout=10, tolerance=0.5):
+    def recognize(self, timeout=1, tolerance=0.5):
         if not self.known_encodings:
             logging.error("No known face encodings loaded")
             return None

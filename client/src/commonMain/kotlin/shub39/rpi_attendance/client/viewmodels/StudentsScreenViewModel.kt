@@ -3,6 +3,7 @@ package shub39.rpi_attendance.client.viewmodels
 import EnrollState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.vinceglb.filekit.readString
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,6 +14,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
+import models.Student
 import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreenAction
 import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreenState
 
@@ -76,6 +80,19 @@ class StudentsScreenViewModel(
             StudentsScreenAction.ResetEnrollState -> {
                 _state.update {
                     it.copy(enrollState = EnrollState.Idle)
+                }
+            }
+
+            is StudentsScreenAction.ImportList -> viewModelScope.launch {
+                try {
+                    val rawFile = action.file.readString()
+                    val students = Json.decodeFromString<List<Student>>(rawFile)
+
+                    students.forEach { student ->
+                        rpcServiceWrapper.rpcService?.upsertStudent(student)
+                    }
+                } catch (e: SerializationException) {
+                    println("Error parsing JSON: ${e.message}")
                 }
             }
         }

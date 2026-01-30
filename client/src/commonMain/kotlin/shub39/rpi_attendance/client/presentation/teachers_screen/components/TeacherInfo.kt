@@ -48,7 +48,7 @@ fun TeacherInfo(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = teacher.firstName,
+                        text = "${teacher.firstName} ${teacher.lastName}",
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
