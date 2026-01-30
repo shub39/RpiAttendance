@@ -82,7 +82,7 @@ class FingerprintDeleteRequest(BaseModel):
 async def with_timeout(func, *args):
     return await asyncio.wait_for(
         run_in_threadpool(func, *args),
-        timeout=HARDWARE_TIMEOUT
+        timeout=PROCESS_TIMEOUT
     )
 
 @app.post("/display")
