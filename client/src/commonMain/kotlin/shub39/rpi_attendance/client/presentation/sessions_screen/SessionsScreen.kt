@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.presentation.attendancelog_screen
+package shub39.rpi_attendance.client.presentation.sessions_screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,25 +49,25 @@ import org.jetbrains.compose.resources.painterResource
 import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.arrow_back
 import rpiattendance.client.generated.resources.arrow_forward
-import shub39.rpi_attendance.client.presentation.attendancelog_screen.components.SessionCard
+import shub39.rpi_attendance.client.presentation.sessions_screen.components.SessionCard
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 import shub39.rpi_attendance.client.presentation.toFormattedString
 import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun AttendanceLogScreen(
+fun SessionsScreen(
     modifier: Modifier = Modifier,
     padding: PaddingValues,
-    state: AttendanceLogState,
-    onAction: (AttendanceLogAction) -> Unit
+    state: SessionsState,
+    onAction: (SessionsAction) -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
 
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
     LaunchedEffect(Unit) {
-        onAction(AttendanceLogAction.OnGetSessions(today))
+        onAction(SessionsAction.OnGetSessions(today))
     }
 
     if (showDatePicker) {
@@ -87,7 +87,7 @@ fun AttendanceLogScreen(
                 TextButton(
                     onClick = {
                         newDate?.let {
-                            onAction(AttendanceLogAction.OnGetSessions(it))
+                            onAction(SessionsAction.OnGetSessions(it))
                         }
                         showDatePicker = false
                     },
@@ -123,7 +123,7 @@ fun AttendanceLogScreen(
                 FilledTonalIconButton(
                     onClick = {
                         onAction(
-                            AttendanceLogAction.OnGetSessions(
+                            SessionsAction.OnGetSessions(
                                 state.selectedDate.minus(
                                     1, DateTimeUnit.DAY
                                 )
@@ -152,7 +152,7 @@ fun AttendanceLogScreen(
                 FilledTonalIconButton(
                     onClick = {
                         onAction(
-                            AttendanceLogAction.OnGetSessions(
+                            SessionsAction.OnGetSessions(
                                 state.selectedDate.plus(
                                     1, DateTimeUnit.DAY
                                 )
@@ -199,8 +199,8 @@ private fun Preview() {
     val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
 
     AppTheme {
-        AttendanceLogScreen(
-            state = AttendanceLogState(
+        SessionsScreen(
+            state = SessionsState(
                 sessions = (0..10).map { 
                     Session(
                         teacher = Teacher(

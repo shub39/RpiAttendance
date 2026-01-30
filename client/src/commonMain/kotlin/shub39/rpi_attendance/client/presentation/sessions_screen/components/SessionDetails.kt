@@ -1,4 +1,4 @@
-package shub39.rpi_attendance.client.presentation.attendancelog_screen.components
+package shub39.rpi_attendance.client.presentation.sessions_screen.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

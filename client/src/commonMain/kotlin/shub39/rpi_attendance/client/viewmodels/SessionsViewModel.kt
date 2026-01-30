@@ -8,23 +8,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import shub39.rpi_attendance.client.presentation.attendancelog_screen.AttendanceLogAction
-import shub39.rpi_attendance.client.presentation.attendancelog_screen.AttendanceLogState
+import shub39.rpi_attendance.client.presentation.sessions_screen.SessionsAction
+import shub39.rpi_attendance.client.presentation.sessions_screen.SessionsState
 
-class AttendanceLogViewModel(
+class SessionsViewModel(
     private val rpcServiceWrapper: RpcServiceWrapper
 ): ViewModel() {
-    private val _state = MutableStateFlow(AttendanceLogState())
+    private val _state = MutableStateFlow(SessionsState())
     val state = _state.asStateFlow()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = AttendanceLogState()
+            initialValue = SessionsState()
         )
 
-    fun onAction(action: AttendanceLogAction) {
+    fun onAction(action: SessionsAction) {
         when (action) {
-            is AttendanceLogAction.OnGetSessions -> viewModelScope.launch {
+            is SessionsAction.OnGetSessions -> viewModelScope.launch {
                 _state.update {
                     it.copy(
                         selectedDate = action.date,
