@@ -48,7 +48,7 @@ fun StudentInfo(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = student.firstName,
+                        text = "${student.firstName} ${student.lastName}",
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(

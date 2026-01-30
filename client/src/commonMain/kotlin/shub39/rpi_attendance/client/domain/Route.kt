@@ -6,7 +6,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.attendance_log
-import rpiattendance.client.generated.resources.csv
+import rpiattendance.client.generated.resources.folder_eye
 import rpiattendance.client.generated.resources.list_alt_check
 import rpiattendance.client.generated.resources.person_book
 import rpiattendance.client.generated.resources.school
@@ -54,7 +54,7 @@ sealed interface Route {
             ),
             NavigationItem(
                 route = SessionsScreen,
-                icon = Res.drawable.csv,
+                icon = Res.drawable.folder_eye,
                 title = Res.string.sessions
             )
         )

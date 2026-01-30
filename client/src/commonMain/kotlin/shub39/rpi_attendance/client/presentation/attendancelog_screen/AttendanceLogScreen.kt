@@ -66,26 +66,26 @@ fun AttendanceLogScreen(
                 selectedDate = state.selectedDate,
                 onDateChange = { onAction(AttendanceLogAction.OnLoadDate(it)) }
             )
-        }
 
-        if (state.logs.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 60.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items(state.logs) { log ->
-                    AttendanceLogCard(log = log)
+            if (state.filteredLogs.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 60.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(state.filteredLogs) { log ->
+                        AttendanceLogCard(log = log)
+                    }
                 }
-            }
-        } else {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "No Logs found",
-                )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No Logs found",
+                    )
+                }
             }
         }
     }
@@ -97,7 +97,7 @@ private fun Preview() {
     AppTheme {
         AttendanceLogScreen(
             state = AttendanceLogState(
-                logs = (0..100).map { num ->
+                filteredLogs = (0..100).map { num ->
                     if (num % 2 == 0) {
                         DetailedAttendanceLog.StudentLog(
                             student = Student(

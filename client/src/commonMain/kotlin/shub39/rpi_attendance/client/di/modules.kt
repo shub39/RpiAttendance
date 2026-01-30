@@ -9,6 +9,7 @@ import shub39.rpi_attendance.client.data.datastore.AppDatastoreImpl
 import shub39.rpi_attendance.client.data.datastore.DataStoreFactory
 import shub39.rpi_attendance.client.domain.AppDatastore
 import shub39.rpi_attendance.client.viewmodels.AppViewModel
+import shub39.rpi_attendance.client.viewmodels.AttendanceLogScreenViewModel
 import shub39.rpi_attendance.client.viewmodels.RpcServiceWrapper
 import shub39.rpi_attendance.client.viewmodels.SessionsViewModel
 import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
@@ -25,4 +26,5 @@ val modules = module {
     viewModelOf(::StudentsScreenViewModel)
     viewModelOf(::TeachersScreenViewModel)
     viewModelOf(::SessionsViewModel)
+    viewModelOf(::AttendanceLogScreenViewModel)
 }
