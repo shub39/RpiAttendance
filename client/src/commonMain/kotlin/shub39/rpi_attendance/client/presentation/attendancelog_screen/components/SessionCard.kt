@@ -37,7 +37,9 @@ fun SessionCard(
     Card(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        onClick = { showDetails = true }
+        onClick = {
+            if (session.students.isNotEmpty()) showDetails = true
+        }
     ) {
         Row(
             modifier = Modifier
@@ -78,7 +80,7 @@ fun SessionCard(
                 )
                 Text(text = "to")
                 Text(
-                    text = session.startTime.toFormattedString(),
+                    text = session.endTime.toFormattedString(),
                     fontWeight = FontWeight.Bold
                 )
             }
