@@ -103,7 +103,7 @@ class FingerprintSensor:
             logging.error("Error deleting template")
             raise FingerprintError(e)
 
-    def search_fingerprint(self, timeout=10):
+    def search_fingerprint(self, timeout=1):
         """
         Search for the fingerprint
 
