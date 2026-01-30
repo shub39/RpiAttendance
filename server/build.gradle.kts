@@ -22,12 +22,15 @@ kotlin {
         }
     }
 
-    listOf(
-        linuxArm64(),
-        linuxX64()
-    ).forEach { linuxTarget ->
-        linuxTarget.binaries.executable {
+    linuxX64 {
+        binaries.executable {
             entryPoint = "main"
+        }
+    }
+    linuxArm64 {
+        binaries.executable {
+            entryPoint = "main"
+            linkerOpts("/usr/lib/gcc/aarch64-linux-gnu/15.1.0/libgcc.a")
         }
     }
 

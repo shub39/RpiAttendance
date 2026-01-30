@@ -18,7 +18,7 @@ class AttendanceLogViewModel(
     val state = _state.asStateFlow()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = AttendanceLogState()
         )
 

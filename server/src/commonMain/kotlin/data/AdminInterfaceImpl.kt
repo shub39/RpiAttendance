@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import logInfo
 import models.EntityType
 import models.Session
 import models.Student
@@ -86,6 +87,7 @@ class AdminInterfaceImpl(
     }
 
     override suspend fun upsertStudent(student: Student) {
+        logInfo("upserting student $student")
         val presentStudent = studentDao.getStudentById(student.id)
         if (presentStudent != null) {
             if (presentStudent.biometricId != null && student.biometricId == null) {
@@ -96,6 +98,7 @@ class AdminInterfaceImpl(
     }
 
     override suspend fun upsertTeacher(teacher: Teacher) {
+        logInfo("upserting teacher $teacher")
         val presentTeacher = teacherDao.getTeacherById(teacher.id)
         if (presentTeacher != null) {
             if (presentTeacher.biometricId != null && teacher.biometricId == null) {
@@ -106,11 +109,13 @@ class AdminInterfaceImpl(
     }
 
     override suspend fun deleteStudent(student: Student) {
+        logInfo("deleting student $student")
         student.biometricId?.toIntOrNull()?.let { deleteBiometrics(it) }
         studentDao.delete(student.toStudentEntity())
     }
 
     override suspend fun deleteTeacher(teacher: Teacher) {
+        logInfo("deleting teacher $teacher")
         teacher.biometricId?.toIntOrNull()?.let { deleteBiometrics(it) }
         teacherDao.delete(teacher.toTeacherEntity())
     }
@@ -163,6 +168,7 @@ class AdminInterfaceImpl(
     }
 
     private suspend fun deleteBiometrics(id: Int) {
+        logInfo("deleting biometrics for $id")
         sensorServer.deleteFingerPrint(id)
         sensorServer.deleteFace(id.toString())
     }

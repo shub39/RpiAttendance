@@ -12,7 +12,6 @@ val appVersionCode = 1
 val appVersionName = "1.0.0"
 
 kotlin {
-    jvmToolchain(17)
     compilerOptions {
         optIn.add("kotlin.time.ExperimentalTime")
     }
@@ -32,7 +31,6 @@ kotlin {
             implementation(projects.client)
 
             implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
 
             implementation(libs.compose.material3)
             implementation(libs.compose.runtime)
@@ -43,6 +41,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+
+            implementation(libs.filekit.core)
         }
     }
 }

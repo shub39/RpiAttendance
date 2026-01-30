@@ -47,8 +47,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     packaging {
@@ -80,4 +80,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    implementation(libs.filekit.core)
 }

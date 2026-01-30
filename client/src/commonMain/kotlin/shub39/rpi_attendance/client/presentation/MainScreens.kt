@@ -6,9 +6,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -53,7 +53,7 @@ fun MainScreens(
         ) {
             composable<Route.StudentsScreen> {
                 val viewModel = koinInject<StudentsScreenViewModel>()
-                val state by viewModel.state.collectAsState()
+                val state by viewModel.state.collectAsStateWithLifecycle()
 
                 StudentsScreen(
                     contentPadding = padding,
@@ -63,7 +63,7 @@ fun MainScreens(
             }
             composable<Route.TeachersScreen> {
                 val viewModel = koinInject<TeachersScreenViewModel>()
-                val state by viewModel.state.collectAsState()
+                val state by viewModel.state.collectAsStateWithLifecycle()
 
                 TeachersScreen(
                     contentPadding = padding,
@@ -73,7 +73,7 @@ fun MainScreens(
             }
             composable<Route.AttendanceLogScreen> {
                 val viewModel = koinInject<AttendanceLogViewModel>()
-                val state by viewModel.state.collectAsState()
+                val state by viewModel.state.collectAsStateWithLifecycle()
 
                 AttendanceLogScreen(
                     padding = padding,

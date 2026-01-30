@@ -5,7 +5,6 @@ import data.toAttendanceLogEntity
 import domain.FaceSearchResult
 import domain.FingerprintSearchResult
 import domain.KeypadResult
-import domain.SensorError
 import domain.SensorServer
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.coroutineScope
@@ -217,12 +216,4 @@ private suspend fun handleShutdown(sensorServer: SensorServer, adminServer: Admi
     adminServer.stop(1000, 2000)
     client.close()
     logInfo("Server stopped.")
-}
-
-private fun logError(tag: String, error: SensorError, debugMessage: String?) {
-    println("[$tag Error]: $error ${debugMessage ?: ""}")
-}
-
-private fun logInfo(message: String) {
-    println("[INFO]: $message")
 }

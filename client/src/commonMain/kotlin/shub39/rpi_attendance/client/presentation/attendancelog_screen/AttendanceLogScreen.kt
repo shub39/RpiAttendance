@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.getSelectedDate
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,10 @@ fun AttendanceLogScreen(
     var showDatePicker by remember { mutableStateOf(false) }
 
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+    LaunchedEffect(Unit) {
+        onAction(AttendanceLogAction.OnGetSessions(today))
+    }
 
     if (showDatePicker) {
         val datePickerState = rememberDatePickerState(

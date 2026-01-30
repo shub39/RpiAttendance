@@ -7,7 +7,6 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(17)
     compilerOptions {
         optIn.add("kotlin.time.ExperimentalTime")
     }
@@ -53,6 +52,10 @@ kotlin {
             implementation(libs.compose.ui.tooling)
             implementation(libs.materialkolor)
             implementation(libs.androidx.datastore.core)
+            implementation(libs.androidx.lifecycle.runtime)
+
+            implementation(libs.filekit.core)
+            implementation(libs.filekit.dialogs.compose)
         }
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
