@@ -7,7 +7,12 @@ import models.Session
 import models.Student
 import models.Teacher
 
-// what the admin can do
+/**
+ * Defines the remote procedure call (RPC) interface for administrative actions.
+ * This interface provides methods for managing students, teachers, attendance logs,
+ * and biometric data within the system. It is intended to be used by the admin client
+ * to interact with the server.
+ */
 @Rpc
 interface AdminInterface {
     suspend fun getStatus(): Boolean

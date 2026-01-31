@@ -71,6 +71,12 @@ sealed interface KeypadResult {
     data object KeyStar: KeypadResult
 }
 
+/**
+ * Defines the contract for interacting with a remote sensor device.
+ * This interface provides methods for controlling various hardware components
+ * like a display, face and fingerprint scanners, and a keypad.
+ * All methods are suspend functions, they perform asynchronous operations.
+ */
 interface SensorServer {
     suspend fun displayText(lines: List<String>): EmptyResult<SensorError>
     suspend fun enrollFace(name: String): EmptyResult<SensorError>

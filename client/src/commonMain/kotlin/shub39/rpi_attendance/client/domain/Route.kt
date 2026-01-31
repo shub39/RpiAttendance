@@ -14,12 +14,24 @@ import rpiattendance.client.generated.resources.sessions
 import rpiattendance.client.generated.resources.students
 import rpiattendance.client.generated.resources.teachers
 
+/**
+ * Represents an item in the navigation UI, such as a navigation drawer or bottom bar.
+ * It encapsulates all the necessary information to display a navigable screen link.
+ *
+ * @property route The destination [Route] to navigate to when this item is selected.
+ * @property icon The [DrawableResource] to be displayed as the icon for this navigation item.
+ * @property title The [StringResource] for the text label of this navigation item.
+ */
 data class NavigationItem(
     val route: Route,
     val icon: DrawableResource,
     val title: StringResource
 )
 
+/**
+ * Represents the different screens/destinations in the application's navigation graph.
+ * This sealed interface is used by the navigation component to identify which screen to display.
+ */
 @Stable
 @Serializable
 sealed interface Route {

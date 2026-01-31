@@ -1,3 +1,5 @@
+![icon](icon.png)
+
 # RpiAttendance
 
 Kotlin/Native server to manage attendance on a raspberry pi 4B
