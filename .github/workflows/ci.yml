@@ -153,4 +153,4 @@ jobs:
           body_path: commit.txt
           files: |
             server.kexe
-            *.apk
+            app-release.apk
