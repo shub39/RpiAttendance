@@ -25,3 +25,4 @@ deploy.sh
 **/server_database.db-shm
 **/server_database.db-wal
 **/server_database.db.lck
+**/release

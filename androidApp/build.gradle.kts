@@ -8,8 +8,8 @@ plugins {
 
 val appName = "RpiAttendance"
 val appPackageName = "shub39.rpi_attendance.client"
-val appVersionCode = 1001
-val appVersionName = "1.0.01"
+val appVersionCode = 1002
+val appVersionName = "1.0.02"
 
 android {
     namespace = appPackageName
@@ -26,8 +26,8 @@ android {
     buildTypes {
         release {
             resValue("string", "app_name", appName)
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

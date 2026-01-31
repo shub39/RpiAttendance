@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.02
+- Fixed builds and obfuscation errors
+- Fixed ci not detecting app
+
 ## 1.0.01
 - Added docs to domain
 

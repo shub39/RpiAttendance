@@ -33,7 +33,7 @@ fun StudentInfo(
 ) {
     Card(
         modifier = modifier.animateContentSize(),
-        shape = MaterialTheme.shapes.extraExtraLarge
+        shape = MaterialTheme.shapes.large
     ) {
         Column(
             modifier = Modifier
