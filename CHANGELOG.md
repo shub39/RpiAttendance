@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.03
+- Fixed server shutdown logic
+- Tweaked upsert UI
+
 ## 1.0.02
 - Fixed builds and obfuscation errors
 - Fixed ci not detecting app
