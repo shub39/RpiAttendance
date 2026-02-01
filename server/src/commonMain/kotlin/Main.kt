@@ -64,12 +64,13 @@ fun main() {
     runBlocking {
         mainLoop(
             sensorServer = sensorServer,
-            client = client,
             attendanceLogDao = attendanceLogDao,
             studentDao = studentDao,
             teacherDao = teachDao
         )
     }
 
+    client.close()
     server.stop(1000, 5000)
+    logInfo("Server Stopped")
 }

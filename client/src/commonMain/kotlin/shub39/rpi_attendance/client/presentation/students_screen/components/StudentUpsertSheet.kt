@@ -256,48 +256,46 @@ fun StudentUpsertSheet(
                     )
                 }
             }
+        }
 
-            item {
-                Column(
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+        Column(
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            HorizontalDivider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        onDelete(newStudent)
+                        onDismissRequest()
+                    },
+                    modifier = Modifier.weight(1f),
+                    enabled = enrollState is EnrollState.Idle ||
+                            enrollState is EnrollState.EnrollComplete ||
+                            enrollState is EnrollState.EnrollFailed
                 ) {
-                    HorizontalDivider()
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        OutlinedButton(
-                            onClick = {
-                                onDelete(newStudent)
-                                onDismissRequest()
-                            },
-                            modifier = Modifier.weight(1f),
-                            enabled = enrollState is EnrollState.Idle ||
-                                    enrollState is EnrollState.EnrollComplete ||
-                                    enrollState is EnrollState.EnrollFailed
-                        ) {
-                            Text(
-                                text = stringResource(Res.string.delete)
-                            )
-                        }
+                    Text(
+                        text = stringResource(Res.string.delete)
+                    )
+                }
 
-                        Button(
-                            onClick = {
-                                onUpsert(newStudent)
-                                onDismissRequest()
-                            },
-                            modifier = Modifier.weight(1f),
-                            enabled = isValidStudentData && student != newStudent
-                        ) {
-                            Text(text = stringResource(Res.string.save))
-                        }
-                    }
+                Button(
+                    onClick = {
+                        onUpsert(newStudent)
+                        onDismissRequest()
+                    },
+                    modifier = Modifier.weight(1f),
+                    enabled = isValidStudentData && student != newStudent
+                ) {
+                    Text(text = stringResource(Res.string.save))
                 }
             }
         }

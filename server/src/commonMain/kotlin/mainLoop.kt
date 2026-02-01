@@ -6,7 +6,6 @@ import domain.FaceSearchResult
 import domain.FingerprintSearchResult
 import domain.KeypadResult
 import domain.SensorServer
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -29,7 +28,6 @@ suspend fun mainLoop(
     teacherDao: TeacherDao,
     attendanceLogDao: AttendanceLogDao,
     sensorServer: SensorServer,
-    client: HttpClient
 ) {
     sensorServer.displayText(listOf("Rpiattendance", "by shub39"))
     delay(2000)
@@ -64,11 +62,14 @@ suspend fun mainLoop(
                     )
 
                     KeypadResult.KeyA -> {
-                        handleShutdown(sensorServer, client)
+                        sensorServer.displayText(listOf("Shutting Down"))
+                        delay(2000)
+                        sensorServer.displayText(listOf())
                         break
                     }
 
                     KeypadResult.NoInput -> logInfo("No keypad input.")
+
                     else -> {
                         logInfo("Invalid key: ${res.data}")
                         sensorServer.displayText(listOf("Invalid key"))
@@ -156,7 +157,8 @@ private suspend fun handleFaceRecognition(
         is Result.Success -> {
             when (val faceData = face.data) {
                 is FaceSearchResult.Found -> {
-                    if (processAttendance(
+                    if (
+                        processAttendance(
                             faceData.name,
                             "Face",
                             sensorServer,
@@ -186,7 +188,8 @@ private suspend fun handleFingerprintSearch(
         is Result.Success -> {
             when (val fingerData = finger.data) {
                 is FingerprintSearchResult.Found -> {
-                    if (processAttendance(
+                    if (
+                        processAttendance(
                             fingerData.id.toString(),
                             "Fingerprint",
                             sensorServer,
@@ -264,15 +267,4 @@ private suspend fun logAttendance(
             }
         ).toAttendanceLogEntity()
     )
-}
-
-private suspend fun handleShutdown(
-    sensorServer: SensorServer,
-    client: HttpClient
-) {
-    sensorServer.displayText(listOf("Shutting Down"))
-    delay(2000)
-    sensorServer.displayText(listOf())
-    client.close()
-    logInfo("Server stopped.")
 }
