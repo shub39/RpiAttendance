@@ -64,6 +64,11 @@ fun TeacherInfo(
                             Res.drawable.fingerprint
                         }
                     ),
+                    tint = if (teacher.biometricId == null) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
                     contentDescription = null
                 )
 

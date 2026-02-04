@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.04
+- Simplified Logs UI
+- Moved sessions calculations to database layer
+
 ## 1.0.03
 - Fixed server shutdown logic
 - Tweaked upsert UI

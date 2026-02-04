@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Instant
 
 @Dao
 interface AttendanceLogDao {
@@ -17,8 +18,8 @@ interface AttendanceLogDao {
     @Query("SELECT * FROM attendance_log WHERE biometricId = :biometricId")
     suspend fun getAttendanceLogByBiometricId(biometricId: String): List<AttendanceLogEntity>
 
-//    @Query("SELECT * FROM attendance_log WHERE id = :id")
-//    suspend fun getAttendanceLogById(id: Long): AttendanceLogEntity?
+    @Query("SELECT * FROM attendance_log WHERE timeStamp >= :startTime AND timeStamp <= :endTime")
+    suspend fun getLogsBetween(startTime: Instant, endTime: Instant): List<AttendanceLogEntity>
 
     @Query("SELECT * FROM attendance_log")
     fun getAttendanceLogs(): Flow<List<AttendanceLogEntity>>
