@@ -9,7 +9,7 @@
     <string name="teachers_enrolled_template">%1$d teachers enrolled</string>
     <string name="add_teacher">Add Teacher</string>
     <string name="edit_teacher">Edit Teacher</string>
-    <string name="attendance_log">Attendance Log</string>
+    <string name="attendance_log">Log</string>
     <string name="add_student">Add Student</string>
     <string name="edit_student">Edit Student</string>
     <string name="sessions">Sessions</string>

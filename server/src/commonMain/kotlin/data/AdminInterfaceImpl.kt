@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import logInfo
 import models.AttendanceLog
@@ -27,6 +28,7 @@ import models.EntityType
 import models.Session
 import models.Student
 import models.Teacher
+import kotlin.time.Duration.Companion.days
 
 class AdminInterfaceImpl(
     private val studentDao: StudentDao,
@@ -76,11 +78,12 @@ class AdminInterfaceImpl(
         .flowOn(Dispatchers.IO)
 
     override suspend fun getSessionsForDate(date: LocalDate): List<Session> {
-        val logs = attendanceLogDao.getAttendanceLogs().first()
-            .filter { it.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == date }
+        val startTime = date.atStartOfDayIn(TimeZone.currentSystemDefault())
+        val endTime = startTime + 1.days
 
-        val teachers = teacherDao.getAllTeachers().first()
-        val students = studentDao.getAllStudents().first()
+        val logs = attendanceLogDao.getLogsBetween(startTime, endTime)
+        val teachers = teacherDao.getTeachersByIds(logs.map { it.entityId }.distinct()).map { it.toTeacher() }
+        val students = studentDao.getAllStudents().first().map { it.toStudent() }
 
         return logs
             .filter { it.entityType == EntityType.TEACHER }
@@ -95,18 +98,17 @@ class AdminInterfaceImpl(
                     return@mapNotNull null
                 }
 
-                val studentsPresent = students
-                    .filter { student ->
-                        logs.any { log ->
-                            log.entityId == student.id &&
-                                    log.timeStamp >= sessionStartTime &&
-                                    log.timeStamp <= sessionEndTime
-                        }
-                    }
-                    .map { it.toStudent() }
+                val studentsPresent = studentDao.getStudentsByIds(
+                    logs.filter {
+                        it.entityType == EntityType.STUDENT &&
+                                it.timeStamp >= sessionStartTime &&
+                                it.timeStamp <= sessionEndTime
+                    }.map { it.entityId }.distinct()
+                ).map { it.toStudent() }
+
 
                 Session(
-                    teacher = teacher.toTeacher(),
+                    teacher = teacher,
                     startTime = sessionStartTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
                     endTime = sessionEndTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
                     totalStudents = students.size,
@@ -120,7 +122,7 @@ class AdminInterfaceImpl(
         val presentStudent = studentDao.getStudentById(student.id)
         if (presentStudent != null) {
             if (presentStudent.biometricId != null && student.biometricId == null) {
-                deleteBiometrics(presentStudent.biometricId.toInt())
+                presentStudent.biometricId.toIntOrNull()?.let { deleteBiometrics(it) }
             }
         }
         studentDao.upsert(student.toStudentEntity())
@@ -131,7 +133,7 @@ class AdminInterfaceImpl(
         val presentTeacher = teacherDao.getTeacherById(teacher.id)
         if (presentTeacher != null) {
             if (presentTeacher.biometricId != null && teacher.biometricId == null) {
-                deleteBiometrics(presentTeacher.biometricId.toInt())
+                presentTeacher.biometricId.toIntOrNull()?.let { deleteBiometrics(it) }
             }
         }
         teacherDao.upsert(teacher.toTeacherEntity())

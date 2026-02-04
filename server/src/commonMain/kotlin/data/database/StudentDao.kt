@@ -17,14 +17,11 @@ interface StudentDao {
     @Query("SELECT * FROM students WHERE id = :id")
     suspend fun getStudentById(id: Long): StudentEntity?
 
+    @Query("SELECT * FROM students WHERE id IN (:ids)")
+    suspend fun getStudentsByIds(ids: List<Long>): List<StudentEntity>
+
     @Query("SELECT * FROM students WHERE biometricId = :biometricId")
     suspend fun getStudentByBiometricId(biometricId: String): StudentEntity?
-//
-//    @Query("SELECT * FROM students WHERE firstName LIKE '%' || :name || '%'")
-//    suspend fun getStudentsByName(name: String): List<StudentEntity>
-//
-//    @Query("SELECT * FROM students WHERE courseId = :courseId")
-//    suspend fun getStudentsByCourseId(courseId: Long): List<StudentEntity>
 
     @Query("SELECT * FROM students")
     fun getAllStudents(): Flow<List<StudentEntity>>

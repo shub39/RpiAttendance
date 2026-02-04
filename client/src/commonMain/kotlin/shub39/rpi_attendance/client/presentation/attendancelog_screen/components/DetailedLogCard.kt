@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import models.AttendanceStatus
 import models.DetailedAttendanceLog
 import org.jetbrains.compose.resources.vectorResource
 import rpiattendance.client.generated.resources.Res
@@ -112,8 +113,28 @@ fun DetailedLogCard(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (detailedLog.log.attendanceStatus == AttendanceStatus.IN) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = vectorResource(Res.drawable.login),
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = detailedLog.log.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).time.toFormattedString(),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = when (detailedLog.log.attendanceStatus) {
+                    AttendanceStatus.IN -> Alignment.End
+                    AttendanceStatus.OUT -> Alignment.Start
+                }
             ) {
                 Text(
                     text = when (detailedLog) {
@@ -140,21 +161,20 @@ fun DetailedLogCard(
                 )
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = vectorResource(
-                        when (detailedLog.log.attendanceStatus) {
-                            models.AttendanceStatus.IN -> Res.drawable.login
-                            models.AttendanceStatus.OUT -> Res.drawable.logout
-                        }
-                    ),
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = detailedLog.log.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).time.toFormattedString(),
-                    style = MaterialTheme.typography.bodySmall
-                )
+            if (detailedLog.log.attendanceStatus == AttendanceStatus.OUT) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = vectorResource(Res.drawable.logout),
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = detailedLog.log.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).time.toFormattedString(),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
     }
