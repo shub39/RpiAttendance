@@ -10,7 +10,7 @@ from a python server managing biometric sensors and camera.
 |:-----------------------:|:-----------------------:|
 | ![3](screenshots/3.png) | ![4](screenshots/4.png) |
 
-Also made a [Youtube Video](https://www.youtube.com/watch?v=sc254TMSav4&t=76s) talking about this project
+Also made a [Youtube Video](https://www.youtube.com/watch?v=sc254TMSav4) talking about this project
 
 ## Requirements
 - Raspberry pi (Used in this project is 4B 8gb variant)
