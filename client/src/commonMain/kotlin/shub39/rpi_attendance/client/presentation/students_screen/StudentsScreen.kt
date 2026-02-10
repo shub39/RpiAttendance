@@ -266,6 +266,7 @@ private fun StudentsScreenContent(
                 onAction(StudentsScreenAction.EnrollStudent(it))
             },
             onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
+            areSensorsBusy = state.areSensorsBusy,
             onDismissRequest = {
                 if (!state.enrollState.isEnrolling()) {
                     showStudentAddSheet = false
@@ -287,6 +288,7 @@ private fun StudentsScreenContent(
                 onAction(StudentsScreenAction.EnrollStudent(it))
             },
             onDelete = { onAction(StudentsScreenAction.DeleteStudent(it)) },
+            areSensorsBusy = state.areSensorsBusy,
             onDismissRequest = {
                 if (!state.enrollState.isEnrolling()) {
                     editStudent = null

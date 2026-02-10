@@ -106,6 +106,12 @@ class TeachersScreenViewModel(
                     it.copy(teachers = teachers)
                 }
             }?.launchIn(this)
+
+            rpcServiceWrapper.rpcService?.getAreSensorsBusy()?.onEach { status ->
+                _state.update {
+                    it.copy(areSensorsBusy = status)
+                }
+            }?.launchIn(this)
         }
     }
 }

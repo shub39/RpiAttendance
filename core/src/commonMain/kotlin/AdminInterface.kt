@@ -17,6 +17,7 @@ import models.Teacher
 interface AdminInterface {
     suspend fun getStatus(): Boolean
 
+    fun getAreSensorsBusy(): Flow<Boolean>
     fun getStudents(): Flow<List<Student>>
     fun getTeachers(): Flow<List<Teacher>>
     fun getDetailedAttendanceLogs(): Flow<List<DetailedAttendanceLog>>

@@ -110,11 +110,13 @@ private fun NavigationBar(
         val currentDestination = navBackStackEntry?.destination
 
         Route.screens.forEach { item ->
+            val selected = currentDestination?.hierarchy?.any {
+                it.hasRoute(item.route::class)
+            } == true
+
             NavigationBarItem(
-                selected = currentDestination?.hierarchy?.any {
-                    it.hasRoute(item.route::class)
-                } == true,
-                onClick = { onNavigate(item.route) },
+                selected = selected,
+                onClick = { if (!selected) onNavigate(item.route) },
                 icon = {
                     Icon(
                         painter = painterResource(item.icon),

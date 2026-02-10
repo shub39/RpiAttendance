@@ -8,6 +8,7 @@ import models.Student
 @Stable
 @Immutable
 data class StudentsScreenState(
+    val areSensorsBusy: Boolean = false,
     val students: List<Student> = emptyList(),
     val enrollState: EnrollState = EnrollState.Idle,
     val searchResults: List<Student> = emptyList(),

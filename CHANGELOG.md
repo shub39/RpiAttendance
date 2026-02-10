@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.05
+- Added Mutex to SensorServerImpl, removing curl crashes
+- Added state to stop enroll operations during attendance
+- Fixed Navbar behaviour
+
 ## 1.0.04
 - Simplified Logs UI
 - Moved sessions calculations to database layer
