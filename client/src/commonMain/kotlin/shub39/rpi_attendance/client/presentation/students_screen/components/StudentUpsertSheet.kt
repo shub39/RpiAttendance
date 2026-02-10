@@ -58,6 +58,7 @@ fun StudentUpsertSheet(
     isUpdate: Boolean = false,
     enrollState: EnrollState,
     student: Student,
+    areSensorsBusy: Boolean,
     onUpsert: (Student) -> Unit,
     onEnroll: (Student) -> Unit,
     onDelete: (Student) -> Unit,
@@ -224,7 +225,7 @@ fun StudentUpsertSheet(
                                             newStudent = newStudent.copy(biometricId = null)
                                         }
                                     },
-                                    enabled = isValidStudentData
+                                    enabled = isValidStudentData && !areSensorsBusy
                                 ) {
                                     Text(
                                         text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
@@ -320,7 +321,8 @@ private fun Preview() {
             onDismissRequest = { },
             enrollState = EnrollState.Idle,
             onEnroll = {},
-            onDelete = {}
+            onDelete = {},
+            areSensorsBusy = false
         )
     }
 }

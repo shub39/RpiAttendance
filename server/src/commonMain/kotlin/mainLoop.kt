@@ -102,6 +102,8 @@ private suspend fun takeAttendance(
     attendanceLogDao: AttendanceLogDao,
     isBulk: Boolean = false
 ) {
+    sensorServer.updateSensorsBusyState(true)
+
     val repetitions = if (isBulk) 30 else 5
     sensorServer.displayText(
         if (isBulk) {
@@ -133,6 +135,8 @@ private suspend fun takeAttendance(
             }
         }
     }
+
+    sensorServer.updateSensorsBusyState(false)
 }
 
 private suspend fun handleFaceRecognition(

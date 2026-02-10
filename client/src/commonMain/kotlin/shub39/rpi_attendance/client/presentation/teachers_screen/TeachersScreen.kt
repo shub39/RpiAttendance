@@ -263,6 +263,7 @@ private fun TeachersScreenContent(
                 onAction(TeachersScreenAction.EnrollTeacher(it))
             },
             onDelete = { onAction(TeachersScreenAction.DeleteTeacher(it)) },
+            areSensorsBusy = state.areSensorsBusy,
             onDismissRequest = {
                 if (!state.enrollState.isEnrolling()) {
                     showTeacherAddSheet = false
@@ -284,6 +285,7 @@ private fun TeachersScreenContent(
                 onAction(TeachersScreenAction.EnrollTeacher(it))
             },
             onDelete = { onAction(TeachersScreenAction.DeleteTeacher(it)) },
+            areSensorsBusy = state.areSensorsBusy,
             onDismissRequest = {
                 if (!state.enrollState.isEnrolling()) {
                     editTeacher = null

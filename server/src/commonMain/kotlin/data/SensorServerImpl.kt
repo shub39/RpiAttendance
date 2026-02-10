@@ -27,6 +27,10 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.Url
 import io.ktor.http.contentType
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import safeCall
@@ -35,7 +39,13 @@ class SensorServerImpl(
     private val client: HttpClient
 ) : SensorServer {
 
-    val mutex = Mutex()
+    private val mutex = Mutex()
+    private val _areSensorsBusy: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    override val areSensorsBusy: Flow<Boolean> = _areSensorsBusy.asStateFlow()
+    override fun updateSensorsBusyState(state: Boolean) {
+        _areSensorsBusy.update { state }
+    }
 
     override suspend fun displayText(lines: List<String>): EmptyResult<SensorError> {
         val request: EmptyResult<SourceError> =

@@ -3,6 +3,7 @@ package domain
 import EmptyResult
 import Result
 import RootError
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
 enum class SensorError: RootError {
@@ -78,6 +79,9 @@ sealed interface KeypadResult {
  * All methods are suspend functions, they perform asynchronous operations.
  */
 interface SensorServer {
+    val areSensorsBusy: Flow<Boolean>
+    fun updateSensorsBusyState(state: Boolean)
+
     suspend fun displayText(lines: List<String>): EmptyResult<SensorError>
     suspend fun enrollFace(name: String): EmptyResult<SensorError>
     suspend fun recognizeFace(): Result<FaceSearchResult, SensorError>

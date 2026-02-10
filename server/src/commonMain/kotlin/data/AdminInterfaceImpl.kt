@@ -40,6 +40,8 @@ class AdminInterfaceImpl(
 
     override suspend fun getStatus(): Boolean = true
 
+    override fun getAreSensorsBusy(): Flow<Boolean> = sensorServer.areSensorsBusy
+
     override fun getStudents(): Flow<List<Student>> = studentDao
         .getAllStudents()
         .map { flow -> flow.map { student -> student.toStudent() } }
