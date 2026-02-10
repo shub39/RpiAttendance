@@ -8,20 +8,13 @@ import domain.KeypadResult
 import domain.SensorServer
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.coroutines.yield
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import models.AttendanceLog
 import models.AttendanceStatus
 import models.EntityType
 import kotlin.time.Clock
-
-val sensorMutex = Mutex()
 
 suspend fun mainLoop(
     studentDao: StudentDao,
@@ -44,21 +37,20 @@ suspend fun mainLoop(
             is Result.Success -> {
                 when (res.data) {
                     KeypadResult.Key1 -> handleDisplayIp(sensorServer)
-                    
+
                     KeypadResult.Key4 -> takeAttendance(
-                        sensorServer,
-                        studentDao,
-                        teacherDao,
-                        attendanceLogDao,
-                        10_000
+                        sensorServer = sensorServer,
+                        studentDao = studentDao,
+                        teacherDao = teacherDao,
+                        attendanceLogDao = attendanceLogDao,
                     )
 
                     KeypadResult.Key7 -> takeAttendance(
-                        sensorServer,
-                        studentDao,
-                        teacherDao,
-                        attendanceLogDao,
-                        30_000
+                        sensorServer = sensorServer,
+                        studentDao = studentDao,
+                        teacherDao = teacherDao,
+                        attendanceLogDao = attendanceLogDao,
+                        isBulk = true
                     )
 
                     KeypadResult.KeyA -> {
@@ -108,39 +100,36 @@ private suspend fun takeAttendance(
     studentDao: StudentDao,
     teacherDao: TeacherDao,
     attendanceLogDao: AttendanceLogDao,
-    timeout: Long
+    isBulk: Boolean = false
 ) {
-    sensorServer.displayText(listOf("Taking bulk", "attendance"))
+    val repetitions = if (isBulk) 30 else 5
+    sensorServer.displayText(
+        if (isBulk) {
+            listOf("Taking Bulk", "Attendance")
+        } else {
+            listOf("Taking", "Attendance")
+        }
+    )
 
-    withTimeoutOrNull(timeout) {
-        coroutineScope {
-            launch {
-                while (isActive) {
-                    sensorMutex.withLock {
-                        handleFaceRecognition(
-                            sensorServer,
-                            studentDao,
-                            teacherDao,
-                            attendanceLogDao
-                        )
-                    }
-                    delay(50)
-                    yield()
-                }
+    coroutineScope {
+        launch {
+            repeat(repetitions) {
+                handleFaceRecognition(
+                    sensorServer = sensorServer,
+                    studentDao = studentDao,
+                    teacherDao = teacherDao,
+                    attendanceLogDao = attendanceLogDao
+                )
             }
-            launch {
-                while (isActive) {
-                    sensorMutex.withLock {
-                        handleFingerprintSearch(
-                            sensorServer,
-                            studentDao,
-                            teacherDao,
-                            attendanceLogDao
-                        )
-                    }
-                    delay(50)
-                    yield()
-                }
+        }
+        launch {
+            repeat(repetitions) {
+                handleFingerprintSearch(
+                    sensorServer = sensorServer,
+                    studentDao = studentDao,
+                    teacherDao = teacherDao,
+                    attendanceLogDao = attendanceLogDao
+                )
             }
         }
     }
@@ -159,12 +148,12 @@ private suspend fun handleFaceRecognition(
                 is FaceSearchResult.Found -> {
                     if (
                         processAttendance(
-                            faceData.name,
-                            "Face",
-                            sensorServer,
-                            studentDao,
-                            teacherDao,
-                            attendanceLogDao
+                            biometricId = faceData.name,
+                            source = "Face",
+                            sensorServer = sensorServer,
+                            studentDao = studentDao,
+                            teacherDao = teacherDao,
+                            attendanceLogDao = attendanceLogDao
                         )
                     ) {
                         delay(1000)
@@ -190,12 +179,12 @@ private suspend fun handleFingerprintSearch(
                 is FingerprintSearchResult.Found -> {
                     if (
                         processAttendance(
-                            fingerData.id.toString(),
-                            "Fingerprint",
-                            sensorServer,
-                            studentDao,
-                            teacherDao,
-                            attendanceLogDao
+                            biometricId = fingerData.id.toString(),
+                            source = "Fingerprint",
+                            sensorServer = sensorServer,
+                            studentDao = studentDao,
+                            teacherDao = teacherDao,
+                            attendanceLogDao = attendanceLogDao
                         )
                     ) {
                         delay(1000)
@@ -224,7 +213,13 @@ private suspend fun processAttendance(
                 student.rollNo.toString()
             )
         )
-        logAttendance(biometricId, EntityType.STUDENT, student.id, attendanceLogDao)
+        logInfo("$source Found Student ${student.firstName} : ${student.rollNo}")
+        logAttendance(
+            biometricId = biometricId,
+            entityType = EntityType.STUDENT,
+            entityId = student.id,
+            attendanceLogDao = attendanceLogDao
+        )
         return true
     }
 
@@ -236,7 +231,13 @@ private suspend fun processAttendance(
                 teacher.subjectTaught
             )
         )
-        logAttendance(biometricId, EntityType.TEACHER, teacher.id, attendanceLogDao)
+        logInfo("$source Found Student ${teacher.firstName} : ${teacher.subjectTaught}")
+        logAttendance(
+            biometricId = biometricId,
+            entityType = EntityType.TEACHER,
+            entityId = teacher.id,
+            attendanceLogDao = attendanceLogDao
+        )
         return true
     }
 
