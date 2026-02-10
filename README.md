@@ -1,13 +1,16 @@
 # RpiAttendance
-
 Kotlin/Native server to manage attendance on a raspberry pi 4B
 from a python server managing biometric sensors and camera.
 
-## Screenshots of Client App
+## Pic
+![Pic](screenshots/pic.jpg)
 
+## Screenshots of Client App
 | ![1](screenshots/1.png) | ![2](screenshots/2.png) |
 |:-----------------------:|:-----------------------:|
 | ![3](screenshots/3.png) | ![4](screenshots/4.png) |
+
+Also made a [Youtube Video](https://www.youtube.com/watch?v=sc254TMSav4) talking about this project
 
 ## Requirements
 - Raspberry pi (Used in this project is 4B 8gb variant)
@@ -52,7 +55,7 @@ uv pip install -r requirements.txt
 
 To build the project from source, you can use the following Gradle commands:
 
-- **Build the native server:** `./gradlew :server:nativeMain`
+- **Build the native server:** `./gradlew :server:linkReleaseExecutableLinuxArm64`
 - **Build the Android app:** `./gradlew :androidApp:assembleRelease`
 - **Run the Desktop app:** `./gradlew :desktopApp:run`
 
@@ -64,68 +67,30 @@ To build the project from source, you can use the following Gradle commands:
 - `androidApp` : Build module for the Android App
 - `desktopApp` : Build Module for the Desktop App, Also for hot reload
 
-## API Reference
-
-The server exposes the following RPC methods through the `AdminInterface`:
-
-| Method                                                               | Description                                                                                                               |
-|----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| `getStatus(): Boolean`                                               | Checks if the server is responsive.                                                                                       |
-| `getStudents(): Flow<List<Student>>`                                 | Provides a real-time stream of all students in the database.                                                              |
-| `getTeachers(): Flow<List<Teacher>>`                                 | Provides a real-time stream of all teachers in the database.                                                              |
-| `getDetailedAttendanceLogs(): Flow<List<DetailedAttendanceLog>>`     | Provides a real-time stream of all attendance logs, including details for the associated student or teacher.              |
-| `getSessionsForDate(date: LocalDate): List<Session>`                 | Retrieves all attendance sessions that occurred on a specific date.                                                       |
-| `upsertStudent(student: Student)`                                    | Creates a new student or updates an existing one.                                                                         |
-| `upsertTeacher(teacher: Teacher)`                                    | Creates a new teacher or updates an existing one.                                                                         |
-| `deleteStudent(student: Student)`                                    | Deletes a student and their associated biometric data.                                                                    |
-| `deleteTeacher(teacher: Teacher)`                                    | Deletes a teacher and their associated biometric data.                                                                    |
-| `deleteAttendanceLog(attendanceLog: AttendanceLog)`                  | Deletes a specific attendance log entry.                                                                                  |
-| `addBiometricDetailsForStudent(student: Student): Flow<EnrollState>` | Initiates the biometric enrollment process (fingerprint and face) for a student. Returns a flow of the enrollment status. |
-| `addBiometricDetailsForTeacher(teacher: Teacher): Flow<EnrollState>` | Initiates the biometric enrollment process for a teacher. Returns a flow of the enrollment status.                        |
-
-## Database Schemas
-
-The database is built using Room and has three tables:
-
-**1. `students`**
-
-This table stores information about the students.
-
-| Column         | Type    | Description                                      |
-|----------------|---------|--------------------------------------------------|
-| `id`           | INTEGER | Primary key for the student.                     |
-| `biometricId`  | TEXT    | The ID from the biometric scanner.               |
-| `firstName`    | TEXT    | The first name of the student.                   |
-| `lastName`     | TEXT    | The last name of the student.                    |
-| `rollNo`       | INTEGER | The roll number of the student.                  |
-| `contactEmail` | TEXT    | The email address of the student.                |
-| `contactPhone` | TEXT    | The phone number of the student.                 |
-
-**2. `teachers`**
-
-This table stores information about the teachers.
-
-| Column          | Type    | Description                           |
-|-----------------|---------|---------------------------------------|
-| `id`            | INTEGER | Primary key for the teacher.          |
-| `biometricId`   | TEXT    | The ID from the biometric scanner.    |
-| `firstName`     | TEXT    | The first name of the teacher.        |
-| `lastName`      | TEXT    | The last name of the teacher.         |
-| `subjectTaught` | TEXT    | The subject that the teacher teaches. |
-
-**3. `attendance_log`**
-
-This table stores the attendance logs for both students and teachers.
-
-| Column             | Type    | Description                                   |
-|--------------------|---------|-----------------------------------------------|
-| `id`               | INTEGER | Primary key for the attendance log.           |
-| `biometricId`      | TEXT    | The ID from the biometric scanner.            |
-| `entityType`       | TEXT    | The type of entity (`STUDENT` or `TEACHER`).  |
-| `entityId`         | INTEGER | The ID of the entity (student or teacher).    |
-| `timeStamp`        | INTEGER | The timestamp of the attendance log.          |
-| `attendanceStatus` | TEXT    | The status of the attendance (`IN` or `OUT`). |
-
+## Architecture
+```mermaid
+graph TD
+    subgraph "Client Apps"
+        androidApp[Android App]
+        desktopApp[Desktop App]
+    end
+    subgraph "Shared Code"
+        client[client module]
+        core[core module]
+    end
+    subgraph "Server Side"
+        server[server module]
+        sensor_server[sensor_server]
+        db[(Database)]
+    end
+    androidApp --> client
+    desktopApp --> client
+    client --> core
+    client -- Ktor RPC --> server
+    server --> core
+    server -- FastAPI HTTP --> sensor_server
+    server --> db
+```
 
 ## Tech stack
 
