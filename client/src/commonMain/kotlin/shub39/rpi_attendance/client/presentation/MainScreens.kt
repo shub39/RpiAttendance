@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation
 
 import androidx.compose.material3.Icon
@@ -30,9 +46,7 @@ import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
 import shub39.rpi_attendance.client.viewmodels.TeachersScreenViewModel
 
 @Composable
-fun MainScreens(
-    modifier: Modifier = Modifier
-) {
+fun MainScreens(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -45,14 +59,11 @@ fun MainScreens(
                         popUpTo(Route.StudentsScreen)
                     }
                 },
-                navController = navController
+                navController = navController,
             )
-        }
+        },
     ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = Route.StudentsScreen
-        ) {
+        NavHost(navController = navController, startDestination = Route.StudentsScreen) {
             composable<Route.StudentsScreen> {
                 val viewModel = koinInject<StudentsScreenViewModel>()
                 val state by viewModel.state.collectAsStateWithLifecycle()
@@ -60,7 +71,7 @@ fun MainScreens(
                 StudentsScreen(
                     contentPadding = padding,
                     state = state,
-                    onAction = viewModel::onAction
+                    onAction = viewModel::onAction,
                 )
             }
             composable<Route.TeachersScreen> {
@@ -70,18 +81,14 @@ fun MainScreens(
                 TeachersScreen(
                     contentPadding = padding,
                     state = state,
-                    onAction = viewModel::onAction
+                    onAction = viewModel::onAction,
                 )
             }
             composable<Route.SessionsScreen> {
                 val viewModel = koinInject<SessionsViewModel>()
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
-                SessionsScreen(
-                    padding = padding,
-                    state = state,
-                    onAction = viewModel::onAction
-                )
+                SessionsScreen(padding = padding, state = state, onAction = viewModel::onAction)
             }
             composable<Route.AttendanceLogScreen> {
                 val viewModel = koinInject<AttendanceLogScreenViewModel>()
@@ -90,7 +97,7 @@ fun MainScreens(
                 AttendanceLogScreen(
                     padding = padding,
                     state = state,
-                    onAction = viewModel::onAction
+                    onAction = viewModel::onAction,
                 )
             }
         }
@@ -101,18 +108,15 @@ fun MainScreens(
 private fun NavigationBar(
     modifier: Modifier = Modifier,
     onNavigate: (Route) -> Unit,
-    navController: NavController
+    navController: NavController,
 ) {
-    NavigationBar(
-        modifier = modifier
-    ) {
+    NavigationBar(modifier = modifier) {
         val navBackStackEntry = navController.currentBackStackEntryAsState().value
         val currentDestination = navBackStackEntry?.destination
 
         Route.screens.forEach { item ->
-            val selected = currentDestination?.hierarchy?.any {
-                it.hasRoute(item.route::class)
-            } == true
+            val selected =
+                currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
 
             NavigationBarItem(
                 selected = selected,
@@ -120,13 +124,11 @@ private fun NavigationBar(
                 icon = {
                     Icon(
                         painter = painterResource(item.icon),
-                        contentDescription = stringResource(item.title)
+                        contentDescription = stringResource(item.title),
                     )
                 },
-                label = {
-                    Text(stringResource(item.title))
-                },
-                alwaysShowLabel = false
+                label = { Text(stringResource(item.title)) },
+                alwaysShowLabel = false,
             )
         }
     }

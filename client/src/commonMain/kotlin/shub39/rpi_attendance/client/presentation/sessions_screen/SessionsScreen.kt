@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.sessions_screen
 
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import models.Session
@@ -27,7 +44,6 @@ import models.Teacher
 import shub39.rpi_attendance.client.presentation.DateDisplay
 import shub39.rpi_attendance.client.presentation.sessions_screen.components.SessionCard
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
-import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -35,53 +51,35 @@ fun SessionsScreen(
     modifier: Modifier = Modifier,
     padding: PaddingValues,
     state: SessionsState,
-    onAction: (SessionsAction) -> Unit
+    onAction: (SessionsAction) -> Unit,
 ) {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-    LaunchedEffect(Unit) {
-        onAction(SessionsAction.OnGetSessions(today))
-    }
+    LaunchedEffect(Unit) { onAction(SessionsAction.OnGetSessions(today)) }
 
     Scaffold(
         modifier = modifier.padding(padding),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Sessions")
-                }
-            )
-        }
+        topBar = { TopAppBar(title = { Text(text = "Sessions") }) },
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             DateDisplay(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 selectedDate = state.selectedDate,
-                onDateChange = { onAction(SessionsAction.OnGetSessions(it)) }
+                onDateChange = { onAction(SessionsAction.OnGetSessions(it)) },
             )
 
             if (state.sessions.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 60.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    contentPadding =
+                        PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 60.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    items(state.sessions) { session ->
-                        SessionCard(session = session)
-                    }
+                    items(state.sessions) { session -> SessionCard(session = session) }
                 }
             } else {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No Sessions found",
-                    )
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "No Sessions found")
                 }
             }
         }
@@ -95,33 +93,37 @@ private fun Preview() {
 
     AppTheme {
         SessionsScreen(
-            state = SessionsState(
-                sessions = (0..10).map { 
-                    Session(
-                        teacher = Teacher(
-                            biometricId = "$it",
-                            firstName = "Teacher $it",
-                            lastName = "last name",
-                            subjectTaught = "Subject $it"
-                        ),
-                        startTime = time,
-                        endTime = time,
-                        totalStudents = 25,
-                        students = (0..25).map { studentIndex ->
-                            Student(
-                                biometricId = "student_$studentIndex",
-                                firstName = "Student $studentIndex",
-                                lastName = "last name",
-                                rollNo = studentIndex,
-                                contactEmail = "@$studentIndex",
-                                contactPhone = "ashbak$studentIndex"
+            state =
+                SessionsState(
+                    sessions =
+                        (0..10).map {
+                            Session(
+                                teacher =
+                                    Teacher(
+                                        biometricId = "$it",
+                                        firstName = "Teacher $it",
+                                        lastName = "last name",
+                                        subjectTaught = "Subject $it",
+                                    ),
+                                startTime = time,
+                                endTime = time,
+                                totalStudents = 25,
+                                students =
+                                    (0..25).map { studentIndex ->
+                                        Student(
+                                            biometricId = "student_$studentIndex",
+                                            firstName = "Student $studentIndex",
+                                            lastName = "last name",
+                                            rollNo = studentIndex,
+                                            contactEmail = "@$studentIndex",
+                                            contactPhone = "ashbak$studentIndex",
+                                        )
+                                    },
                             )
                         }
-                    )
-                }
-            ),
+                ),
             onAction = {},
-            padding = PaddingValues()
+            padding = PaddingValues(),
         )
     }
 }

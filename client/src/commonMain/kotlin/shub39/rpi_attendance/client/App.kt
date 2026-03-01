@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client
 
 import androidx.compose.animation.AnimatedContent
@@ -32,9 +48,7 @@ import shub39.rpi_attendance.client.presentation.theme.AppTheme
 import shub39.rpi_attendance.client.viewmodels.AppViewModel
 
 @Composable
-fun App(
-    modifier: Modifier = Modifier
-) {
+fun App(modifier: Modifier = Modifier) {
     val mainViewModel: AppViewModel = koinInject()
     val serverUrl by mainViewModel.serverUrl.collectAsState()
     val isInterfaceChecked by mainViewModel.isInterfaceChecked.collectAsState()
@@ -45,7 +59,7 @@ fun App(
             isInterfaceChecked = isInterfaceChecked,
             serverUrl = serverUrl,
             onSetUrl = { mainViewModel.updateServerUrl(it) },
-            onSaveUrl = { mainViewModel.saveUrl(it) }
+            onSaveUrl = { mainViewModel.saveUrl(it) },
         )
     }
 }
@@ -56,25 +70,22 @@ private fun AppContent(
     serverUrl: String,
     isInterfaceChecked: Boolean,
     onSetUrl: (String) -> Unit,
-    onSaveUrl: (String) -> Unit
+    onSaveUrl: (String) -> Unit,
 ) {
     var showApp by remember { mutableStateOf(false) }
 
-    AnimatedContent(
-        modifier = modifier,
-        targetState = showApp
-    ) { showAppContent ->
+    AnimatedContent(modifier = modifier, targetState = showApp) { showAppContent ->
         if (!showAppContent) {
             // prompt to enter Ip
             Surface {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = stringResource(Res.string.app_name),
-                        style = MaterialTheme.typography.headlineLarge
+                        style = MaterialTheme.typography.headlineLarge,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
@@ -83,9 +94,8 @@ private fun AppContent(
                         label = { Text(stringResource(Res.string.enter_ip)) },
                         singleLine = true,
                         shape = MaterialTheme.shapes.extraLarge,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            textAlign = TextAlign.Center
-                        )
+                        textStyle =
+                            MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(
@@ -93,7 +103,7 @@ private fun AppContent(
                             onSaveUrl(serverUrl)
                             showApp = true
                         },
-                        enabled = isInterfaceChecked
+                        enabled = isInterfaceChecked,
                     ) {
                         Text(text = stringResource(Res.string.connect))
                     }

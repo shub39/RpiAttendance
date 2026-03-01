@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package data.database
+package errors
 
-import androidx.room.TypeConverter
-import kotlin.time.Instant
-
-object Converters {
-    @TypeConverter
-    fun instantToTimeStamp(instant: Instant): Long {
-        return instant.toEpochMilliseconds()
+sealed interface SourceError : RootError {
+    enum class NetworkError : SourceError {
+        REQUEST_FAILED,
+        NO_INTERNET_CONNECTION,
     }
 
-    @TypeConverter
-    fun timeStampToInstant(timeStamp: Long): Instant {
-        return Instant.fromEpochMilliseconds(timeStamp)
+    enum class DataError : SourceError {
+        SENSOR_ERROR,
+        PARSE_ERROR,
+        UNKNOWN_ERROR,
     }
 }

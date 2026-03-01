@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+- Added status indicator to stop pause server while running enroll operations
+- Added checks to prevent logging attendance of a single person repeatedly 
+- Cleaned up texts
+- Added spotless
+
 ## 1.0.05
 - Added Mutex to SensorServerImpl, removing curl crashes
 - Added state to stop enroll operations during attendance

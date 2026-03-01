@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.students_screen.components
 
 import EnrollState
@@ -62,11 +78,12 @@ fun StudentUpsertSheet(
     onUpsert: (Student) -> Unit,
     onEnroll: (Student) -> Unit,
     onDelete: (Student) -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     var newStudent by remember { mutableStateOf(student) }
 
-    val isValidStudentData = newStudent.firstName.isNotBlank() &&
+    val isValidStudentData =
+        newStudent.firstName.isNotBlank() &&
             newStudent.lastName.isNotBlank() &&
             newStudent.rollNo > 0 &&
             newStudent.contactEmail.isNotBlank() &&
@@ -76,35 +93,36 @@ fun StudentUpsertSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetGesturesEnabled = false,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
         LazyColumn(
             modifier = Modifier.heightIn(max = 500.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(vertical = 16.dp)
+            contentPadding = PaddingValues(vertical = 16.dp),
         ) {
             stickyHeader {
                 Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                        .fillMaxWidth(),
+                    modifier =
+                        Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
+                            .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.edit),
                         contentDescription = null,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(36.dp),
                     )
                     Text(
-                        text = stringResource(
-                            if (isUpdate) {
-                                Res.string.edit_student
-                            } else {
-                                Res.string.add_student
-                            }
-                        ),
-                        style = MaterialTheme.typography.titleLarge
+                        text =
+                            stringResource(
+                                if (isUpdate) {
+                                    Res.string.edit_student
+                                } else {
+                                    Res.string.add_student
+                                }
+                            ),
+                        style = MaterialTheme.typography.titleLarge,
                     )
                     HorizontalDivider()
                 }
@@ -117,9 +135,7 @@ fun StudentUpsertSheet(
                     label = { Text("First Name") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                 )
             }
 
@@ -130,9 +146,7 @@ fun StudentUpsertSheet(
                     label = { Text("Last Name") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                 )
             }
 
@@ -148,9 +162,7 @@ fun StudentUpsertSheet(
                     singleLine = true,
                     shape = MaterialTheme.shapes.large,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                 )
             }
 
@@ -161,9 +173,7 @@ fun StudentUpsertSheet(
                     label = { Text("Email") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                 )
             }
 
@@ -174,104 +184,103 @@ fun StudentUpsertSheet(
                     label = { Text("Phone") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                 )
             }
 
             item {
                 if (isUpdate) {
                     ListItem(
-                        colors = ListItemDefaults.colors(
-                            containerColor = Color.Transparent
-                        ),
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         leadingContent = {
                             Icon(
-                                painter = painterResource(
-                                    if (newStudent.biometricId == null) {
-                                        Res.drawable.fingerprint_off
-                                    } else {
-                                        Res.drawable.fingerprint
-                                    }
-                                ),
-                                contentDescription = null
+                                painter =
+                                    painterResource(
+                                        if (newStudent.biometricId == null) {
+                                            Res.drawable.fingerprint_off
+                                        } else {
+                                            Res.drawable.fingerprint
+                                        }
+                                    ),
+                                contentDescription = null,
                             )
                         },
-                        headlineContent = {
-                            Text(text = "Biometrics")
-                        },
+                        headlineContent = { Text(text = "Biometrics") },
                         supportingContent = {
                             Text(
-                                text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
-                                    when (enrollState) {
-                                        is EnrollState.EnrollFailed -> "Enroll Failed"
-                                        EnrollState.Enrolling -> "Enrolling"
-                                        EnrollState.FingerprintEnrolled -> "Fingerprint Enrolled..."
-                                        EnrollState.Idle -> "Not Enrolled"
+                                text =
+                                    if (
+                                        newStudent.biometricId == null &&
+                                            enrollState !is EnrollState.EnrollComplete
+                                    ) {
+                                        when (enrollState) {
+                                            is EnrollState.EnrollFailed -> "Enroll Failed"
+                                            EnrollState.Enrolling -> "Enrolling"
+                                            EnrollState.FingerprintEnrolled ->
+                                                "Fingerprint Enrolled..."
+                                            EnrollState.Idle -> "Not Enrolled"
+                                        }
+                                    } else {
+                                        "Enrolled"
                                     }
-                                } else {
-                                    "Enrolled"
-                                }
                             )
                         },
                         trailingContent = {
                             if (!enrollState.isEnrolling()) {
                                 Button(
                                     onClick = {
-                                        if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
+                                        if (
+                                            newStudent.biometricId == null &&
+                                                enrollState !is EnrollState.EnrollComplete
+                                        ) {
                                             onEnroll(newStudent)
                                         } else {
                                             newStudent = newStudent.copy(biometricId = null)
                                         }
                                     },
-                                    enabled = isValidStudentData && !areSensorsBusy
+                                    enabled = isValidStudentData && !areSensorsBusy,
                                 ) {
                                     Text(
-                                        text = if (newStudent.biometricId == null && enrollState !is EnrollState.EnrollComplete) {
-                                            "Enroll"
-                                        } else {
-                                            "Delete"
-                                        }
+                                        text =
+                                            if (
+                                                newStudent.biometricId == null &&
+                                                    enrollState !is EnrollState.EnrollComplete
+                                            ) {
+                                                "Enroll"
+                                            } else {
+                                                "Delete"
+                                            }
                                     )
                                 }
                             } else {
                                 LoadingIndicator()
                             }
-                        }
+                        },
                     )
                 } else {
                     ListItem(
-                        headlineContent = {
-                            Text("Enroll Biometrics after saving data")
-                        },
+                        headlineContent = { Text("Enroll Biometrics after saving data") },
                         leadingContent = {
                             Icon(
                                 painter = painterResource(Res.drawable.fingerprint_off),
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         },
-                        colors = ListItemDefaults.colors(
-                            containerColor = Color.Transparent
-                        ),
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
                 }
             }
         }
 
         Column(
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(bottom = 16.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             HorizontalDivider()
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 OutlinedButton(
                     onClick = {
@@ -279,13 +288,12 @@ fun StudentUpsertSheet(
                         onDismissRequest()
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = enrollState is EnrollState.Idle ||
+                    enabled =
+                        enrollState is EnrollState.Idle ||
                             enrollState is EnrollState.EnrollComplete ||
-                            enrollState is EnrollState.EnrollFailed
+                            enrollState is EnrollState.EnrollFailed,
                 ) {
-                    Text(
-                        text = stringResource(Res.string.delete)
-                    )
+                    Text(text = stringResource(Res.string.delete))
                 }
 
                 Button(
@@ -294,7 +302,7 @@ fun StudentUpsertSheet(
                         onDismissRequest()
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = isValidStudentData && student != newStudent
+                    enabled = isValidStudentData && student != newStudent,
                 ) {
                     Text(text = stringResource(Res.string.save))
                 }
@@ -308,21 +316,22 @@ fun StudentUpsertSheet(
 private fun Preview() {
     AppTheme {
         StudentUpsertSheet(
-            student = Student(
-                id = 1,
-                biometricId = "1",
-                firstName = "Shubham",
-                lastName = "Gorai",
-                rollNo = 120,
-                contactEmail = "gmail",
-                contactPhone = "123"
-            ),
-            onUpsert = { },
-            onDismissRequest = { },
+            student =
+                Student(
+                    id = 1,
+                    biometricId = "1",
+                    firstName = "Shubham",
+                    lastName = "Gorai",
+                    rollNo = 120,
+                    contactEmail = "gmail",
+                    contactPhone = "123",
+                ),
+            onUpsert = {},
+            onDismissRequest = {},
             enrollState = EnrollState.Idle,
             onEnroll = {},
             onDelete = {},
-            areSensorsBusy = false
+            areSensorsBusy = false,
         )
     }
 }

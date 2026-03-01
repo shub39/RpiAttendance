@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.students_screen.components
 
 import androidx.compose.animation.animateContentSize
@@ -26,59 +42,41 @@ import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun StudentInfo(
-    modifier: Modifier = Modifier,
-    student: Student,
-    onEdit: () -> Unit
-) {
-    Card(
-        modifier = modifier.animateContentSize(),
-        shape = MaterialTheme.shapes.large
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
+fun StudentInfo(modifier: Modifier = Modifier, student: Student, onEdit: () -> Unit) {
+    Card(modifier = modifier.animateContentSize(), shape = MaterialTheme.shapes.large) {
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "${student.firstName} ${student.lastName}",
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
                     )
-                    Text(
-                        text = student.rollNo.toString()
-                    )
+                    Text(text = student.rollNo.toString())
                 }
 
                 Icon(
-                    painter = painterResource(
+                    painter =
+                        painterResource(
+                            if (student.biometricId == null) {
+                                Res.drawable.fingerprint_off
+                            } else {
+                                Res.drawable.fingerprint
+                            }
+                        ),
+                    tint =
                         if (student.biometricId == null) {
-                            Res.drawable.fingerprint_off
+                            MaterialTheme.colorScheme.error
                         } else {
-                            Res.drawable.fingerprint
-                        }
-                    ),
-                    tint = if (student.biometricId == null) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    contentDescription = null
+                            MaterialTheme.colorScheme.primary
+                        },
+                    contentDescription = null,
                 )
 
-                IconButton(
-                    onClick = onEdit
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.edit),
-                        contentDescription = "Edit"
-                    )
+                IconButton(onClick = onEdit) {
+                    Icon(painter = painterResource(Res.drawable.edit), contentDescription = "Edit")
                 }
             }
         }
@@ -90,16 +88,17 @@ fun StudentInfo(
 private fun Preview() {
     AppTheme {
         StudentInfo(
-            student = Student(
-                id = 1,
-                biometricId = "as",
-                firstName = "Shubham",
-                lastName = "Gorai",
-                rollNo = 12213,
-                contactEmail = "asasa",
-                contactPhone = "112123"
-            ),
-            onEdit = {}
+            student =
+                Student(
+                    id = 1,
+                    biometricId = "as",
+                    firstName = "Shubham",
+                    lastName = "Gorai",
+                    rollNo = 12213,
+                    contactEmail = "asasa",
+                    contactPhone = "112123",
+                ),
+            onEdit = {},
         )
     }
 }

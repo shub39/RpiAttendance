@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.viewmodels
 
 import EnrollState
@@ -20,42 +36,41 @@ import models.Teacher
 import shub39.rpi_attendance.client.presentation.teachers_screen.TeachersScreenAction
 import shub39.rpi_attendance.client.presentation.teachers_screen.TeachersScreenState
 
-class TeachersScreenViewModel(
-    private val rpcServiceWrapper: RpcServiceWrapper
-) : ViewModel() {
+class TeachersScreenViewModel(private val rpcServiceWrapper: RpcServiceWrapper) : ViewModel() {
     private var dataSyncJob: Job? = null
 
     private val _state = MutableStateFlow(TeachersScreenState())
-    val state = _state.asStateFlow()
-        .onStart { onStartSync() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = _state.value
-        )
+    val state =
+        _state
+            .asStateFlow()
+            .onStart { onStartSync() }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = _state.value,
+            )
 
     fun onAction(action: TeachersScreenAction) {
         when (action) {
-            is TeachersScreenAction.UpsertTeacher -> viewModelScope.launch {
-                rpcServiceWrapper.rpcService?.upsertTeacher(action.teacher)
-            }
+            is TeachersScreenAction.UpsertTeacher ->
+                viewModelScope.launch {
+                    rpcServiceWrapper.rpcService?.upsertTeacher(action.teacher)
+                }
 
-            is TeachersScreenAction.DeleteTeacher -> viewModelScope.launch {
-                rpcServiceWrapper.rpcService?.deleteTeacher(action.teacher)
-            }
+            is TeachersScreenAction.DeleteTeacher ->
+                viewModelScope.launch {
+                    rpcServiceWrapper.rpcService?.deleteTeacher(action.teacher)
+                }
 
-            is TeachersScreenAction.EnrollTeacher -> viewModelScope.launch {
-                rpcServiceWrapper.rpcService
-                    ?.addBiometricDetailsForTeacher(action.teacher)
-                    ?.onEach { enrollState ->
-                        _state.update {
-                            it.copy(
-                                enrollState = enrollState
-                            )
+            is TeachersScreenAction.EnrollTeacher ->
+                viewModelScope.launch {
+                    rpcServiceWrapper.rpcService
+                        ?.addBiometricDetailsForTeacher(action.teacher)
+                        ?.onEach { enrollState ->
+                            _state.update { it.copy(enrollState = enrollState) }
                         }
-                    }
-                    ?.launchIn(this)
-            }
+                        ?.launchIn(this)
+                }
 
             is TeachersScreenAction.OnChangeSearchQuery -> {
                 if (action.query.isBlank()) {
@@ -68,50 +83,49 @@ class TeachersScreenViewModel(
                 _state.update { teachersScreenState ->
                     teachersScreenState.copy(
                         searchQuery = action.query,
-                        searchResults = teachersScreenState.teachers.filter {
-                            it.firstName.contains(action.query, ignoreCase = true) ||
+                        searchResults =
+                            teachersScreenState.teachers.filter {
+                                it.firstName.contains(action.query, ignoreCase = true) ||
                                     it.lastName.contains(action.query, ignoreCase = true) ||
                                     it.subjectTaught.contains(action.query, ignoreCase = true)
-                        }
+                            },
                     )
                 }
             }
 
             TeachersScreenAction.ResetEnrollState -> {
-                _state.update {
-                    it.copy(enrollState = EnrollState.Idle)
-                }
+                _state.update { it.copy(enrollState = EnrollState.Idle) }
             }
 
-            is TeachersScreenAction.ImportList -> viewModelScope.launch {
-                try {
-                    val rawFile = action.file.readString()
-                    val students = Json.decodeFromString<List<Teacher>>(rawFile)
+            is TeachersScreenAction.ImportList ->
+                viewModelScope.launch {
+                    try {
+                        val rawFile = action.file.readString()
+                        val students = Json.decodeFromString<List<Teacher>>(rawFile)
 
-                    students.forEach { student ->
-                        rpcServiceWrapper.rpcService?.upsertTeacher(student)
+                        students.forEach { student ->
+                            rpcServiceWrapper.rpcService?.upsertTeacher(student)
+                        }
+                    } catch (e: SerializationException) {
+                        println("Error parsing JSON: ${e.message}")
                     }
-                } catch (e: SerializationException) {
-                    println("Error parsing JSON: ${e.message}")
                 }
-            }
         }
     }
 
     private fun onStartSync() {
         dataSyncJob?.cancel()
-        dataSyncJob = viewModelScope.launch {
-            rpcServiceWrapper.rpcService?.getTeachers()?.onEach { teachers ->
-                _state.update {
-                    it.copy(teachers = teachers)
-                }
-            }?.launchIn(this)
+        dataSyncJob =
+            viewModelScope.launch {
+                rpcServiceWrapper.rpcService
+                    ?.getTeachers()
+                    ?.onEach { teachers -> _state.update { it.copy(teachers = teachers) } }
+                    ?.launchIn(this)
 
-            rpcServiceWrapper.rpcService?.getAreSensorsBusy()?.onEach { status ->
-                _state.update {
-                    it.copy(areSensorsBusy = status)
-                }
-            }?.launchIn(this)
-        }
+                rpcServiceWrapper.rpcService
+                    ?.getAreSensorsBusy()
+                    ?.onEach { status -> _state.update { it.copy(areSensorsBusy = status) } }
+                    ?.launchIn(this)
+            }
     }
 }

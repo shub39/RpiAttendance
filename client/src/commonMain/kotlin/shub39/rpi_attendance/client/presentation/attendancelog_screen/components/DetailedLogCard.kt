@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.attendancelog_screen.components
 
 import androidx.compose.foundation.layout.Arrangement
@@ -42,40 +58,32 @@ import shub39.rpi_attendance.client.presentation.toFormattedString
 fun DetailedLogCard(
     detailedLog: DetailedAttendanceLog,
     modifier: Modifier = Modifier,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     if (showDeleteDialog) {
-        BasicAlertDialog(
-            onDismissRequest = { showDeleteDialog = false }
-        ) {
-            Card(
-                shape = MaterialTheme.shapes.extraLarge,
-            ) {
+        BasicAlertDialog(onDismissRequest = { showDeleteDialog = false }) {
+            Card(shape = MaterialTheme.shapes.extraLarge) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Icon(
                         imageVector = vectorResource(Res.drawable.delete),
-                        contentDescription = null
+                        contentDescription = null,
                     )
 
                     Text(
                         text = "Delete this log?",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            textAlign = TextAlign.Center
-                        )
+                        style =
+                            MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
                     )
                     Text(
                         text = detailedLog.log.toString(),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            textAlign = TextAlign.Center
-                        )
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
                     )
 
                     Button(
@@ -83,7 +91,7 @@ fun DetailedLogCard(
                             onDelete()
                             showDeleteDialog = false
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(text = "Delete")
                     }
@@ -95,84 +103,101 @@ fun DetailedLogCard(
     Card(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = when (detailedLog) {
-                is DetailedAttendanceLog.StudentLog -> MaterialTheme.colorScheme.primaryContainer
-                is DetailedAttendanceLog.TeacherLog -> MaterialTheme.colorScheme.secondaryContainer
-            },
-            contentColor = when (detailedLog) {
-                is DetailedAttendanceLog.StudentLog -> MaterialTheme.colorScheme.onPrimaryContainer
-                is DetailedAttendanceLog.TeacherLog -> MaterialTheme.colorScheme.onSecondaryContainer
-            }
-        ),
-        onClick = { showDeleteDialog = true }
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    when (detailedLog) {
+                        is DetailedAttendanceLog.StudentLog ->
+                            MaterialTheme.colorScheme.primaryContainer
+                        is DetailedAttendanceLog.TeacherLog ->
+                            MaterialTheme.colorScheme.secondaryContainer
+                    },
+                contentColor =
+                    when (detailedLog) {
+                        is DetailedAttendanceLog.StudentLog ->
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        is DetailedAttendanceLog.TeacherLog ->
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                    },
+            ),
+        onClick = { showDeleteDialog = true },
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (detailedLog.log.attendanceStatus == AttendanceStatus.IN) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         imageVector = vectorResource(Res.drawable.login),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = detailedLog.log.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).time.toFormattedString(),
-                        style = MaterialTheme.typography.bodySmall
+                        text =
+                            detailedLog.log.timeStamp
+                                .toLocalDateTime(TimeZone.currentSystemDefault())
+                                .time
+                                .toFormattedString(),
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
 
             Column(
                 modifier = Modifier.weight(1f),
-                horizontalAlignment = when (detailedLog.log.attendanceStatus) {
-                    AttendanceStatus.IN -> Alignment.End
-                    AttendanceStatus.OUT -> Alignment.Start
-                }
+                horizontalAlignment =
+                    when (detailedLog.log.attendanceStatus) {
+                        AttendanceStatus.IN -> Alignment.End
+                        AttendanceStatus.OUT -> Alignment.Start
+                    },
             ) {
                 Text(
-                    text = when (detailedLog) {
-                        is DetailedAttendanceLog.StudentLog -> "${detailedLog.student.firstName} ${detailedLog.student.lastName}"
-                        is DetailedAttendanceLog.TeacherLog -> "${detailedLog.teacher.firstName} ${detailedLog.teacher.lastName}"
-                    },
+                    text =
+                        when (detailedLog) {
+                            is DetailedAttendanceLog.StudentLog ->
+                                "${detailedLog.student.firstName} ${detailedLog.student.lastName}"
+                            is DetailedAttendanceLog.TeacherLog ->
+                                "${detailedLog.teacher.firstName} ${detailedLog.teacher.lastName}"
+                        },
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = when (detailedLog) {
-                        is DetailedAttendanceLog.StudentLog -> "Student"
-                        is DetailedAttendanceLog.TeacherLog -> "Teacher"
-                    },
-                    style = MaterialTheme.typography.bodyMedium
+                    text =
+                        when (detailedLog) {
+                            is DetailedAttendanceLog.StudentLog -> "Student"
+                            is DetailedAttendanceLog.TeacherLog -> "Teacher"
+                        },
+                    style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(
-                    text = when (detailedLog) {
-                        is DetailedAttendanceLog.StudentLog -> "Roll No: ${detailedLog.student.rollNo}"
-                        is DetailedAttendanceLog.TeacherLog -> "Subject: ${detailedLog.teacher.subjectTaught}"
-                    },
-                    style = MaterialTheme.typography.bodySmall
+                    text =
+                        when (detailedLog) {
+                            is DetailedAttendanceLog.StudentLog ->
+                                "Roll No: ${detailedLog.student.rollNo}"
+                            is DetailedAttendanceLog.TeacherLog ->
+                                "Subject: ${detailedLog.teacher.subjectTaught}"
+                        },
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
 
             if (detailedLog.log.attendanceStatus == AttendanceStatus.OUT) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         imageVector = vectorResource(Res.drawable.logout),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = detailedLog.log.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).time.toFormattedString(),
-                        style = MaterialTheme.typography.bodySmall
+                        text =
+                            detailedLog.log.timeStamp
+                                .toLocalDateTime(TimeZone.currentSystemDefault())
+                                .time
+                                .toFormattedString(),
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }

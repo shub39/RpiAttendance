@@ -1,18 +1,34 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 import domain.SensorServer
+import errors.Result
+import errors.onSuccess
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.runBlocking
 
-fun testLoop(
-    sensorServer: SensorServer,
-    client: HttpClient
-) {
+fun testLoop(sensorServer: SensorServer, client: HttpClient) {
     runBlocking {
         println("Starting server...")
         println("Displaying Status Message...")
 
         sensorServer.getStatus().onSuccess { status ->
-            when (val result =
-                sensorServer.displayText(listOf("ADMIN SERVER", "${status.ip}:8080"))) {
+            when (
+                val result = sensorServer.displayText(listOf("ADMIN SERVER", "${status.ip}:8080"))
+            ) {
                 is Result.Error -> {
                     println("Error: ${result.error}")
                     return@runBlocking
@@ -35,7 +51,6 @@ fun testLoop(
         println("7. Delete Face")
         println("8. Delete Fingerprint")
         println("================================")
-
 
         while (true) {
             println("Enter option:")
@@ -86,11 +101,9 @@ fun testLoop(
 
                 "4" -> {
                     when (val res = sensorServer.enrollFingerPrint()) {
-                        is Result.Success ->
-                            println("Fingerprint enrolled with ID: ${res.data}")
+                        is Result.Success -> println("Fingerprint enrolled with ID: ${res.data}")
 
-                        is Result.Error ->
-                            println("Error: ${res.error} ${res.debugMessage ?: ""}")
+                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
                     }
                 }
 
@@ -100,8 +113,7 @@ fun testLoop(
                             println(res.data)
                         }
 
-                        is Result.Error ->
-                            println("Error: ${res.error} ${res.debugMessage ?: ""}")
+                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
                     }
                 }
 
@@ -111,8 +123,7 @@ fun testLoop(
                             println(res.data)
                         }
 
-                        is Result.Error ->
-                            println("Error: ${res.error} ${res.debugMessage ?: ""}")
+                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
                     }
                 }
 
@@ -126,8 +137,7 @@ fun testLoop(
 
                     when (val res = sensorServer.deleteFace(id)) {
                         is Result.Success -> println("Face deleted")
-                        is Result.Error ->
-                            println("Error: ${res.error} ${res.debugMessage ?: ""}")
+                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
                     }
                 }
 
@@ -141,8 +151,7 @@ fun testLoop(
 
                     when (val res = sensorServer.deleteFingerPrint(id)) {
                         is Result.Success -> println("Fingerprint deleted")
-                        is Result.Error ->
-                            println("Error: ${res.error} ${res.debugMessage ?: ""}")
+                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
                     }
                 }
 
@@ -159,8 +168,7 @@ fun testLoop(
                             println(res.data)
                         }
 
-                        is Result.Error ->
-                            println("Error: ${res.error} ${res.debugMessage ?: ""}")
+                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
                     }
                 }
 

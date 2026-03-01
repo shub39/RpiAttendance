@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.students_screen
 
 import EnrollState.Companion.isEnrolling
@@ -61,23 +77,24 @@ fun StudentsScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues,
     state: StudentsScreenState,
-    onAction: (StudentsScreenAction) -> Unit
+    onAction: (StudentsScreenAction) -> Unit,
 ) {
-    val launcher = rememberFilePickerLauncher(
-        type = FileKitType.File(extensions = listOf("txt", "json")),
-        mode = FileKitMode.Single
-    ) { file ->
-        if (file != null) {
-            onAction(StudentsScreenAction.ImportList(file))
+    val launcher =
+        rememberFilePickerLauncher(
+            type = FileKitType.File(extensions = listOf("txt", "json")),
+            mode = FileKitMode.Single,
+        ) { file ->
+            if (file != null) {
+                onAction(StudentsScreenAction.ImportList(file))
+            }
         }
-    }
 
     StudentsScreenContent(
         modifier = modifier,
         contentPadding = contentPadding,
         state = state,
         onAction = onAction,
-        onPickFile = { launcher.launch() }
+        onPickFile = { launcher.launch() },
     )
 }
 
@@ -88,7 +105,7 @@ private fun StudentsScreenContent(
     contentPadding: PaddingValues,
     state: StudentsScreenState,
     onAction: (StudentsScreenAction) -> Unit,
-    onPickFile: () -> Unit
+    onPickFile: () -> Unit,
 ) {
     var showStudentAddSheet by remember { mutableStateOf(false) }
     var editStudent by remember { mutableStateOf<Student?>(null) }
@@ -97,17 +114,16 @@ private fun StudentsScreenContent(
         modifier = Modifier.padding(contentPadding),
         topBar = {
             TopAppBar(
-                title = {
-                    Text(text = stringResource(Res.string.students))
-                },
+                title = { Text(text = stringResource(Res.string.students)) },
                 subtitle = {
                     Text(
-                        text = stringResource(
-                            Res.string.students_enrolled_template,
-                            state.students.size
-                        )
+                        text =
+                            stringResource(
+                                Res.string.students_enrolled_template,
+                                state.students.size,
+                            )
                     )
-                }
+                },
             )
         },
         floatingActionButton = {
@@ -115,16 +131,10 @@ private fun StudentsScreenContent(
             FloatingActionButtonMenu(
                 expanded = menu,
                 button = {
-                    ToggleFloatingActionButton(
-                        checked = menu,
-                        onCheckedChange = { menu = it }
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.add),
-                            contentDescription = null
-                        )
+                    ToggleFloatingActionButton(checked = menu, onCheckedChange = { menu = it }) {
+                        Icon(painter = painterResource(Res.drawable.add), contentDescription = null)
                     }
-                }
+                },
             ) {
                 FloatingActionButtonMenuItem(
                     onClick = {
@@ -132,7 +142,7 @@ private fun StudentsScreenContent(
                         menu = false
                     },
                     text = { Text("Add Manually") },
-                    icon = {}
+                    icon = {},
                 )
 
                 FloatingActionButtonMenuItem(
@@ -141,35 +151,31 @@ private fun StudentsScreenContent(
                         menu = false
                     },
                     text = { Text("Import") },
-                    icon = {}
+                    icon = {},
                 )
             }
-        }
+        },
     ) { paddingValues ->
-        AnimatedContent(
-            targetState = state.students.isNotEmpty()
-        ) { isNotEmpty ->
+        AnimatedContent(targetState = state.students.isNotEmpty()) { isNotEmpty ->
             if (isNotEmpty) {
                 LazyColumn(
                     modifier = modifier,
-                    contentPadding = PaddingValues(
-                        top = paddingValues.calculateTopPadding() + 16.dp,
-                        bottom = paddingValues.calculateBottomPadding() + 60.dp,
-                        start = paddingValues.calculateLeftPadding(LocalLayoutDirection.current),
-                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current)
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding =
+                        PaddingValues(
+                            top = paddingValues.calculateTopPadding() + 16.dp,
+                            bottom = paddingValues.calculateBottomPadding() + 60.dp,
+                            start =
+                                paddingValues.calculateLeftPadding(LocalLayoutDirection.current),
+                            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     item {
-                        Row(
-                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                        ) {
+                        Row(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
                             OutlinedTextField(
                                 value = state.searchQuery,
                                 onValueChange = {
-                                    onAction(
-                                        StudentsScreenAction.OnChangeSearchQuery(it)
-                                    )
+                                    onAction(StudentsScreenAction.OnChangeSearchQuery(it))
                                 },
                                 singleLine = true,
                                 shape = MaterialTheme.shapes.extraLarge,
@@ -178,7 +184,7 @@ private fun StudentsScreenContent(
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(Res.drawable.search),
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
                                 },
                                 trailingIcon = {
@@ -186,17 +192,15 @@ private fun StudentsScreenContent(
                                         onClick = {
                                             onAction(StudentsScreenAction.OnChangeSearchQuery(""))
                                         },
-                                        enabled = state.searchQuery.isNotBlank()
+                                        enabled = state.searchQuery.isNotBlank(),
                                     ) {
                                         Icon(
                                             painter = painterResource(Res.drawable.delete),
-                                            contentDescription = null
+                                            contentDescription = null,
                                         )
                                     }
                                 },
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth()
+                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                             )
                         }
                     }
@@ -205,7 +209,7 @@ private fun StudentsScreenContent(
                         StudentInfo(
                             student = student,
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            onEdit = { editStudent = student }
+                            onEdit = { editStudent = student },
                         )
                     }
 
@@ -223,24 +227,20 @@ private fun StudentsScreenContent(
                 }
             } else {
                 Box(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.padding(paddingValues).fillMaxSize(),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Icon(
                             painter = painterResource(Res.drawable.add),
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
                         )
-                        Text(
-                            text = stringResource(Res.string.add_student)
-                        )
+                        Text(text = stringResource(Res.string.add_student))
                     }
                 }
             }
@@ -252,14 +252,15 @@ private fun StudentsScreenContent(
             modifier = Modifier.imePadding(),
             isUpdate = false,
             enrollState = state.enrollState,
-            student = Student(
-                biometricId = null,
-                firstName = "",
-                lastName = "",
-                rollNo = 0,
-                contactEmail = "",
-                contactPhone = ""
-            ),
+            student =
+                Student(
+                    biometricId = null,
+                    firstName = "",
+                    lastName = "",
+                    rollNo = 0,
+                    contactEmail = "",
+                    contactPhone = "",
+                ),
             onUpsert = { onAction(StudentsScreenAction.UpsertStudent(it)) },
             onEnroll = {
                 onAction(StudentsScreenAction.UpsertStudent(it))
@@ -272,7 +273,7 @@ private fun StudentsScreenContent(
                     showStudentAddSheet = false
                     onAction(StudentsScreenAction.ResetEnrollState)
                 }
-            }
+            },
         )
     }
 
@@ -294,7 +295,7 @@ private fun StudentsScreenContent(
                     editStudent = null
                     onAction(StudentsScreenAction.ResetEnrollState)
                 }
-            }
+            },
         )
     }
 }
@@ -307,8 +308,8 @@ private fun Preview() {
             modifier = Modifier,
             contentPadding = PaddingValues(),
             state = StudentsScreenState(),
-            onAction = { },
-            onPickFile = {}
+            onAction = {},
+            onPickFile = {},
         )
     }
 }

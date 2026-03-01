@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.sessions_screen.components
 
 import androidx.compose.foundation.layout.Column
@@ -21,68 +37,48 @@ import models.Session
 import shub39.rpi_attendance.client.presentation.toFormattedString
 
 @Composable
-fun SessionCard(
-    modifier: Modifier = Modifier,
-    session: Session
-) {
+fun SessionCard(modifier: Modifier = Modifier, session: Session) {
     var showDetails by remember { mutableStateOf(false) }
 
     if (showDetails) {
-        SessionDetails(
-            onDismissRequest = { showDetails = false },
-            session = session
-        )
+        SessionDetails(onDismissRequest = { showDetails = false }, session = session)
     }
 
     Card(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        onClick = {
-            if (session.students.isNotEmpty()) showDetails = true
-        }
+        onClick = { if (session.students.isNotEmpty()) showDetails = true },
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = session.teacher.subjectTaught,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Text(
                     text = "By ${session.teacher.firstName}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(
                     text = "${session.students.size}/${session.totalStudents} Students Present",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = session.startTime.toFormattedString(),
-                    fontWeight = FontWeight.Bold
-                )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = session.startTime.toFormattedString(), fontWeight = FontWeight.Bold)
                 Text(text = "to")
-                Text(
-                    text = session.endTime.toFormattedString(),
-                    fontWeight = FontWeight.Bold
-                )
+                Text(text = session.endTime.toFormattedString(), fontWeight = FontWeight.Bold)
             }
         }
     }

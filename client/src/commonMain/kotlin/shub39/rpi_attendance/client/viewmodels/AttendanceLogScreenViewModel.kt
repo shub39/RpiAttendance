@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.viewmodels
 
 import androidx.lifecycle.ViewModel
@@ -17,25 +33,26 @@ import kotlinx.datetime.toLocalDateTime
 import shub39.rpi_attendance.client.presentation.attendancelog_screen.AttendanceLogAction
 import shub39.rpi_attendance.client.presentation.attendancelog_screen.AttendanceLogState
 
-class AttendanceLogScreenViewModel(
-    private val rpcServiceWrapper: RpcServiceWrapper
-) : ViewModel() {
+class AttendanceLogScreenViewModel(private val rpcServiceWrapper: RpcServiceWrapper) : ViewModel() {
     private var observeJob: Job? = null
 
     private val _state = MutableStateFlow(AttendanceLogState())
-    val state = _state.asStateFlow()
-        .onStart { observeLogs() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = AttendanceLogState()
-        )
+    val state =
+        _state
+            .asStateFlow()
+            .onStart { observeLogs() }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = AttendanceLogState(),
+            )
 
     fun onAction(action: AttendanceLogAction) {
         when (action) {
-            is AttendanceLogAction.OnDeleteLog -> viewModelScope.launch {
-                rpcServiceWrapper.rpcService?.deleteAttendanceLog(action.log)
-            }
+            is AttendanceLogAction.OnDeleteLog ->
+                viewModelScope.launch {
+                    rpcServiceWrapper.rpcService?.deleteAttendanceLog(action.log)
+                }
 
             is AttendanceLogAction.OnLoadDate -> {
                 _state.update { it.copy(selectedDate = action.date) }
@@ -46,20 +63,24 @@ class AttendanceLogScreenViewModel(
 
     private fun observeLogs() {
         observeJob?.cancel()
-        observeJob = viewModelScope.launch {
-            rpcServiceWrapper.rpcService
-                ?.getDetailedAttendanceLogs()
-                ?.onEach { logs ->
-                    _state.update { attendanceLogState ->
-                        attendanceLogState.copy(
-                            allDetailedLogs = logs,
-                            filteredDetailedLogs = logs.filter {
-                                it.log.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == state.value.selectedDate
-                            }
-                        )
+        observeJob =
+            viewModelScope.launch {
+                rpcServiceWrapper.rpcService
+                    ?.getDetailedAttendanceLogs()
+                    ?.onEach { logs ->
+                        _state.update { attendanceLogState ->
+                            attendanceLogState.copy(
+                                allDetailedLogs = logs,
+                                filteredDetailedLogs =
+                                    logs.filter {
+                                        it.log.timeStamp
+                                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                                            .date == state.value.selectedDate
+                                    },
+                            )
+                        }
                     }
-                }
-                ?.launchIn(this)
-        }
+                    ?.launchIn(this)
+            }
     }
 }
