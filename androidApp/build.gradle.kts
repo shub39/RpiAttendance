@@ -25,7 +25,7 @@ plugins {
 val appName = "RpiAttendance"
 val appPackageName = "shub39.rpi_attendance.client"
 val appVersionCode = 1100
-val appVersionName = "1.1.00"
+val appVersionName = "1.1.0"
 
 android {
     namespace = appPackageName
