@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.viewmodels
 
 import AdminInterface
@@ -26,37 +42,34 @@ class RpcServiceWrapper {
     private var rpcCheckJob: Job? = null
 
     fun setUrl(url: String) {
-        rpcService = client.rpc {
-            url("ws://$url/rpc")
-            rpcConfig {
-                serialization {
-                    json {
-                        allowStructuredMapKeys = true
-                    }
+        rpcService =
+            client
+                .rpc {
+                    url("ws://$url/rpc")
+                    rpcConfig { serialization { json { allowStructuredMapKeys = true } } }
                 }
-            }
-        }.withService<AdminInterface>()
+                .withService<AdminInterface>()
     }
 
     fun checkUrl(url: String) {
         rpcCheckJob?.cancel()
-        rpcCheckJob = scope.launch {
-            try {
-                val tempInterface = client.rpc {
-                    url("ws://$url/rpc")
-                    rpcConfig {
-                        serialization {
-                            json {
-                                allowStructuredMapKeys = true
+        rpcCheckJob =
+            scope.launch {
+                try {
+                    val tempInterface =
+                        client
+                            .rpc {
+                                url("ws://$url/rpc")
+                                rpcConfig {
+                                    serialization { json { allowStructuredMapKeys = true } }
+                                }
                             }
-                        }
-                    }
-                }.withService<AdminInterface>()
-                isInterfaceChecked.update { tempInterface.getStatus() }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                isInterfaceChecked.update { false }
+                            .withService<AdminInterface>()
+                    isInterfaceChecked.update { tempInterface.getStatus() }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    isInterfaceChecked.update { false }
+                }
             }
-        }
     }
 }

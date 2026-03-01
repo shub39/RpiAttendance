@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.sessions_screen.components
 
 import androidx.compose.foundation.background
@@ -24,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import models.Session
@@ -31,42 +48,39 @@ import models.Student
 import models.Teacher
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 import shub39.rpi_attendance.client.presentation.toFormattedString
-import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SessionDetails(
-    modifier: Modifier = Modifier,
-    session: Session,
-    onDismissRequest: () -> Unit
-) {
+fun SessionDetails(modifier: Modifier = Modifier, session: Session, onDismissRequest: () -> Unit) {
     ModalBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetGesturesEnabled = false,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
         LazyColumn(
             modifier = Modifier.heightIn(max = 700.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(vertical = 32.dp)
+            contentPadding = PaddingValues(vertical = 32.dp),
         ) {
             stickyHeader {
                 Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                        .padding(bottom = 16.dp)
-                        .fillMaxWidth(),
+                    modifier =
+                        Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
+                            .padding(bottom = 16.dp)
+                            .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     Text(
                         text = session.teacher.subjectTaught,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        style =
+                            MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     )
                     Text(
                         text = "${session.teacher.firstName} ${session.teacher.lastName}",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        style =
+                            MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     )
                     Text(
                         text = "${session.students.size}/${session.totalStudents} Students Present"
@@ -74,12 +88,12 @@ fun SessionDetails(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Card {
                             Text(
                                 text = session.startTime.toFormattedString(),
-                                modifier = Modifier.padding(8.dp)
+                                modifier = Modifier.padding(8.dp),
                             )
                         }
 
@@ -88,7 +102,7 @@ fun SessionDetails(
                         Card {
                             Text(
                                 text = session.endTime.toFormattedString(),
-                                modifier = Modifier.padding(8.dp)
+                                modifier = Modifier.padding(8.dp),
                             )
                         }
                     }
@@ -99,29 +113,21 @@ fun SessionDetails(
             items(session.students) { student ->
                 Card(
                     shape = MaterialTheme.shapes.large,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                         Text(
                             text = "${student.firstName} ${student.lastName}",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
-                        Text(
-                            text = "Roll no: ${student.rollNo}"
-                        )
+                        Text(text = "Roll no: ${student.rollNo}")
                     }
                 }
             }
 
-            item {
-                HorizontalDivider()
-            }
+            item { HorizontalDivider() }
         }
     }
 }
@@ -133,28 +139,31 @@ private fun Preview() {
 
     AppTheme {
         SessionDetails(
-            session = Session(
-                teacher = Teacher(
-                    biometricId = "b",
-                    firstName = "Teacher",
-                    lastName = "last name",
-                    subjectTaught = "Subject "
+            session =
+                Session(
+                    teacher =
+                        Teacher(
+                            biometricId = "b",
+                            firstName = "Teacher",
+                            lastName = "last name",
+                            subjectTaught = "Subject ",
+                        ),
+                    startTime = time,
+                    endTime = time,
+                    totalStudents = 25,
+                    students =
+                        (0..20).map { studentIndex ->
+                            Student(
+                                biometricId = "student_$studentIndex",
+                                firstName = "Student $studentIndex",
+                                lastName = "last name",
+                                rollNo = studentIndex,
+                                contactEmail = "@$studentIndex",
+                                contactPhone = "ashbak$studentIndex",
+                            )
+                        },
                 ),
-                startTime = time,
-                endTime = time,
-                totalStudents = 25,
-                students = (0..20).map { studentIndex ->
-                    Student(
-                        biometricId = "student_$studentIndex",
-                        firstName = "Student $studentIndex",
-                        lastName = "last name",
-                        rollNo = studentIndex,
-                        contactEmail = "@$studentIndex",
-                        contactPhone = "ashbak$studentIndex"
-                    )
-                }
-            ),
-            onDismissRequest = {}
+            onDismissRequest = {},
         )
     }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.teachers_screen
 
 import EnrollState.Companion.isEnrolling
@@ -64,21 +80,22 @@ fun TeachersScreen(
     state: TeachersScreenState,
     onAction: (TeachersScreenAction) -> Unit,
 ) {
-    val launcher = rememberFilePickerLauncher(
-        type = FileKitType.File(extensions = listOf("txt", "json")),
-        mode = FileKitMode.Single
-    ) { file ->
-        if (file != null) {
-            onAction(TeachersScreenAction.ImportList(file))
+    val launcher =
+        rememberFilePickerLauncher(
+            type = FileKitType.File(extensions = listOf("txt", "json")),
+            mode = FileKitMode.Single,
+        ) { file ->
+            if (file != null) {
+                onAction(TeachersScreenAction.ImportList(file))
+            }
         }
-    }
 
     TeachersScreenContent(
         modifier = modifier,
         contentPadding = contentPadding,
         state = state,
         onAction = onAction,
-        onPickFile = { launcher.launch() }
+        onPickFile = { launcher.launch() },
     )
 }
 
@@ -89,7 +106,7 @@ private fun TeachersScreenContent(
     contentPadding: PaddingValues,
     state: TeachersScreenState,
     onAction: (TeachersScreenAction) -> Unit,
-    onPickFile: () -> Unit
+    onPickFile: () -> Unit,
 ) {
     var showTeacherAddSheet by remember { mutableStateOf(false) }
     var editTeacher by remember { mutableStateOf<Teacher?>(null) }
@@ -98,17 +115,16 @@ private fun TeachersScreenContent(
         modifier = Modifier.padding(contentPadding),
         topBar = {
             TopAppBar(
-                title = {
-                    Text(text = stringResource(Res.string.teachers))
-                },
+                title = { Text(text = stringResource(Res.string.teachers)) },
                 subtitle = {
                     Text(
-                        text = stringResource(
-                            Res.string.teachers_enrolled_template,
-                            state.teachers.size
-                        )
+                        text =
+                            stringResource(
+                                Res.string.teachers_enrolled_template,
+                                state.teachers.size,
+                            )
                     )
-                }
+                },
             )
         },
         floatingActionButton = {
@@ -116,16 +132,10 @@ private fun TeachersScreenContent(
             FloatingActionButtonMenu(
                 expanded = menu,
                 button = {
-                    ToggleFloatingActionButton(
-                        checked = menu,
-                        onCheckedChange = { menu = it }
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.add),
-                            contentDescription = null
-                        )
+                    ToggleFloatingActionButton(checked = menu, onCheckedChange = { menu = it }) {
+                        Icon(painter = painterResource(Res.drawable.add), contentDescription = null)
                     }
-                }
+                },
             ) {
                 FloatingActionButtonMenuItem(
                     onClick = {
@@ -133,7 +143,7 @@ private fun TeachersScreenContent(
                         menu = false
                     },
                     text = { Text("Add Manually") },
-                    icon = {}
+                    icon = {},
                 )
 
                 FloatingActionButtonMenuItem(
@@ -142,29 +152,27 @@ private fun TeachersScreenContent(
                         menu = false
                     },
                     text = { Text("Import") },
-                    icon = {}
+                    icon = {},
                 )
             }
-        }
+        },
     ) { paddingValues ->
-        AnimatedContent(
-            targetState = state.teachers.isNotEmpty()
-        ) { isNotEmpty ->
+        AnimatedContent(targetState = state.teachers.isNotEmpty()) { isNotEmpty ->
             if (isNotEmpty) {
                 LazyColumn(
                     modifier = modifier,
-                    contentPadding = PaddingValues(
-                        top = paddingValues.calculateTopPadding() + 16.dp,
-                        bottom = paddingValues.calculateBottomPadding() + 60.dp,
-                        start = paddingValues.calculateLeftPadding(LocalLayoutDirection.current),
-                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current)
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding =
+                        PaddingValues(
+                            top = paddingValues.calculateTopPadding() + 16.dp,
+                            bottom = paddingValues.calculateBottomPadding() + 60.dp,
+                            start =
+                                paddingValues.calculateLeftPadding(LocalLayoutDirection.current),
+                            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     item {
-                        Row(
-                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                        ) {
+                        Row(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
                             OutlinedTextField(
                                 value = state.searchQuery,
                                 onValueChange = {
@@ -177,7 +185,7 @@ private fun TeachersScreenContent(
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(Res.drawable.search),
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
                                 },
                                 trailingIcon = {
@@ -185,17 +193,15 @@ private fun TeachersScreenContent(
                                         onClick = {
                                             onAction(TeachersScreenAction.OnChangeSearchQuery(""))
                                         },
-                                        enabled = state.searchQuery.isNotBlank()
+                                        enabled = state.searchQuery.isNotBlank(),
                                     ) {
                                         Icon(
                                             painter = painterResource(Res.drawable.delete),
-                                            contentDescription = null
+                                            contentDescription = null,
                                         )
                                     }
                                 },
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth()
+                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                             )
                         }
                     }
@@ -204,7 +210,7 @@ private fun TeachersScreenContent(
                         TeacherInfo(
                             teacher = teacher,
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            onEdit = { editTeacher = teacher }
+                            onEdit = { editTeacher = teacher },
                         )
                     }
 
@@ -222,24 +228,20 @@ private fun TeachersScreenContent(
                 }
             } else {
                 Box(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.padding(paddingValues).fillMaxSize(),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Icon(
                             painter = painterResource(Res.drawable.add),
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
                         )
-                        Text(
-                            text = stringResource(Res.string.add_teacher)
-                        )
+                        Text(text = stringResource(Res.string.add_teacher))
                     }
                 }
             }
@@ -251,12 +253,8 @@ private fun TeachersScreenContent(
             modifier = Modifier.imePadding(),
             isUpdate = false,
             enrollState = state.enrollState,
-            teacher = Teacher(
-                biometricId = null,
-                firstName = "",
-                lastName = "",
-                subjectTaught = ""
-            ),
+            teacher =
+                Teacher(biometricId = null, firstName = "", lastName = "", subjectTaught = ""),
             onUpsert = { onAction(TeachersScreenAction.UpsertTeacher(it)) },
             onEnroll = {
                 onAction(TeachersScreenAction.UpsertTeacher(it))
@@ -269,7 +267,7 @@ private fun TeachersScreenContent(
                     showTeacherAddSheet = false
                     onAction(TeachersScreenAction.ResetEnrollState)
                 }
-            }
+            },
         )
     }
 
@@ -291,7 +289,7 @@ private fun TeachersScreenContent(
                     editTeacher = null
                     onAction(TeachersScreenAction.ResetEnrollState)
                 }
-            }
+            },
         )
     }
 }
@@ -304,8 +302,8 @@ private fun Preview() {
             modifier = Modifier,
             contentPadding = PaddingValues(),
             state = TeachersScreenState(),
-            onAction = { },
-            onPickFile = {}
+            onAction = {},
+            onPickFile = {},
         )
     }
 }

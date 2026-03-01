@@ -1,8 +1,21 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package data
 
-import EmptyResult
-import Result
-import SourceError
 import domain.DisplayRequest
 import domain.FaceDeleteRequest
 import domain.FaceEnrollRequest
@@ -19,6 +32,9 @@ import domain.SensorError
 import domain.SensorServer
 import domain.StatusResponse
 import domain.toKeypadResult
+import errors.EmptyResult
+import errors.Result
+import errors.SourceError
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -35,14 +51,20 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import safeCall
 
-class SensorServerImpl(
-    private val client: HttpClient
-) : SensorServer {
+class SensorServerImpl(private val client: HttpClient) : SensorServer {
 
     private val mutex = Mutex()
     private val _areSensorsBusy: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _isAdminOperationActive: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    override val isAdminOperationActive: Flow<Boolean> = _isAdminOperationActive.asStateFlow()
+
+    override fun updateAdminOperationStatus(status: Boolean) {
+        _isAdminOperationActive.update { status }
+    }
 
     override val areSensorsBusy: Flow<Boolean> = _areSensorsBusy.asStateFlow()
+
     override fun updateSensorsBusyState(state: Boolean) {
         _areSensorsBusy.update { state }
     }
@@ -51,9 +73,7 @@ class SensorServerImpl(
         val request: EmptyResult<SourceError> =
             mutex.withLock {
                 safeCall {
-                    client.post(
-                        url = Url("$BASE_URL/display")
-                    ) {
+                    client.post(url = Url("$BASE_URL/display")) {
                         contentType(ContentType.Application.Json)
                         setBody(DisplayRequest(lines))
                     }
@@ -62,10 +82,7 @@ class SensorServerImpl(
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
             }
 
             is Result.Success -> Result.Success(Unit)
@@ -76,9 +93,7 @@ class SensorServerImpl(
         val request: Result<Response, SourceError> =
             mutex.withLock {
                 safeCall {
-                    client.post(
-                        url = Url("$BASE_URL/face/enroll")
-                    ) {
+                    client.post(url = Url("$BASE_URL/face/enroll")) {
                         contentType(ContentType.Application.Json)
                         setBody(FaceEnrollRequest(name))
                     }
@@ -90,12 +105,12 @@ class SensorServerImpl(
                 if (request.error == SourceError.DataError.SENSOR_ERROR) {
                     Result.Error(
                         error = SensorError.FACE_TIMEOUT,
-                        debugMessage = request.debugMessage
+                        debugMessage = request.debugMessage,
                     )
                 } else {
                     Result.Error(
                         error = SensorError.SERVER_ERROR,
-                        debugMessage = request.debugMessage
+                        debugMessage = request.debugMessage,
                     )
                 }
             }
@@ -106,53 +121,39 @@ class SensorServerImpl(
 
     override suspend fun recognizeFace(): Result<FaceSearchResult, SensorError> {
         val request: Result<FaceSearchResponse, SourceError> =
-            mutex.withLock {
-                safeCall {
-                    client.post(
-                        url = Url("$BASE_URL/face/recognize")
-                    )
-                }
-            }
+            mutex.withLock { safeCall { client.post(url = Url("$BASE_URL/face/recognize")) } }
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
             }
 
-            is Result.Success -> Result.Success(
-                if (request.data.match != null) {
-                    FaceSearchResult.Found(request.data.match!!)
-                } else {
-                    FaceSearchResult.NotFound
-                }
-            )
+            is Result.Success ->
+                Result.Success(
+                    if (request.data.match != null) {
+                        FaceSearchResult.Found(request.data.match!!)
+                    } else {
+                        FaceSearchResult.NotFound
+                    }
+                )
         }
     }
 
     override suspend fun enrollFingerPrint(): Result<Int, SensorError> {
         val request: Result<FingerPrintEnrollResponse, SourceError> =
-            mutex.withLock {
-                safeCall {
-                    client.post(
-                        url = Url("$BASE_URL/fingerprint/enroll")
-                    )
-                }
-            }
+            mutex.withLock { safeCall { client.post(url = Url("$BASE_URL/fingerprint/enroll")) } }
 
         return when (request) {
             is Result.Error -> {
                 if (request.error == SourceError.DataError.SENSOR_ERROR) {
                     Result.Error(
                         error = SensorError.FINGERPRINT_TIMEOUT,
-                        debugMessage = request.debugMessage
+                        debugMessage = request.debugMessage,
                     )
                 } else {
                     Result.Error(
                         error = SensorError.SERVER_ERROR,
-                        debugMessage = request.debugMessage
+                        debugMessage = request.debugMessage,
                     )
                 }
             }
@@ -163,50 +164,38 @@ class SensorServerImpl(
 
     override suspend fun searchFingerPrint(): Result<FingerprintSearchResult, SensorError> {
         val request: Result<FingerPrintSearchResponse, SourceError> =
-            mutex.withLock {
-                safeCall {
-                    client.post(
-                        url = Url("$BASE_URL/fingerprint/search")
-                    )
-                }
-            }
+            mutex.withLock { safeCall { client.post(url = Url("$BASE_URL/fingerprint/search")) } }
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
             }
 
-            is Result.Success -> Result.Success(
-                if (request.data.index != null) {
-                    FingerprintSearchResult.Found(request.data.index!!)
-                } else {
-                    FingerprintSearchResult.NotFound
-                }
-            )
+            is Result.Success ->
+                Result.Success(
+                    if (request.data.index != null) {
+                        FingerprintSearchResult.Found(request.data.index!!)
+                    } else {
+                        FingerprintSearchResult.NotFound
+                    }
+                )
         }
     }
 
     override suspend fun deleteFingerPrint(id: Int): EmptyResult<SensorError> {
-        val request: Result<Response, SourceError> = mutex.withLock {
-            safeCall {
-                client.post(
-                    url = Url("$BASE_URL/fingerprint/delete")
-                ) {
-                    contentType(ContentType.Application.Json)
-                    setBody(FingerPrintDeleteRequest(id))
+        val request: Result<Response, SourceError> =
+            mutex.withLock {
+                safeCall {
+                    client.post(url = Url("$BASE_URL/fingerprint/delete")) {
+                        contentType(ContentType.Application.Json)
+                        setBody(FingerPrintDeleteRequest(id))
+                    }
                 }
             }
-        }
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
             }
 
             is Result.Success -> Result.Success(Unit)
@@ -217,9 +206,7 @@ class SensorServerImpl(
         val request: Result<Response, SourceError> =
             mutex.withLock {
                 safeCall {
-                    client.post(
-                        url = Url("$BASE_URL/face/delete")
-                    ) {
+                    client.post(url = Url("$BASE_URL/face/delete")) {
                         contentType(ContentType.Application.Json)
                         setBody(FaceDeleteRequest(id))
                     }
@@ -228,10 +215,7 @@ class SensorServerImpl(
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
             }
 
             is Result.Success -> Result.Success(Unit)
@@ -242,9 +226,7 @@ class SensorServerImpl(
         val request: Result<StatusResponse, SourceError> =
             mutex.withLock {
                 safeCall {
-                    client.get(
-                        url = Url("$BASE_URL/status")
-                    ) {
+                    client.get(url = Url("$BASE_URL/status")) {
                         contentType(ContentType.Application.Json)
                     }
                 }
@@ -252,10 +234,7 @@ class SensorServerImpl(
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
             }
 
             is Result.Success -> Result.Success(request.data)
@@ -266,20 +245,13 @@ class SensorServerImpl(
         val request: Result<KeypadResponse, SourceError> =
             mutex.withLock {
                 safeCall {
-                    client.get(
-                        url = Url("$BASE_URL/keypad")
-                    ) {
-                        parameter("timeout", timeout)
-                    }
+                    client.get(url = Url("$BASE_URL/keypad")) { parameter("timeout", timeout) }
                 }
             }
 
         return when (request) {
             is Result.Error -> {
-                Result.Error(
-                    error = SensorError.SERVER_ERROR,
-                    debugMessage = request.debugMessage
-                )
+                Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
             }
 
             is Result.Success -> {

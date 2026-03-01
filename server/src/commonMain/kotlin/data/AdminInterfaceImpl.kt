@@ -1,16 +1,34 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package data
 
 import AdminInterface
 import EnrollState
-import Result
 import data.database.AttendanceLogDao
 import data.database.StudentDao
 import data.database.TeacherDao
 import domain.SensorServer
+import errors.Result
+import kotlin.time.Duration.Companion.days
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -28,13 +46,12 @@ import models.EntityType
 import models.Session
 import models.Student
 import models.Teacher
-import kotlin.time.Duration.Companion.days
 
 class AdminInterfaceImpl(
     private val studentDao: StudentDao,
     private val teacherDao: TeacherDao,
     private val attendanceLogDao: AttendanceLogDao,
-    private val sensorServer: SensorServer
+    private val sensorServer: SensorServer,
 ) : AdminInterface {
     val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
@@ -42,49 +59,53 @@ class AdminInterfaceImpl(
 
     override fun getAreSensorsBusy(): Flow<Boolean> = sensorServer.areSensorsBusy
 
-    override fun getStudents(): Flow<List<Student>> = studentDao
-        .getAllStudents()
-        .map { flow -> flow.map { student -> student.toStudent() } }
-        .flowOn(Dispatchers.IO)
+    override fun getStudents(): Flow<List<Student>> =
+        studentDao
+            .getAllStudents()
+            .map { flow -> flow.map { student -> student.toStudent() } }
+            .flowOn(Dispatchers.IO)
 
-    override fun getTeachers(): Flow<List<Teacher>> = teacherDao
-        .getAllTeachers()
-        .map { flow -> flow.map { teachers -> teachers.toTeacher() } }
-        .flowOn(Dispatchers.IO)
+    override fun getTeachers(): Flow<List<Teacher>> =
+        teacherDao
+            .getAllTeachers()
+            .map { flow -> flow.map { teachers -> teachers.toTeacher() } }
+            .flowOn(Dispatchers.IO)
 
-    override fun getDetailedAttendanceLogs(): Flow<List<DetailedAttendanceLog>> = attendanceLogDao
-        .getAttendanceLogs()
-        .map { flow ->
-            flow.mapNotNull { log ->
-                when (log.entityType) {
-                    EntityType.STUDENT -> {
-                        studentDao.getStudentById(log.entityId)?.let { studentEntity ->
-                            DetailedAttendanceLog.StudentLog(
-                                student = studentEntity.toStudent(),
-                                log = log.toAttendanceLog()
-                            )
+    override fun getDetailedAttendanceLogs(): Flow<List<DetailedAttendanceLog>> =
+        attendanceLogDao
+            .getAttendanceLogs()
+            .map { flow ->
+                flow.mapNotNull { log ->
+                    when (log.entityType) {
+                        EntityType.STUDENT -> {
+                            studentDao.getStudentById(log.entityId)?.let { studentEntity ->
+                                DetailedAttendanceLog.StudentLog(
+                                    student = studentEntity.toStudent(),
+                                    log = log.toAttendanceLog(),
+                                )
+                            }
                         }
-                    }
 
-                    EntityType.TEACHER -> {
-                        teacherDao.getTeacherById(log.entityId)?.let { teacherEntity ->
-                            DetailedAttendanceLog.TeacherLog(
-                                teacher = teacherEntity.toTeacher(),
-                                log = log.toAttendanceLog()
-                            )
+                        EntityType.TEACHER -> {
+                            teacherDao.getTeacherById(log.entityId)?.let { teacherEntity ->
+                                DetailedAttendanceLog.TeacherLog(
+                                    teacher = teacherEntity.toTeacher(),
+                                    log = log.toAttendanceLog(),
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-        .flowOn(Dispatchers.IO)
+            .flowOn(Dispatchers.IO)
 
     override suspend fun getSessionsForDate(date: LocalDate): List<Session> {
         val startTime = date.atStartOfDayIn(TimeZone.currentSystemDefault())
         val endTime = startTime + 1.days
 
         val logs = attendanceLogDao.getLogsBetween(startTime, endTime)
-        val teachers = teacherDao.getTeachersByIds(logs.map { it.entityId }.distinct()).map { it.toTeacher() }
+        val teachers =
+            teacherDao.getTeachersByIds(logs.map { it.entityId }.distinct()).map { it.toTeacher() }
         val students = studentDao.getAllStudents().first().map { it.toStudent() }
 
         return logs
@@ -100,21 +121,27 @@ class AdminInterfaceImpl(
                     return@mapNotNull null
                 }
 
-                val studentsPresent = studentDao.getStudentsByIds(
-                    logs.filter {
-                        it.entityType == EntityType.STUDENT &&
-                                it.timeStamp >= sessionStartTime &&
-                                it.timeStamp <= sessionEndTime
-                    }.map { it.entityId }.distinct()
-                ).map { it.toStudent() }
-
+                val studentsPresent =
+                    studentDao
+                        .getStudentsByIds(
+                            logs
+                                .filter {
+                                    it.entityType == EntityType.STUDENT &&
+                                        it.timeStamp >= sessionStartTime &&
+                                        it.timeStamp <= sessionEndTime
+                                }
+                                .map { it.entityId }
+                                .distinct()
+                        )
+                        .map { it.toStudent() }
 
                 Session(
                     teacher = teacher,
-                    startTime = sessionStartTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
+                    startTime =
+                        sessionStartTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
                     endTime = sessionEndTime.toLocalDateTime(TimeZone.currentSystemDefault()).time,
                     totalStudents = students.size,
-                    students = studentsPresent
+                    students = studentsPresent,
                 )
             }
     }
@@ -161,48 +188,45 @@ class AdminInterfaceImpl(
     override fun addBiometricDetailsForStudent(student: Student): Flow<EnrollState> =
         addBiometricDetails { biometricId ->
             scope.launch {
-                studentDao.upsert(
-                    student.copy(
-                        biometricId = biometricId
-                    ).toStudentEntity()
-                )
+                studentDao.upsert(student.copy(biometricId = biometricId).toStudentEntity())
             }
         }
 
     override fun addBiometricDetailsForTeacher(teacher: Teacher): Flow<EnrollState> =
         addBiometricDetails { biometricId ->
             scope.launch {
-                teacherDao.upsert(
-                    teacher.copy(
-                        biometricId = biometricId
-                    ).toTeacherEntity()
-                )
+                teacherDao.upsert(teacher.copy(biometricId = biometricId).toTeacherEntity())
             }
         }
 
-    private fun addBiometricDetails(
-        onSuccess: (String) -> Unit
-    ): Flow<EnrollState> = flow {
+    private fun addBiometricDetails(onSuccess: (String) -> Unit): Flow<EnrollState> = flow {
+        sensorServer.updateAdminOperationStatus(true)
         emit(EnrollState.Enrolling)
 
         when (val fingerprintResult = sensorServer.enrollFingerPrint()) {
             is Result.Error -> emit(EnrollState.EnrollFailed(fingerprintResult.debugMessage))
             is Result.Success -> {
                 emit(EnrollState.FingerprintEnrolled)
+                sensorServer.displayText(listOf("Enrolling", "Face"))
 
                 when (val faceResult = sensorServer.enrollFace(fingerprintResult.data.toString())) {
                     is Result.Error -> {
                         sensorServer.deleteFingerPrint(fingerprintResult.data)
                         emit(EnrollState.EnrollFailed(faceResult.debugMessage))
+                        sensorServer.displayText(listOf("Enroll", "Failed!"))
                     }
 
                     is Result.Success -> {
                         emit(EnrollState.EnrollComplete)
                         onSuccess(fingerprintResult.data.toString())
+                        sensorServer.displayText(listOf("Enroll", "Complete!"))
                     }
                 }
             }
         }
+
+        delay(1000)
+        sensorServer.updateAdminOperationStatus(false)
     }
 
     private suspend fun deleteBiometrics(id: Int) {

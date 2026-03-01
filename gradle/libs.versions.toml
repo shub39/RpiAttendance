@@ -1,26 +1,28 @@
 [versions]
-agp = "9.0.0"
+agp = "9.0.1"
 android-compileSdk = "36"
 android-minSdk = "27"
-compose-multiplatform = "1.10.0"
-filekitCore = "0.12.0"
-kotlin = "2.3.0"
+compose-multiplatform = "1.10.1"
+filekitCore = "0.13.0"
+kotlin = "2.3.10"
 ktor = "3.4.0"
 material3 = "1.10.0-alpha05"
 rpc = "0.10.2"
 room = "2.8.4"
 sqlite = "2.6.2"
-ksp = "2.3.4"
+ksp = "2.3.5"
 splashscreen = "1.2.0"
-androidx-activity-compose = "1.12.3"
+androidx-activity-compose = "1.12.4"
 androidx-lifecycle = "2.10.0-alpha08"
 androidx-lifecycle-runtime = "2.10.0"
 coroutines = "1.10.2"
 koin = "4.1.1"
 datetime = "0.7.1"
-navigation = "2.9.1"
+navigation = "2.9.2"
 materialkolor = "4.1.1"
 datastore = "1.2.0"
+spotless = "8.2.1"
+ktfmt = "0.61"
 
 [libraries]
 # android
@@ -84,3 +86,4 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 kotlinx-rpc = { id = "org.jetbrains.kotlinx.rpc.plugin", version.ref = "rpc" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

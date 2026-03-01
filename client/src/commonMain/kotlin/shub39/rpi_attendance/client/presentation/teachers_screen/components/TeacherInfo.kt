@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2026  Shubham Gorai
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package shub39.rpi_attendance.client.presentation.teachers_screen.components
 
 import androidx.compose.animation.animateContentSize
@@ -26,59 +42,41 @@ import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun TeacherInfo(
-    modifier: Modifier = Modifier,
-    teacher: Teacher,
-    onEdit: () -> Unit
-) {
-    Card(
-        modifier = modifier.animateContentSize(),
-        shape = MaterialTheme.shapes.large
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
+fun TeacherInfo(modifier: Modifier = Modifier, teacher: Teacher, onEdit: () -> Unit) {
+    Card(modifier = modifier.animateContentSize(), shape = MaterialTheme.shapes.large) {
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "${teacher.firstName} ${teacher.lastName}",
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
                     )
-                    Text(
-                        text = teacher.subjectTaught
-                    )
+                    Text(text = teacher.subjectTaught)
                 }
 
                 Icon(
-                    painter = painterResource(
+                    painter =
+                        painterResource(
+                            if (teacher.biometricId == null) {
+                                Res.drawable.fingerprint_off
+                            } else {
+                                Res.drawable.fingerprint
+                            }
+                        ),
+                    tint =
                         if (teacher.biometricId == null) {
-                            Res.drawable.fingerprint_off
+                            MaterialTheme.colorScheme.error
                         } else {
-                            Res.drawable.fingerprint
-                        }
-                    ),
-                    tint = if (teacher.biometricId == null) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    contentDescription = null
+                            MaterialTheme.colorScheme.primary
+                        },
+                    contentDescription = null,
                 )
 
-                IconButton(
-                    onClick = onEdit
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.edit),
-                        contentDescription = "Edit"
-                    )
+                IconButton(onClick = onEdit) {
+                    Icon(painter = painterResource(Res.drawable.edit), contentDescription = "Edit")
                 }
             }
         }
@@ -90,14 +88,15 @@ fun TeacherInfo(
 private fun Preview() {
     AppTheme {
         TeacherInfo(
-            teacher = Teacher(
-                id = 1,
-                biometricId = "as",
-                firstName = "Shubham",
-                lastName = "Gorai",
-                subjectTaught = "Chemistry"
-            ),
-            onEdit = {}
+            teacher =
+                Teacher(
+                    id = 1,
+                    biometricId = "as",
+                    firstName = "Shubham",
+                    lastName = "Gorai",
+                    subjectTaught = "Chemistry",
+                ),
+            onEdit = {},
         )
     }
 }
