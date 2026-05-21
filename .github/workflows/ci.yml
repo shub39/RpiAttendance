@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-android:
-    if: startsWith(github.event.head_commit.message, '[release]')
+    if: startsWith(github.event.head_commit.message, '[release]') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -59,7 +59,7 @@ jobs:
           path: androidApp/build/outputs/apk/release/*.apk
 
   build-server:
-    if: startsWith(github.event.head_commit.message, '[release]')
+    if: startsWith(github.event.head_commit.message, '[release]') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -102,7 +102,7 @@ jobs:
           path: server/build/bin/linuxArm64/releaseExecutable/server.kexe
 
   create-release:
-    if: startsWith(github.event.head_commit.message, '[release]')
+    if: startsWith(github.event.head_commit.message, '[release]') || github.event_name == 'workflow_dispatch'
     needs: [ build-android, build-server ]
     runs-on: ubuntu-latest
     steps:
