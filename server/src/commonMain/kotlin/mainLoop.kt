@@ -268,7 +268,7 @@ private suspend fun logAttendance(
 
     if (
         pastLogsForToday.any {
-            Clock.System.now().epochSeconds <= it.timeStamp.epochSeconds + 30_000
+            Clock.System.now().toEpochMilliseconds() <= it.timeStamp.toEpochMilliseconds() + 30_000
         }
     ) {
         logInfo(
