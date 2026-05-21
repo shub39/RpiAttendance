@@ -1,4 +1,4 @@
-name: Build Server
+name: Build and Release Server and Client App
 
 on:
   push:
