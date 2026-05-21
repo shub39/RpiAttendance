@@ -35,7 +35,7 @@ kotlin {
     linuxArm64()
     linuxX64()
     jvm()
-    androidLibrary {
+    android {
         namespace = "shub39.rpi_attendance.core"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()

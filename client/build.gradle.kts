@@ -34,7 +34,7 @@ kotlin {
     }
 
     jvm()
-    androidLibrary {
+    android {
         namespace = "shub39.rpi_attendance"
         compileSdk { version = release(libs.versions.android.compileSdk.get().toInt()) }
         minSdk { version = release(libs.versions.android.minSdk.get().toInt()) }
