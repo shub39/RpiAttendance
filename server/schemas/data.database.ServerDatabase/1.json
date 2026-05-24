@@ -2,50 +2,39 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f59c482ad77f0efed05a68d755663224",
+    "identityHash": "5187329756d5659faab333a61753a1ab",
     "entities": [
       {
-        "tableName": "students",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `biometricId` TEXT, `firstName` TEXT NOT NULL, `lastName` TEXT NOT NULL, `rollNo` INTEGER NOT NULL, `contactEmail` TEXT NOT NULL, `contactPhone` TEXT NOT NULL)",
+        "tableName": "faculty",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`entityId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` TEXT NOT NULL, `name` TEXT NOT NULL, `dept` TEXT NOT NULL, `designation` TEXT NOT NULL)",
         "fields": [
+          {
+            "fieldPath": "entityId",
+            "columnName": "entityId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "biometricId",
-            "columnName": "biometricId",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "firstName",
-            "columnName": "firstName",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "lastName",
-            "columnName": "lastName",
+            "fieldPath": "name",
+            "columnName": "name",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "rollNo",
-            "columnName": "rollNo",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "contactEmail",
-            "columnName": "contactEmail",
+            "fieldPath": "dept",
+            "columnName": "dept",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "contactPhone",
-            "columnName": "contactPhone",
+            "fieldPath": "designation",
+            "columnName": "designation",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -53,48 +42,7 @@
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "id"
-          ]
-        }
-      },
-      {
-        "tableName": "teachers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `biometricId` TEXT, `firstName` TEXT NOT NULL, `lastName` TEXT NOT NULL, `subjectTaught` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "biometricId",
-            "columnName": "biometricId",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "firstName",
-            "columnName": "firstName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "lastName",
-            "columnName": "lastName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "subjectTaught",
-            "columnName": "subjectTaught",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
+            "entityId"
           ]
         }
       },
@@ -196,7 +144,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f59c482ad77f0efed05a68d755663224')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5187329756d5659faab333a61753a1ab')"
     ]
   }
 }

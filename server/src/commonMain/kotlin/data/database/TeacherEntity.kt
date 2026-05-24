@@ -19,11 +19,11 @@ package data.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "teachers")
+@Entity(tableName = "faculty")
 data class TeacherEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val biometricId: String?,
-    val firstName: String,
-    val lastName: String,
-    val subjectTaught: String,
+    @PrimaryKey(autoGenerate = true) val entityId: Long = 0,
+    val id: String,
+    val name: String,
+    val dept: String,
+    val designation: String,
 )

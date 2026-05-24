@@ -181,7 +181,7 @@ private fun TeachersScreenContent(
                                 singleLine = true,
                                 shape = MaterialTheme.shapes.extraLarge,
                                 label = { Text("Search") },
-                                placeholder = { Text("Name, Subject") },
+                                placeholder = { Text("Name, ID, Department") },
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(Res.drawable.search),
@@ -253,8 +253,7 @@ private fun TeachersScreenContent(
             modifier = Modifier.imePadding(),
             isUpdate = false,
             enrollState = state.enrollState,
-            teacher =
-                Teacher(biometricId = null, firstName = "", lastName = "", subjectTaught = ""),
+            teacher = Teacher(id = "", name = "", dept = "", designation = ""),
             onUpsert = { onAction(TeachersScreenAction.UpsertTeacher(it)) },
             onEnroll = {
                 onAction(TeachersScreenAction.UpsertTeacher(it))

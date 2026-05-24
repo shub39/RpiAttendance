@@ -19,22 +19,21 @@ package models
 import kotlinx.serialization.Serializable
 
 /**
- * Represents a teacher in the school system.
+ * Represents a faculty member in the attendance system.
  *
- * This data class holds the essential information about a teacher, including their unique
- * identifiers and personal details.
+ * This data class holds the essential information about a faculty member.
  *
- * @property id The unique database identifier for the teacher. Defaults to 0 for new entries.
- * @property biometricId The optional unique identifier for enrolled face data. Can be null.
- * @property firstName The teacher's first name.
- * @property lastName The teacher's last name.
- * @property subjectTaught The primary subject the teacher is responsible for teaching.
+ * @property entityId The unique database identifier. Defaults to 0 for new entries.
+ * @property id The faculty identifier used for face enrollment and attendance logs.
+ * @property name The faculty member's name.
+ * @property dept The faculty member's department.
+ * @property designation The faculty member's designation.
  */
 @Serializable
 data class Teacher(
-    val id: Long = 0,
-    val biometricId: String?,
-    val firstName: String,
-    val lastName: String,
-    val subjectTaught: String,
+    val entityId: Long = 0,
+    val id: String,
+    val name: String,
+    val dept: String,
+    val designation: String,
 )

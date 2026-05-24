@@ -105,20 +105,8 @@ fun DetailedLogCard(
         shape = MaterialTheme.shapes.large,
         colors =
             CardDefaults.cardColors(
-                containerColor =
-                    when (detailedLog) {
-                        is DetailedAttendanceLog.StudentLog ->
-                            MaterialTheme.colorScheme.primaryContainer
-                        is DetailedAttendanceLog.TeacherLog ->
-                            MaterialTheme.colorScheme.secondaryContainer
-                    },
-                contentColor =
-                    when (detailedLog) {
-                        is DetailedAttendanceLog.StudentLog ->
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        is DetailedAttendanceLog.TeacherLog ->
-                            MaterialTheme.colorScheme.onSecondaryContainer
-                    },
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             ),
         onClick = { showDeleteDialog = true },
     ) {
@@ -153,33 +141,14 @@ fun DetailedLogCard(
                     },
             ) {
                 Text(
-                    text =
-                        when (detailedLog) {
-                            is DetailedAttendanceLog.StudentLog ->
-                                "${detailedLog.student.firstName} ${detailedLog.student.lastName}"
-                            is DetailedAttendanceLog.TeacherLog ->
-                                "${detailedLog.teacher.firstName} ${detailedLog.teacher.lastName}"
-                        },
+                    text = detailedLog.teacher.name,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                Text(text = "Faculty", style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    text =
-                        when (detailedLog) {
-                            is DetailedAttendanceLog.StudentLog -> "Student"
-                            is DetailedAttendanceLog.TeacherLog -> "Teacher"
-                        },
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Text(
-                    text =
-                        when (detailedLog) {
-                            is DetailedAttendanceLog.StudentLog ->
-                                "Roll No: ${detailedLog.student.rollNo}"
-                            is DetailedAttendanceLog.TeacherLog ->
-                                "Subject: ${detailedLog.teacher.subjectTaught}"
-                        },
+                    text = "${detailedLog.teacher.id} | ${detailedLog.teacher.dept}",
                     style = MaterialTheme.typography.bodySmall,
                 )
             }

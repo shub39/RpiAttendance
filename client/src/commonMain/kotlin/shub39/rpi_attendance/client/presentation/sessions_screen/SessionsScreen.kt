@@ -100,10 +100,10 @@ private fun Preview() {
                             Session(
                                 teacher =
                                     Teacher(
-                                        biometricId = "$it",
-                                        firstName = "Teacher $it",
-                                        lastName = "last name",
-                                        subjectTaught = "Subject $it",
+                                        id = "FAC$it",
+                                        name = "Teacher $it",
+                                        dept = "Subject $it",
+                                        designation = "Professor",
                                     ),
                                 startTime = time,
                                 endTime = time,

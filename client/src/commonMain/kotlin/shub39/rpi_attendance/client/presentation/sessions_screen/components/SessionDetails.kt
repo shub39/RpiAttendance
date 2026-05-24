@@ -73,12 +73,12 @@ fun SessionDetails(modifier: Modifier = Modifier, session: Session, onDismissReq
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     Text(
-                        text = session.teacher.subjectTaught,
+                        text = session.teacher.dept,
                         style =
                             MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     )
                     Text(
-                        text = "${session.teacher.firstName} ${session.teacher.lastName}",
+                        text = session.teacher.name,
                         style =
                             MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     )
@@ -143,10 +143,10 @@ private fun Preview() {
                 Session(
                     teacher =
                         Teacher(
-                            biometricId = "b",
-                            firstName = "Teacher",
-                            lastName = "last name",
-                            subjectTaught = "Subject ",
+                            id = "FAC001",
+                            name = "Teacher",
+                            dept = "Subject",
+                            designation = "Professor",
                         ),
                     startTime = time,
                     endTime = time,

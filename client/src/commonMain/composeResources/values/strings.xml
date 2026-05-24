@@ -5,10 +5,10 @@
     <string name="connect">Connect</string>
     <string name="students">Students</string>
     <string name="students_enrolled_template">%1$d students enrolled</string>
-    <string name="teachers">Teachers</string>
-    <string name="teachers_enrolled_template">%1$d teachers enrolled</string>
-    <string name="add_teacher">Add Teacher</string>
-    <string name="edit_teacher">Edit Teacher</string>
+    <string name="teachers">Faculty</string>
+    <string name="teachers_enrolled_template">%1$d faculty enrolled</string>
+    <string name="add_teacher">Add Faculty</string>
+    <string name="edit_teacher">Edit Faculty</string>
     <string name="attendance_log">Log</string>
     <string name="add_student">Add Student</string>
     <string name="edit_student">Edit Student</string>

@@ -37,12 +37,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import shub39.rpi_attendance.client.domain.Route
 import shub39.rpi_attendance.client.presentation.attendancelog_screen.AttendanceLogScreen
-import shub39.rpi_attendance.client.presentation.sessions_screen.SessionsScreen
-import shub39.rpi_attendance.client.presentation.students_screen.StudentsScreen
 import shub39.rpi_attendance.client.presentation.teachers_screen.TeachersScreen
 import shub39.rpi_attendance.client.viewmodels.AttendanceLogScreenViewModel
-import shub39.rpi_attendance.client.viewmodels.SessionsViewModel
-import shub39.rpi_attendance.client.viewmodels.StudentsScreenViewModel
 import shub39.rpi_attendance.client.viewmodels.TeachersScreenViewModel
 
 @Composable
@@ -56,24 +52,14 @@ fun MainScreens(modifier: Modifier = Modifier) {
                 onNavigate = {
                     navController.navigate(it) {
                         launchSingleTop = true
-                        popUpTo(Route.StudentsScreen)
+                        popUpTo(Route.TeachersScreen)
                     }
                 },
                 navController = navController,
             )
         },
     ) { padding ->
-        NavHost(navController = navController, startDestination = Route.StudentsScreen) {
-            composable<Route.StudentsScreen> {
-                val viewModel = koinInject<StudentsScreenViewModel>()
-                val state by viewModel.state.collectAsStateWithLifecycle()
-
-                StudentsScreen(
-                    contentPadding = padding,
-                    state = state,
-                    onAction = viewModel::onAction,
-                )
-            }
+        NavHost(navController = navController, startDestination = Route.TeachersScreen) {
             composable<Route.TeachersScreen> {
                 val viewModel = koinInject<TeachersScreenViewModel>()
                 val state by viewModel.state.collectAsStateWithLifecycle()
@@ -83,12 +69,6 @@ fun MainScreens(modifier: Modifier = Modifier) {
                     state = state,
                     onAction = viewModel::onAction,
                 )
-            }
-            composable<Route.SessionsScreen> {
-                val viewModel = koinInject<SessionsViewModel>()
-                val state by viewModel.state.collectAsStateWithLifecycle()
-
-                SessionsScreen(padding = padding, state = state, onAction = viewModel::onAction)
             }
             composable<Route.AttendanceLogScreen> {
                 val viewModel = koinInject<AttendanceLogScreenViewModel>()

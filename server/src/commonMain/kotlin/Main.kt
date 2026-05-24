@@ -44,14 +44,12 @@ fun main() {
             }
         }
     val db = getRoomDatabase()
-    val studentDao = db.studentDao()
     val teachDao = db.teacherDao()
     val attendanceLogDao = db.attendanceLogDao()
 
     val sensorServer = SensorServerImpl(client = client)
     val adminInterface =
         AdminInterfaceImpl(
-            studentDao = studentDao,
             teacherDao = teachDao,
             attendanceLogDao = attendanceLogDao,
             sensorServer = sensorServer,

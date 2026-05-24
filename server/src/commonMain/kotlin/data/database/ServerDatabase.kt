@@ -22,15 +22,10 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 
-@Database(
-    entities = [StudentEntity::class, TeacherEntity::class, AttendanceLogEntity::class],
-    version = 1,
-)
+@Database(entities = [TeacherEntity::class, AttendanceLogEntity::class], version = 1)
 @TypeConverters(Converters::class)
 @ConstructedBy(ServerDatabaseConstructor::class)
 abstract class ServerDatabase : RoomDatabase() {
-    abstract fun studentDao(): StudentDao
-
     abstract fun teacherDao(): TeacherDao
 
     abstract fun attendanceLogDao(): AttendanceLogDao

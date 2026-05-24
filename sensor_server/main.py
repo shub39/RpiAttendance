@@ -4,7 +4,6 @@ import socket
 import asyncio
 import logging
 import json
-import subprocess
 import uvicorn
 
 from contextlib import asynccontextmanager
@@ -63,19 +62,16 @@ class Hardware:
 hw = Hardware()
 executor = ThreadPoolExecutor(max_workers=3)
 face_detector = None
-keypad_task = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if not hw.ok:
         raise RuntimeError("Hardware not initialized")
-    global face_detector, keypad_task
+    global face_detector
     face_detector = FaceDetectionService(hw.face_rec)
     face_detector.start()
-    keypad_task = asyncio.create_task(keypad_worker())
+    await run_in_threadpool(draw, ["Detecting", "Faces"])
     yield
-    if keypad_task:
-        keypad_task.cancel()
     if face_detector:
         await face_detector.stop()
     executor.shutdown(wait=False)
@@ -251,26 +247,6 @@ def load_faculty(faculty_id: str):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-async def keypad_worker():
-    last_key = None
-    last_key_time = 0
-
-    while True:
-        key = await run_in_threadpool(read_key)
-        now = time.time()
-
-        if key is not None and (key != last_key or now - last_key_time > 1):
-            last_key = key
-            last_key_time = now
-
-            if key == "1":
-                draw(["SENSOR SERVER", f"{get_local_ip()}:{SERVER_PORT}"])
-            elif key == "A":
-                draw(["Shutting Down"])
-                subprocess.Popen(["sudo", "shutdown", "now"])
-
-        await asyncio.sleep(KEYPAD_POLL_INTERVAL)
-
 async def with_timeout(func, *args):
     return await asyncio.wait_for(
         run_in_threadpool(func, *args),
@@ -305,6 +281,7 @@ async def enroll_face(req: FaceEnrollRequest):
             raise HTTPException(400, "No face detected")
 
         await run_in_threadpool(hw.face_rec.reload_encodings)
+        await run_in_threadpool(draw, ["Enroll", "Complete!"])
         return {"status": "ok"}
     except HTTPException as e:
         raise HTTPException(e.status_code, e.detail)
@@ -312,6 +289,7 @@ async def enroll_face(req: FaceEnrollRequest):
         raise HTTPException(500, str(e))
     finally:
         await face_detector.resume()
+        await run_in_threadpool(draw, ["Detecting", "Faces"])
 
 
 @app.post("/face/recognize")

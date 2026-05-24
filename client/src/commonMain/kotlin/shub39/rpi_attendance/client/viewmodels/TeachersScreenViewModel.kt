@@ -85,9 +85,10 @@ class TeachersScreenViewModel(private val rpcServiceWrapper: RpcServiceWrapper) 
                         searchQuery = action.query,
                         searchResults =
                             teachersScreenState.teachers.filter {
-                                it.firstName.contains(action.query, ignoreCase = true) ||
-                                    it.lastName.contains(action.query, ignoreCase = true) ||
-                                    it.subjectTaught.contains(action.query, ignoreCase = true)
+                                it.name.contains(action.query, ignoreCase = true) ||
+                                    it.id.contains(action.query, ignoreCase = true) ||
+                                    it.dept.contains(action.query, ignoreCase = true) ||
+                                    it.designation.contains(action.query, ignoreCase = true)
                             },
                     )
                 }

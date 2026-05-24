@@ -49,21 +49,13 @@ fun TeacherInfo(modifier: Modifier = Modifier, teacher: Teacher, onEdit: () -> U
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "${teacher.firstName} ${teacher.lastName}",
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                    Text(text = teacher.subjectTaught)
+                    Text(text = teacher.name, style = MaterialTheme.typography.titleLarge)
+                    Text(text = "${teacher.id} | ${teacher.dept} | ${teacher.designation}")
                 }
 
                 Icon(
                     painter = painterResource(Res.drawable.person_book),
-                    tint =
-                        if (teacher.biometricId == null) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        },
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = null,
                 )
 
@@ -82,11 +74,10 @@ private fun Preview() {
         TeacherInfo(
             teacher =
                 Teacher(
-                    id = 1,
-                    biometricId = "as",
-                    firstName = "Shubham",
-                    lastName = "Gorai",
-                    subjectTaught = "Chemistry",
+                    id = "FAC001",
+                    name = "Shubham Gorai",
+                    dept = "Chemistry",
+                    designation = "Professor",
                 ),
             onEdit = {},
         )

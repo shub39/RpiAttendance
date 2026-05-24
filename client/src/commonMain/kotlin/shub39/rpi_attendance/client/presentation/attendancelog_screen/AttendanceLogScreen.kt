@@ -42,7 +42,6 @@ import models.AttendanceLog
 import models.AttendanceStatus
 import models.DetailedAttendanceLog
 import models.EntityType
-import models.Student
 import models.Teacher
 import shub39.rpi_attendance.client.presentation.DateDisplay
 import shub39.rpi_attendance.client.presentation.attendancelog_screen.components.DetailedLogCard
@@ -105,49 +104,24 @@ private fun Preview() {
                 AttendanceLogState(
                     filteredDetailedLogs =
                         (0..100).map { num ->
-                            if (num % 2 == 0) {
-                                DetailedAttendanceLog.StudentLog(
-                                    student =
-                                        Student(
-                                            id = 0,
-                                            biometricId = "asdf",
-                                            firstName = "John",
-                                            lastName = "Doe",
-                                            rollNo = 1234,
-                                            contactEmail = "johndoe@example.com",
-                                            contactPhone = "1234567890",
-                                        ),
-                                    log =
-                                        AttendanceLog(
-                                            id = 0,
-                                            biometricId = "asdf",
-                                            entityType = EntityType.STUDENT,
-                                            entityId = 0,
-                                            timeStamp = Clock.System.now(),
-                                            attendanceStatus = AttendanceStatus.entries.random(),
-                                        ),
-                                )
-                            } else {
-                                DetailedAttendanceLog.TeacherLog(
-                                    teacher =
-                                        Teacher(
-                                            id = 0,
-                                            biometricId = "asdf",
-                                            firstName = "Jane",
-                                            lastName = "Doe",
-                                            subjectTaught = "MAD",
-                                        ),
-                                    log =
-                                        AttendanceLog(
-                                            id = 0,
-                                            biometricId = "asdf",
-                                            entityType = EntityType.STUDENT,
-                                            entityId = 0,
-                                            timeStamp = Clock.System.now() - 1.hours,
-                                            attendanceStatus = AttendanceStatus.entries.random(),
-                                        ),
-                                )
-                            }
+                            DetailedAttendanceLog(
+                                teacher =
+                                    Teacher(
+                                        id = "FAC$num",
+                                        name = "Jane Doe",
+                                        dept = "MAD",
+                                        designation = "Professor",
+                                    ),
+                                log =
+                                    AttendanceLog(
+                                        id = 0,
+                                        biometricId = "FAC$num",
+                                        entityType = EntityType.TEACHER,
+                                        entityId = 0,
+                                        timeStamp = Clock.System.now() - 1.hours,
+                                        attendanceStatus = AttendanceStatus.entries.random(),
+                                    ),
+                            )
                         }
                 ),
             onAction = {},

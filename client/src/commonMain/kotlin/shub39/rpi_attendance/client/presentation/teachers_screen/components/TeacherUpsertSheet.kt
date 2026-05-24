@@ -80,9 +80,10 @@ fun TeacherUpsertSheet(
     var newTeacher by remember { mutableStateOf(teacher) }
 
     val isValidTeacherData =
-        newTeacher.firstName.isNotBlank() &&
-            newTeacher.lastName.isNotBlank() &&
-            newTeacher.subjectTaught.isNotBlank()
+        newTeacher.name.isNotBlank() &&
+            newTeacher.id.isNotBlank() &&
+            newTeacher.dept.isNotBlank() &&
+            newTeacher.designation.isNotBlank()
 
     ModalBottomSheet(
         modifier = modifier,
@@ -125,9 +126,9 @@ fun TeacherUpsertSheet(
 
             item {
                 OutlinedTextField(
-                    value = newTeacher.firstName,
-                    onValueChange = { newTeacher = newTeacher.copy(firstName = it) },
-                    label = { Text("First Name") },
+                    value = newTeacher.name,
+                    onValueChange = { newTeacher = newTeacher.copy(name = it) },
+                    label = { Text("Name") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
                     modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
@@ -136,9 +137,9 @@ fun TeacherUpsertSheet(
 
             item {
                 OutlinedTextField(
-                    value = newTeacher.lastName,
-                    onValueChange = { newTeacher = newTeacher.copy(lastName = it) },
-                    label = { Text("Last Name") },
+                    value = newTeacher.id,
+                    onValueChange = { newTeacher = newTeacher.copy(id = it) },
+                    label = { Text("Faculty ID") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
                     modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
@@ -147,9 +148,20 @@ fun TeacherUpsertSheet(
 
             item {
                 OutlinedTextField(
-                    value = newTeacher.subjectTaught,
-                    onValueChange = { newTeacher = newTeacher.copy(subjectTaught = it) },
-                    label = { Text("Subject Taught") },
+                    value = newTeacher.dept,
+                    onValueChange = { newTeacher = newTeacher.copy(dept = it) },
+                    label = { Text("Department") },
+                    singleLine = true,
+                    shape = MaterialTheme.shapes.large,
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+                )
+            }
+
+            item {
+                OutlinedTextField(
+                    value = newTeacher.designation,
+                    onValueChange = { newTeacher = newTeacher.copy(designation = it) },
+                    label = { Text("Designation") },
                     singleLine = true,
                     shape = MaterialTheme.shapes.large,
                     modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
@@ -170,10 +182,7 @@ fun TeacherUpsertSheet(
                         supportingContent = {
                             Text(
                                 text =
-                                    if (
-                                        newTeacher.biometricId == null &&
-                                            enrollState !is EnrollState.EnrollComplete
-                                    ) {
+                                    if (enrollState !is EnrollState.EnrollComplete) {
                                         when (enrollState) {
                                             is EnrollState.EnrollFailed -> "Enroll Failed"
                                             EnrollState.Enrolling -> "Enrolling"
@@ -187,27 +196,15 @@ fun TeacherUpsertSheet(
                         trailingContent = {
                             if (!enrollState.isEnrolling()) {
                                 Button(
-                                    onClick = {
-                                        if (
-                                            newTeacher.biometricId == null &&
-                                                enrollState !is EnrollState.EnrollComplete
-                                        ) {
-                                            onEnroll(newTeacher)
-                                        } else {
-                                            newTeacher = newTeacher.copy(biometricId = null)
-                                        }
-                                    },
+                                    onClick = { onEnroll(newTeacher) },
                                     enabled = isValidTeacherData && !areSensorsBusy,
                                 ) {
                                     Text(
                                         text =
-                                            if (
-                                                newTeacher.biometricId == null &&
-                                                    enrollState !is EnrollState.EnrollComplete
-                                            ) {
+                                            if (enrollState !is EnrollState.EnrollComplete) {
                                                 "Enroll"
                                             } else {
-                                                "Delete"
+                                                "Re-enroll"
                                             }
                                     )
                                 }
@@ -277,14 +274,7 @@ private fun Preview() {
         TeacherUpsertSheet(
             isUpdate = false,
             enrollState = EnrollState.Idle,
-            teacher =
-                Teacher(
-                    id = 0,
-                    biometricId = null,
-                    firstName = "",
-                    lastName = "",
-                    subjectTaught = "",
-                ),
+            teacher = Teacher(id = "", name = "", dept = "", designation = ""),
             onUpsert = {},
             onEnroll = {},
             onDelete = {},

@@ -55,14 +55,14 @@ fun SessionCard(modifier: Modifier = Modifier, session: Session) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = session.teacher.subjectTaught,
+                    text = session.teacher.dept,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "By ${session.teacher.firstName}",
+                    text = "By ${session.teacher.name}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodyMedium,

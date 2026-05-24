@@ -122,13 +122,13 @@ private suspend fun processAttendance(
     teacherDao: TeacherDao,
     attendanceLogDao: AttendanceLogDao,
 ): Boolean {
-    teacherDao.getTeacherByBiometricId(biometricId)?.let { teacher ->
-        sensorServer.displayText(listOf("$source Found", teacher.firstName, teacher.subjectTaught))
-        logInfo("$source Found Faculty ${teacher.firstName} : ${teacher.subjectTaught}")
+    teacherDao.getTeacherById(biometricId)?.let { teacher ->
+        sensorServer.displayText(listOf(teacher.name, teacher.id, currentLoginTime()))
+        logInfo("$source Found Faculty ${teacher.name} : ${teacher.dept}")
         logAttendance(
             biometricId = biometricId,
             entityType = EntityType.TEACHER,
-            entityId = teacher.id,
+            entityId = teacher.entityId,
             attendanceLogDao = attendanceLogDao,
         )
         return true
@@ -136,6 +136,9 @@ private suspend fun processAttendance(
 
     return false
 }
+
+private fun currentLoginTime(): String =
+    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time.toString()
 
 private suspend fun logAttendance(
     biometricId: String,

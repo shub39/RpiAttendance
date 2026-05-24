@@ -38,7 +38,7 @@ kotlin {
     linuxArm64 {
         binaries.executable {
             entryPoint = "main"
-            linkerOpts("/usr/lib/gcc/aarch64-linux-gnu/15.1.0/libgcc.a")
+            linkerOpts("/usr/lib/gcc/aarch64-linux-gnu/15.2.0/libgcc.a")
         }
     }
 

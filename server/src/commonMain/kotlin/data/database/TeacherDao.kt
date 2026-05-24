@@ -28,14 +28,14 @@ interface TeacherDao {
 
     @Delete suspend fun delete(teacherEntity: TeacherEntity)
 
-    @Query("SELECT * FROM teachers WHERE id = :id")
-    suspend fun getTeacherById(id: Long): TeacherEntity?
+    @Query("SELECT * FROM faculty WHERE entityId = :entityId")
+    suspend fun getTeacherByEntityId(entityId: Long): TeacherEntity?
 
-    @Query("SELECT * FROM teachers WHERE id IN (:ids)")
-    suspend fun getTeachersByIds(ids: List<Long>): List<TeacherEntity>
+    @Query("SELECT * FROM faculty WHERE entityId IN (:entityIds)")
+    suspend fun getTeachersByEntityIds(entityIds: List<Long>): List<TeacherEntity>
 
-    @Query("SELECT * FROM teachers WHERE biometricId = :biometricId")
-    suspend fun getTeacherByBiometricId(biometricId: String): TeacherEntity?
+    @Query("SELECT * FROM faculty WHERE id = :id")
+    suspend fun getTeacherById(id: String): TeacherEntity?
 
-    @Query("SELECT * FROM teachers") fun getAllTeachers(): Flow<List<TeacherEntity>>
+    @Query("SELECT * FROM faculty") fun getAllTeachers(): Flow<List<TeacherEntity>>
 }
