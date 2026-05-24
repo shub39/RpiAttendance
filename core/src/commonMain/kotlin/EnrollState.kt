@@ -18,8 +18,8 @@ import EnrollState.Companion.isEnrolling
 import kotlinx.serialization.Serializable
 
 /**
- * Represents the various states of a face enrollment process. This sealed interface is used
- * to model the flow from starting the enrollment to its successful completion or failure.
+ * Represents the various states of a face enrollment process. This sealed interface is used to
+ * model the flow from starting the enrollment to its successful completion or failure.
  *
  * The states are:
  * - [Idle]: The initial state before the enrollment process begins.

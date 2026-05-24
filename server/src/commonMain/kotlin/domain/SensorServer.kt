@@ -47,9 +47,11 @@ data class FaceEnrollRequest(
 
 @Serializable data class FaceSearchResponse(val match: String?)
 
-@Serializable data class Faculty(val id: String, val name: String, val dept: String, val designation: String)
+@Serializable
+data class Faculty(val id: String, val name: String, val dept: String, val designation: String)
 
-@Serializable data class FaceEvent(val faculty: Faculty, val login_time: String, val timestamp: Double)
+@Serializable
+data class FaceEvent(val faculty: Faculty, val login_time: String, val timestamp: Double)
 
 @Serializable data class FaceEventsResponse(val events: List<FaceEvent>)
 
@@ -97,8 +99,8 @@ sealed interface KeypadResult {
 
 /**
  * Defines the contract for interacting with a remote sensor device. This interface provides methods
- * for controlling hardware components like a display, face recognition, and a
- * keypad. All methods are suspend functions, they perform asynchronous operations.
+ * for controlling hardware components like a display, face recognition, and a keypad. All methods
+ * are suspend functions, they perform asynchronous operations.
  */
 interface SensorServer {
     val isAdminOperationActive: Flow<Boolean>
@@ -111,7 +113,12 @@ interface SensorServer {
 
     suspend fun displayText(lines: List<String>): EmptyResult<SensorError>
 
-    suspend fun enrollFace(id: String, name: String, dept: String, designation: String): EmptyResult<SensorError>
+    suspend fun enrollFace(
+        id: String,
+        name: String,
+        dept: String,
+        designation: String,
+    ): EmptyResult<SensorError>
 
     suspend fun recognizeFace(): Result<FaceSearchResult, SensorError>
 

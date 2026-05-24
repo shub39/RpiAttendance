@@ -57,10 +57,7 @@ fun TeacherInfo(modifier: Modifier = Modifier, teacher: Teacher, onEdit: () -> U
                 }
 
                 Icon(
-                    painter =
-                        painterResource(
-                            Res.drawable.person_book
-                        ),
+                    painter = painterResource(Res.drawable.person_book),
                     tint =
                         if (teacher.biometricId == null) {
                             MaterialTheme.colorScheme.error

@@ -162,10 +162,7 @@ fun TeacherUpsertSheet(
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         leadingContent = {
                             Icon(
-                                painter =
-                                    painterResource(
-                                        Res.drawable.person_book
-                                    ),
+                                painter = painterResource(Res.drawable.person_book),
                                 contentDescription = null,
                             )
                         },
@@ -177,11 +174,11 @@ fun TeacherUpsertSheet(
                                         newTeacher.biometricId == null &&
                                             enrollState !is EnrollState.EnrollComplete
                                     ) {
-                                            when (enrollState) {
-                                                is EnrollState.EnrollFailed -> "Enroll Failed"
-                                                EnrollState.Enrolling -> "Enrolling"
-                                                EnrollState.Idle -> "Not Enrolled"
-                                            }
+                                        when (enrollState) {
+                                            is EnrollState.EnrollFailed -> "Enroll Failed"
+                                            EnrollState.Enrolling -> "Enrolling"
+                                            EnrollState.Idle -> "Not Enrolled"
+                                        }
                                     } else {
                                         "Enrolled"
                                     }

@@ -57,10 +57,7 @@ fun StudentInfo(modifier: Modifier = Modifier, student: Student, onEdit: () -> U
                 }
 
                 Icon(
-                    painter =
-                        painterResource(
-                            Res.drawable.person_book
-                        ),
+                    painter = painterResource(Res.drawable.person_book),
                     tint =
                         if (student.biometricId == null) {
                             MaterialTheme.colorScheme.error
