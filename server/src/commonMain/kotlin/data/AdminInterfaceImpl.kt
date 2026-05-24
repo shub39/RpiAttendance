@@ -186,42 +186,59 @@ class AdminInterfaceImpl(
     }
 
     override fun addBiometricDetailsForStudent(student: Student): Flow<EnrollState> =
-        addBiometricDetails { biometricId ->
+        addBiometricDetails(
+            faceId = student.id.toString(),
+            name = "${student.firstName} ${student.lastName}",
+            dept = "",
+            designation = "Student",
+        ) { biometricId ->
             scope.launch {
                 studentDao.upsert(student.copy(biometricId = biometricId).toStudentEntity())
             }
         }
 
     override fun addBiometricDetailsForTeacher(teacher: Teacher): Flow<EnrollState> =
-        addBiometricDetails { biometricId ->
+        addBiometricDetails(
+            faceId = teacher.id.toString(),
+            name = "${teacher.firstName} ${teacher.lastName}",
+            dept = teacher.subjectTaught,
+            designation = "Faculty",
+        ) { biometricId ->
             scope.launch {
                 teacherDao.upsert(teacher.copy(biometricId = biometricId).toTeacherEntity())
             }
         }
 
-    private fun addBiometricDetails(onSuccess: (String) -> Unit): Flow<EnrollState> = flow {
+    private fun addBiometricDetails(
+        faceId: String,
+        name: String,
+        dept: String,
+        designation: String,
+        onSuccess: (String) -> Unit,
+    ): Flow<EnrollState> = flow {
         sensorServer.updateAdminOperationStatus(true)
         emit(EnrollState.Enrolling)
 
-        when (val fingerprintResult = sensorServer.enrollFingerPrint()) {
-            is Result.Error -> emit(EnrollState.EnrollFailed(fingerprintResult.debugMessage))
+        sensorServer.displayText(listOf("Enrolling", "Face"))
+
+        when (
+            val faceResult =
+                sensorServer.enrollFace(
+                    id = faceId,
+                    name = name,
+                    dept = dept,
+                    designation = designation,
+                )
+        ) {
+            is Result.Error -> {
+                emit(EnrollState.EnrollFailed(faceResult.debugMessage))
+                sensorServer.displayText(listOf("Enroll", "Failed!"))
+            }
+
             is Result.Success -> {
-                emit(EnrollState.FingerprintEnrolled)
-                sensorServer.displayText(listOf("Enrolling", "Face"))
-
-                when (val faceResult = sensorServer.enrollFace(fingerprintResult.data.toString())) {
-                    is Result.Error -> {
-                        sensorServer.deleteFingerPrint(fingerprintResult.data)
-                        emit(EnrollState.EnrollFailed(faceResult.debugMessage))
-                        sensorServer.displayText(listOf("Enroll", "Failed!"))
-                    }
-
-                    is Result.Success -> {
-                        emit(EnrollState.EnrollComplete)
-                        onSuccess(fingerprintResult.data.toString())
-                        sensorServer.displayText(listOf("Enroll", "Complete!"))
-                    }
-                }
+                emit(EnrollState.EnrollComplete)
+                onSuccess(faceId)
+                sensorServer.displayText(listOf("Enroll", "Complete!"))
             }
         }
 
@@ -231,7 +248,6 @@ class AdminInterfaceImpl(
 
     private suspend fun deleteBiometrics(id: Int) {
         logInfo("deleting biometrics for $id")
-        sensorServer.deleteFingerPrint(id)
         sensorServer.deleteFace(id.toString())
     }
 }

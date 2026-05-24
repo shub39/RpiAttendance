@@ -76,7 +76,6 @@ fun main() {
         mainLoop(
             sensorServer = sensorServer,
             attendanceLogDao = attendanceLogDao,
-            studentDao = studentDao,
             teacherDao = teachDao,
         )
     }

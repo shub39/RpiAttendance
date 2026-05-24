@@ -36,8 +36,7 @@ import models.Teacher
 import org.jetbrains.compose.resources.painterResource
 import rpiattendance.client.generated.resources.Res
 import rpiattendance.client.generated.resources.edit
-import rpiattendance.client.generated.resources.fingerprint
-import rpiattendance.client.generated.resources.fingerprint_off
+import rpiattendance.client.generated.resources.person_book
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -60,11 +59,7 @@ fun TeacherInfo(modifier: Modifier = Modifier, teacher: Teacher, onEdit: () -> U
                 Icon(
                     painter =
                         painterResource(
-                            if (teacher.biometricId == null) {
-                                Res.drawable.fingerprint_off
-                            } else {
-                                Res.drawable.fingerprint
-                            }
+                            Res.drawable.person_book
                         ),
                     tint =
                         if (teacher.biometricId == null) {

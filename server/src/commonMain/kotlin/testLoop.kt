@@ -45,11 +45,9 @@ fun testLoop(sensorServer: SensorServer, client: HttpClient) {
         println("1. Display Text")
         println("2. Get Status")
         println("3. Enroll Face")
-        println("4. Enroll Fingerprint")
         println("5. Search Face")
-        println("6. Search Fingerprint")
         println("7. Delete Face")
-        println("8. Delete Fingerprint")
+        println("9. Read Keypad")
         println("================================")
 
         while (true) {
@@ -86,39 +84,32 @@ fun testLoop(sensorServer: SensorServer, client: HttpClient) {
                 }
 
                 "3" -> {
+                    println("Enter faculty ID for face enrollment:")
+                    val id = readlnOrNull()
                     println("Enter name for face enrollment:")
                     val name = readlnOrNull()
-                    if (name.isNullOrBlank()) {
-                        println("Invalid name")
+                    println("Enter department:")
+                    val dept = readlnOrNull()
+                    println("Enter designation:")
+                    val designation = readlnOrNull()
+                    if (
+                        id.isNullOrBlank() ||
+                            name.isNullOrBlank() ||
+                            dept.isNullOrBlank() ||
+                            designation.isNullOrBlank()
+                    ) {
+                        println("Invalid faculty details")
                         continue
                     }
 
-                    when (val res = sensorServer.enrollFace(name)) {
+                    when (val res = sensorServer.enrollFace(id, name, dept, designation)) {
                         is Result.Success -> println("Face enrolled")
-                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
-                    }
-                }
-
-                "4" -> {
-                    when (val res = sensorServer.enrollFingerPrint()) {
-                        is Result.Success -> println("Fingerprint enrolled with ID: ${res.data}")
-
                         is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
                     }
                 }
 
                 "5" -> {
                     when (val res = sensorServer.recognizeFace()) {
-                        is Result.Success -> {
-                            println(res.data)
-                        }
-
-                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
-                    }
-                }
-
-                "6" -> {
-                    when (val res = sensorServer.searchFingerPrint()) {
                         is Result.Success -> {
                             println(res.data)
                         }
@@ -137,20 +128,6 @@ fun testLoop(sensorServer: SensorServer, client: HttpClient) {
 
                     when (val res = sensorServer.deleteFace(id)) {
                         is Result.Success -> println("Face deleted")
-                        is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
-                    }
-                }
-
-                "8" -> {
-                    println("Enter fingerprint ID to delete:")
-                    val id = readlnOrNull()?.toIntOrNull()
-                    if (id == null) {
-                        println("Invalid ID")
-                        continue
-                    }
-
-                    when (val res = sensorServer.deleteFingerPrint(id)) {
-                        is Result.Success -> println("Fingerprint deleted")
                         is Result.Error -> println("Error: ${res.error} ${res.debugMessage ?: ""}")
                     }
                 }

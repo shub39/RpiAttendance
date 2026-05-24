@@ -16,12 +16,12 @@ class FaceRecognizer:
     def __init__(self, dataset_dir="encodings"):
         self.dataset_dir = dataset_dir
         self.known_encodings = []
-        self.known_names = []
+        self.known_ids = []
         self.reload_encodings()
 
     def reload_encodings(self):
         self.known_encodings.clear()
-        self.known_names.clear()
+        self.known_ids.clear()
 
         os.makedirs(self.dataset_dir, exist_ok=True)
 
@@ -29,7 +29,7 @@ class FaceRecognizer:
             if not file.endswith(".pkl"):
                 continue
 
-            name = os.path.splitext(file)[0]
+            faculty_id = os.path.splitext(file)[0]
             path = os.path.join(self.dataset_dir, file)
 
             try:
@@ -38,14 +38,14 @@ class FaceRecognizer:
 
                 for enc in encs:
                     self.known_encodings.append(enc)
-                    self.known_names.append(name)
+                    self.known_ids.append(faculty_id)
 
             except Exception as e:
                 logging.warning(f"Failed loading {file}: {e}")
 
         logging.info(
             f"Loaded {len(self.known_encodings)} encodings "
-            f"for {len(set(self.known_names))} identities"
+            f"for {len(set(self.known_ids))} identities"
         )
 
     def _start_camera(self):
@@ -70,12 +70,30 @@ class FaceRecognizer:
         best_distance = distances[best_idx]
 
         logging.debug(
-            f"Best match: {self.known_names[best_idx]} "
+            f"Best match: {self.known_ids[best_idx]} "
             f"(distance={best_distance:.3f})"
         )
 
         if best_distance <= tolerance:
-            return self.known_names[best_idx]
+            return self.known_ids[best_idx]
+
+        return None
+
+    def recognize_frame(self, frame, tolerance=0.5):
+        if not self.known_encodings:
+            return None
+
+        locations = face_recognition.face_locations(frame)
+        if not locations:
+            return None
+
+        encodings = face_recognition.face_encodings(frame, locations)
+
+        for enc in encodings:
+            faculty_id = self._match_face(enc, tolerance)
+            if faculty_id:
+                logging.info(f"[MATCH] {faculty_id}")
+                return faculty_id
 
         return None
 
@@ -92,19 +110,9 @@ class FaceRecognizer:
         try:
             while time.time() - start_time < timeout:
                 frame = cam.capture_array()
-                rgb = frame
-
-                locations = face_recognition.face_locations(rgb)
-                if not locations:
-                    continue
-
-                encodings = face_recognition.face_encodings(rgb, locations)
-
-                for enc in encodings:
-                    name = self._match_face(enc, tolerance)
-                    if name:
-                        logging.info(f"[MATCH] {name}")
-                        return name
+                faculty_id = self.recognize_frame(frame, tolerance)
+                if faculty_id:
+                    return faculty_id
 
             logging.info("No match found")
             return None

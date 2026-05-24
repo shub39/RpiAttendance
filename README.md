@@ -14,7 +14,6 @@ Also made a [Youtube Video](https://www.youtube.com/watch?v=sc254TMSav4) talking
 
 ## Requirements
 - Raspberry pi (Used in this project is 4B 8gb variant)
-- R307 fingerprint scanner with UART to USB Converter
 - ssd1305 OLED Display 
 - Raspberry pi camera
 - 4x4 matrix membrane keypad

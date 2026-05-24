@@ -19,12 +19,9 @@ package data
 import domain.DisplayRequest
 import domain.FaceDeleteRequest
 import domain.FaceEnrollRequest
+import domain.FaceEventsResponse
 import domain.FaceSearchResponse
 import domain.FaceSearchResult
-import domain.FingerPrintDeleteRequest
-import domain.FingerPrintEnrollResponse
-import domain.FingerPrintSearchResponse
-import domain.FingerprintSearchResult
 import domain.KeypadResponse
 import domain.KeypadResult
 import domain.Response
@@ -89,13 +86,18 @@ class SensorServerImpl(private val client: HttpClient) : SensorServer {
         }
     }
 
-    override suspend fun enrollFace(name: String): EmptyResult<SensorError> {
+    override suspend fun enrollFace(
+        id: String,
+        name: String,
+        dept: String,
+        designation: String,
+    ): EmptyResult<SensorError> {
         val request: Result<Response, SourceError> =
             mutex.withLock {
                 safeCall {
                     client.post(url = Url("$BASE_URL/face/enroll")) {
                         contentType(ContentType.Application.Json)
-                        setBody(FaceEnrollRequest(name))
+                        setBody(FaceEnrollRequest(id, name, dept, designation))
                     }
                 }
             }
@@ -139,56 +141,12 @@ class SensorServerImpl(private val client: HttpClient) : SensorServer {
         }
     }
 
-    override suspend fun enrollFingerPrint(): Result<Int, SensorError> {
-        val request: Result<FingerPrintEnrollResponse, SourceError> =
-            mutex.withLock { safeCall { client.post(url = Url("$BASE_URL/fingerprint/enroll")) } }
-
-        return when (request) {
-            is Result.Error -> {
-                if (request.error == SourceError.DataError.SENSOR_ERROR) {
-                    Result.Error(
-                        error = SensorError.FINGERPRINT_TIMEOUT,
-                        debugMessage = request.debugMessage,
-                    )
-                } else {
-                    Result.Error(
-                        error = SensorError.SERVER_ERROR,
-                        debugMessage = request.debugMessage,
-                    )
-                }
-            }
-
-            is Result.Success -> Result.Success(request.data.index)
-        }
-    }
-
-    override suspend fun searchFingerPrint(): Result<FingerprintSearchResult, SensorError> {
-        val request: Result<FingerPrintSearchResponse, SourceError> =
-            mutex.withLock { safeCall { client.post(url = Url("$BASE_URL/fingerprint/search")) } }
-
-        return when (request) {
-            is Result.Error -> {
-                Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
-            }
-
-            is Result.Success ->
-                Result.Success(
-                    if (request.data.index != null) {
-                        FingerprintSearchResult.Found(request.data.index!!)
-                    } else {
-                        FingerprintSearchResult.NotFound
-                    }
-                )
-        }
-    }
-
-    override suspend fun deleteFingerPrint(id: Int): EmptyResult<SensorError> {
-        val request: Result<Response, SourceError> =
+    override suspend fun getFaceEvents(since: Double?): Result<FaceEventsResponse, SensorError> {
+        val request: Result<FaceEventsResponse, SourceError> =
             mutex.withLock {
                 safeCall {
-                    client.post(url = Url("$BASE_URL/fingerprint/delete")) {
-                        contentType(ContentType.Application.Json)
-                        setBody(FingerPrintDeleteRequest(id))
+                    client.get(url = Url("$BASE_URL/face/events")) {
+                        since?.let { parameter("since", it) }
                     }
                 }
             }
@@ -198,7 +156,7 @@ class SensorServerImpl(private val client: HttpClient) : SensorServer {
                 Result.Error(error = SensorError.SERVER_ERROR, debugMessage = request.debugMessage)
             }
 
-            is Result.Success -> Result.Success(Unit)
+            is Result.Success -> Result.Success(request.data)
         }
     }
 

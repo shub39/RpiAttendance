@@ -25,8 +25,7 @@ import kotlinx.serialization.Serializable
  * identifiers and personal details.
  *
  * @property id The unique database identifier for the teacher. Defaults to 0 for new entries.
- * @property biometricId The optional unique identifier from a biometric system (e.g., fingerprint
- *   or facial scan). Can be null.
+ * @property biometricId The optional unique identifier for enrolled face data. Can be null.
  * @property firstName The teacher's first name.
  * @property lastName The teacher's last name.
  * @property subjectTaught The primary subject the teacher is responsible for teaching.

@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 private fun getDatabaseBuilder(): RoomDatabase.Builder<ServerDatabase> {
-    return Room.databaseBuilder<ServerDatabase>(name = "server_database.db")
+    return Room.databaseBuilder<ServerDatabase>(name = "faculty_attendance_server.db")
 }
 
 fun getRoomDatabase(

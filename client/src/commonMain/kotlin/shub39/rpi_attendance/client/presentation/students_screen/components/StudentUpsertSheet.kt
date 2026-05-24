@@ -62,8 +62,7 @@ import rpiattendance.client.generated.resources.add_student
 import rpiattendance.client.generated.resources.delete
 import rpiattendance.client.generated.resources.edit
 import rpiattendance.client.generated.resources.edit_student
-import rpiattendance.client.generated.resources.fingerprint
-import rpiattendance.client.generated.resources.fingerprint_off
+import rpiattendance.client.generated.resources.person_book
 import rpiattendance.client.generated.resources.save
 import shub39.rpi_attendance.client.presentation.theme.AppTheme
 
@@ -196,16 +195,12 @@ fun StudentUpsertSheet(
                             Icon(
                                 painter =
                                     painterResource(
-                                        if (newStudent.biometricId == null) {
-                                            Res.drawable.fingerprint_off
-                                        } else {
-                                            Res.drawable.fingerprint
-                                        }
+                                        Res.drawable.person_book
                                     ),
                                 contentDescription = null,
                             )
                         },
-                        headlineContent = { Text(text = "Biometrics") },
+                        headlineContent = { Text(text = "Face Data") },
                         supportingContent = {
                             Text(
                                 text =
@@ -213,13 +208,11 @@ fun StudentUpsertSheet(
                                         newStudent.biometricId == null &&
                                             enrollState !is EnrollState.EnrollComplete
                                     ) {
-                                        when (enrollState) {
-                                            is EnrollState.EnrollFailed -> "Enroll Failed"
-                                            EnrollState.Enrolling -> "Enrolling"
-                                            EnrollState.FingerprintEnrolled ->
-                                                "Fingerprint Enrolled..."
-                                            EnrollState.Idle -> "Not Enrolled"
-                                        }
+                                            when (enrollState) {
+                                                is EnrollState.EnrollFailed -> "Enroll Failed"
+                                                EnrollState.Enrolling -> "Enrolling"
+                                                EnrollState.Idle -> "Not Enrolled"
+                                            }
                                     } else {
                                         "Enrolled"
                                     }
@@ -259,10 +252,10 @@ fun StudentUpsertSheet(
                     )
                 } else {
                     ListItem(
-                        headlineContent = { Text("Enroll Biometrics after saving data") },
+                        headlineContent = { Text("Enroll face after saving data") },
                         leadingContent = {
                             Icon(
-                                painter = painterResource(Res.drawable.fingerprint_off),
+                                painter = painterResource(Res.drawable.person_book),
                                 contentDescription = null,
                             )
                         },

@@ -24,7 +24,6 @@ import kotlinx.serialization.Serializable
 
 enum class SensorError : RootError {
     SERVER_ERROR,
-    FINGERPRINT_TIMEOUT,
     FACE_TIMEOUT,
 }
 
@@ -36,23 +35,23 @@ enum class SensorError : RootError {
 
 @Serializable data class DisplayRequest(val lines: List<String>)
 
-@Serializable data class FaceDeleteRequest(val name: String)
+@Serializable data class FaceDeleteRequest(val id: String)
 
-@Serializable data class FaceEnrollRequest(val name: String)
-
-@Serializable data class FingerPrintDeleteRequest(val id: Int)
+@Serializable
+data class FaceEnrollRequest(
+    val id: String,
+    val name: String,
+    val dept: String,
+    val designation: String,
+)
 
 @Serializable data class FaceSearchResponse(val match: String?)
 
-@Serializable data class FingerPrintEnrollResponse(val index: Int)
+@Serializable data class Faculty(val id: String, val name: String, val dept: String, val designation: String)
 
-@Serializable data class FingerPrintSearchResponse(val index: Int?)
+@Serializable data class FaceEvent(val faculty: Faculty, val login_time: String, val timestamp: Double)
 
-sealed interface FingerprintSearchResult {
-    data object NotFound : FingerprintSearchResult
-
-    data class Found(val id: Int) : FingerprintSearchResult
-}
+@Serializable data class FaceEventsResponse(val events: List<FaceEvent>)
 
 sealed interface FaceSearchResult {
     data object NotFound : FaceSearchResult
@@ -98,7 +97,7 @@ sealed interface KeypadResult {
 
 /**
  * Defines the contract for interacting with a remote sensor device. This interface provides methods
- * for controlling various hardware components like a display, face and fingerprint scanners, and a
+ * for controlling hardware components like a display, face recognition, and a
  * keypad. All methods are suspend functions, they perform asynchronous operations.
  */
 interface SensorServer {
@@ -112,15 +111,11 @@ interface SensorServer {
 
     suspend fun displayText(lines: List<String>): EmptyResult<SensorError>
 
-    suspend fun enrollFace(name: String): EmptyResult<SensorError>
+    suspend fun enrollFace(id: String, name: String, dept: String, designation: String): EmptyResult<SensorError>
 
     suspend fun recognizeFace(): Result<FaceSearchResult, SensorError>
 
-    suspend fun enrollFingerPrint(): Result<Int, SensorError>
-
-    suspend fun searchFingerPrint(): Result<FingerprintSearchResult, SensorError>
-
-    suspend fun deleteFingerPrint(id: Int): EmptyResult<SensorError>
+    suspend fun getFaceEvents(since: Double?): Result<FaceEventsResponse, SensorError>
 
     suspend fun deleteFace(id: String): EmptyResult<SensorError>
 
