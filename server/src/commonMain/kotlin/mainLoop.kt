@@ -25,7 +25,11 @@ import errors.onSuccess
 import kotlin.time.Clock
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import models.AttendanceLog
 import models.AttendanceStatus
@@ -39,9 +43,29 @@ suspend fun mainLoop(
     sensorServer.displayText(listOf("Rpiattendance", "by shub39"))
     delay(2000)
 
-    var lastFaceEventTimestamp: Double? = null
+    var lastFaceEventTimestamp =
+        when (val pendingFaceEvents = sensorServer.getFaceEvents(null)) {
+            is Result.Error -> {
+                logError(
+                    "Face Events",
+                    pendingFaceEvents.error,
+                    pendingFaceEvents.debugMessage,
+                )
+                null
+            }
+
+            is Result.Success -> {
+                val latestTimestamp = pendingFaceEvents.data.events.maxOfOrNull { it.timestamp }
+                if (latestTimestamp != null) {
+                    logInfo("Discarded pending face events before main loop")
+                }
+                latestTimestamp
+            }
+        }
 
     while (true) {
+        sensorServer.displayText(listOf("Detecting Faces"))
+
         if (sensorServer.isAdminOperationActive.first()) {
             logInfo("Admin Operation in process")
             delay(1000)
@@ -131,6 +155,8 @@ private suspend fun processAttendance(
             entityId = teacher.entityId,
             attendanceLogDao = attendanceLogDao,
         )
+        delay(3000)
+
         return true
     }
 
@@ -138,7 +164,15 @@ private suspend fun processAttendance(
 }
 
 private fun currentLoginTime(): String =
-    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time.toString()
+    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time.format(
+        LocalTime.Format {
+            hour()
+            char(':')
+            minute()
+            char(':')
+            second()
+        }
+    )
 
 private suspend fun logAttendance(
     biometricId: String,
