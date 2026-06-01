@@ -17,6 +17,7 @@
 import data.database.AttendanceLogDao
 import data.database.TeacherDao
 import data.toAttendanceLogEntity
+import data.toTeacher
 import domain.FaceEvent
 import domain.KeypadResult
 import domain.SensorServer
@@ -34,6 +35,8 @@ import kotlinx.datetime.toLocalDateTime
 import models.AttendanceLog
 import models.AttendanceStatus
 import models.EntityType
+import models.Teacher
+import kotlin.time.Instant
 
 suspend fun mainLoop(
     teacherDao: TeacherDao,
@@ -147,13 +150,14 @@ private suspend fun processAttendance(
     attendanceLogDao: AttendanceLogDao,
 ): Boolean {
     teacherDao.getTeacherById(biometricId)?.let { teacher ->
-        sensorServer.displayText(listOf(teacher.name, teacher.id, currentLoginTime()))
         logInfo("$source Found Faculty ${teacher.name} : ${teacher.dept}")
         logAttendance(
             biometricId = biometricId,
             entityType = EntityType.TEACHER,
             entityId = teacher.entityId,
             attendanceLogDao = attendanceLogDao,
+            sensorServer = sensorServer,
+            teacher = teacher.toTeacher()
         )
         delay(3000)
 
@@ -163,27 +167,28 @@ private suspend fun processAttendance(
     return false
 }
 
-private fun currentLoginTime(): String =
-    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time.format(
+private fun Instant.toFormattedString(): String =
+    toLocalDateTime(TimeZone.UTC).time.format(
         LocalTime.Format {
             hour()
             char(':')
             minute()
-            char(':')
-            second()
         }
     )
+
 
 private suspend fun logAttendance(
     biometricId: String,
     entityType: EntityType,
     entityId: Long,
     attendanceLogDao: AttendanceLogDao,
+    sensorServer: SensorServer,
+    teacher: Teacher
 ) {
     val pastLogsForToday =
         attendanceLogDao.getAttendanceLogByBiometricId(biometricId).filter {
             it.timeStamp.toLocalDateTime(TimeZone.currentSystemDefault()).date ==
-                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         }
 
     if (
@@ -197,19 +202,32 @@ private suspend fun logAttendance(
         return
     }
 
+    val attendanceStatus = if (pastLogsForToday.size % 2 == 0) {
+        AttendanceStatus.IN
+    } else {
+        AttendanceStatus.OUT
+    }
+    val timeStamp = Clock.System.now()
+
     attendanceLogDao.upsert(
         AttendanceLog(
-                biometricId = biometricId,
-                entityType = entityType,
-                entityId = entityId,
-                timeStamp = Clock.System.now(),
-                attendanceStatus =
-                    if (pastLogsForToday.size % 2 == 0) {
-                        AttendanceStatus.IN
-                    } else {
-                        AttendanceStatus.OUT
-                    },
-            )
+            biometricId = biometricId,
+            entityType = entityType,
+            entityId = entityId,
+            timeStamp = timeStamp,
+            attendanceStatus = attendanceStatus,
+        )
             .toAttendanceLogEntity()
+    )
+
+    sensorServer.displayText(
+        listOf(
+            "Name: ${teacher.name}",
+            "Id: ${teacher.id}",
+            when (attendanceStatus) {
+                AttendanceStatus.IN -> "log in: ${timeStamp.toFormattedString()}"
+                AttendanceStatus.OUT -> "log out: ${timeStamp.toFormattedString()}"
+            }
+        )
     )
 }
